@@ -7,7 +7,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** `@DataJpaTest` (H2 in-memory, test-only profile) saves a `User` and finds it by email; schema has a unique constraint on `email`.
   **Commit:** `feat(user): add User entity, Role enum, repository`
 
-- [ ] **1.2 Course + Enrollment entities/repos**
+- [x] **1.2 Course + Enrollment entities/repos**
   `Course.instructor` FK indexed; `Course.code` unique; `Enrollment` composite unique `(student_id, course_id)`; `Enrollment.course` gets its own index per §2a rationale.
   **Acceptance:** `@DataJpaTest` — saving a duplicate `(student, course)` enrollment throws `DataIntegrityViolationException`; saving a second course with an already-used `code` (any `term`) throws `DataIntegrityViolationException`.
   **Commit:** `feat(course): add Course and Enrollment entities, repositories`
