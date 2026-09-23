@@ -2,7 +2,7 @@
 
 Status legend: `[x]` done, `[ ]` not yet.
 
-- [ ] **2.1 JwtTokenProvider (pure unit, no Spring context)**
+- [x] **2.1 JwtTokenProvider (pure unit, no Spring context)**
   Generate/parse access + refresh tokens, embed `userId` + `role`, configurable expiry.
   **Acceptance:** plain JUnit test — token generated then parsed returns the same `userId`/`role`; an expired token (mint with `-1s` expiry) fails validation; a tampered token fails validation.
   **Commit:** `feat(security): add JwtTokenProvider with unit tests`
