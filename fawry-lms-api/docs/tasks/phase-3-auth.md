@@ -2,7 +2,7 @@
 
 Status legend: `[x]` done, `[ ]` not yet.
 
-- [ ] **3.1 POST /api/auth/signup**
+- [x] **3.1 POST /api/auth/signup**
   Public self-registration. `SignupRequest` DTO has `fullName`/`email`/`password` only — **no `role` field exists on the DTO**, so anything sent in a `role` key is simply unbound/ignored, not validated or rejected. Created user is always `STUDENT`, `isActive=true`, and gets an auto-generated `profilePictureUrl` (DiceBear avatar) since none can be supplied at signup. Returns access + refresh tokens immediately — no separate login call needed.
   **Acceptance:** integration test — valid signup → 201, response includes both tokens and the created user is `STUDENT`; posting a body that also includes `"role":"ADMIN"` → still creates a `STUDENT` (no error, field is just ignored); duplicate email → 409; missing/invalid field (bad email format, blank password) → 400/422; created user's `profilePictureUrl` is non-null.
   **Commit:** `feat(auth): implement POST /api/auth/signup`
