@@ -2,7 +2,7 @@
 
 Status legend: `[x]` done, `[ ]` not yet.
 
-- [ ] **1.1 User entity + Role enum + UserRepository**
+- [x] **1.1 User entity + Role enum + UserRepository**
   Fields per spec §2. `email` unique index (`@Column(unique=true)`), `role`/`isActive` indexed per §2a.
   **Acceptance:** `@DataJpaTest` (H2 in-memory, test-only profile) saves a `User` and finds it by email; schema has a unique constraint on `email`.
   **Commit:** `feat(user): add User entity, Role enum, repository`
