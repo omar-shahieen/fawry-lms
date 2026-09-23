@@ -6,6 +6,8 @@ import com.fawry.lms.user.dto.EnrolledCourseResponse;
 import com.fawry.lms.user.dto.UserProfileResponse;
 import com.fawry.lms.user.dto.UpdateCurrentUserRequest;
 import com.fawry.lms.user.dto.AdminUserResponse;
+import com.fawry.lms.user.dto.CreateUserRequest;
+import com.fawry.lms.user.dto.AdminUpdateUserRequest;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
 
@@ -17,16 +19,26 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import com.fawry.lms.user.utils.ProfilePictureUrlGenerator;
 
 @Service
 public class UserService {
 
         private final UserRepository userRepository;
         private final EnrollmentRepository enrollmentRepository;
+        private final PasswordEncoder passwordEncoder;
+        private final ProfilePictureUrlGenerator profilePictureUrlGenerator;
 
-        public UserService(UserRepository userRepository, EnrollmentRepository enrollmentRepository) {
+        public UserService(
+                        UserRepository userRepository,
+                        EnrollmentRepository enrollmentRepository,
+                        PasswordEncoder passwordEncoder,
+                        ProfilePictureUrlGenerator profilePictureUrlGenerator) {
                 this.userRepository = userRepository;
                 this.enrollmentRepository = enrollmentRepository;
+                this.passwordEncoder = passwordEncoder;
+                this.profilePictureUrlGenerator = profilePictureUrlGenerator;
         }
 
         @Transactional(readOnly = true)
@@ -71,6 +83,61 @@ public class UserService {
         public AdminUserResponse getUser(UUID id) {
                 return userRepository.findById(id)
                                 .map(this::toAdminResponse)
+                                .orElseThrow(() -> new EntityNotFoundException("User not found."));
+        }
+
+        @Transactional
+        public AdminUserResponse createUser(CreateUserRequest request) {
+                User user = new User();
+                user.setFullName(request.fullName());
+                user.setEmail(request.email());
+                user.setPassword(passwordEncoder.encode(request.password()));
+                user.setRole(request.role());
+                user.setActive(true);
+                user.setProfilePictureUrl(request.profilePictureUrl() == null
+                                ? profilePictureUrlGenerator.generate()
+                                : request.profilePictureUrl());
+                return toAdminResponse(userRepository.saveAndFlush(user));
+        }
+
+        @Transactional
+        public AdminUserResponse updateUser(UUID id, AdminUpdateUserRequest request) {
+                User user = findUser(id);
+                if (request.fullName() != null) {
+                        user.setFullName(request.fullName());
+                }
+                if (request.email() != null) {
+                        user.setEmail(request.email());
+                }
+                if (request.password() != null) {
+                        user.setPassword(passwordEncoder.encode(request.password()));
+                }
+                if (request.role() != null && request.role() != user.getRole()) {
+                        user.setRole(request.role());
+                        user.setAccessToken(null);
+                }
+                if (request.profilePictureUrl() != null) {
+                        user.setProfilePictureUrl(request.profilePictureUrl());
+                }
+                if (request.isActive() != null) {
+                        user.setActive(request.isActive());
+                        if (!request.isActive()) {
+                                user.setAccessToken(null);
+                        }
+                }
+                return toAdminResponse(userRepository.saveAndFlush(user));
+        }
+
+        @Transactional
+        public AdminUserResponse deactivateUser(UUID id) {
+                User user = findUser(id);
+                user.setActive(false);
+                user.setAccessToken(null);
+                return toAdminResponse(userRepository.saveAndFlush(user));
+        }
+
+        private User findUser(UUID id) {
+                return userRepository.findById(id)
                                 .orElseThrow(() -> new EntityNotFoundException("User not found."));
         }
 

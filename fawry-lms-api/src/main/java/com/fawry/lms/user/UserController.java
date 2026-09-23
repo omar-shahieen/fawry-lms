@@ -3,6 +3,8 @@ package com.fawry.lms.user;
 import com.fawry.lms.user.dto.UserProfileResponse;
 import com.fawry.lms.user.dto.UpdateCurrentUserRequest;
 import com.fawry.lms.user.dto.AdminUserResponse;
+import com.fawry.lms.user.dto.CreateUserRequest;
+import com.fawry.lms.user.dto.AdminUpdateUserRequest;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
 
@@ -15,6 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.UUID;
@@ -54,5 +60,22 @@ public class UserController {
     @GetMapping("/{id}")
     public AdminUserResponse getUser(@PathVariable UUID id) {
         return userService.getUser(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<AdminUserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
+    }
+
+    @PatchMapping("/{id}")
+    public AdminUserResponse updateUser(
+            @PathVariable UUID id,
+            @RequestBody AdminUpdateUserRequest request) {
+        return userService.updateUser(id, request);
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    public AdminUserResponse deactivateUser(@PathVariable UUID id) {
+        return userService.deactivateUser(id);
     }
 }
