@@ -1,6 +1,8 @@
 package com.fawry.lms.common;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.OptimisticLockException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +55,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ApiErrorResponse> handleConflict(ConflictException exception) {
         return response(HttpStatus.CONFLICT, exception.getMessage());
+    }
+
+    @ExceptionHandler({OptimisticLockException.class, ObjectOptimisticLockingFailureException.class})
+    public ResponseEntity<ApiErrorResponse> handleOptimisticLock() {
+        return response(HttpStatus.CONFLICT, "The quiz attempt was submitted concurrently.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

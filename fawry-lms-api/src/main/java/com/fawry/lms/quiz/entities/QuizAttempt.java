@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 
 import java.time.Instant;
 
@@ -34,7 +35,7 @@ public class QuizAttempt {
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
 
-    @Column(name = "started_at", nullable = false, updatable = false)
+    @Column(name = "started_at", nullable = false)
     private Instant startedAt;
 
     @Column(name = "submitted_at")
@@ -44,6 +45,9 @@ public class QuizAttempt {
 
     @Column(name = "total_questions")
     private Integer totalQuestions;
+
+    @Version
+    private Long version;
 
     public QuizAttempt() {
     }

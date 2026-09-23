@@ -14,10 +14,14 @@ import com.fawry.lms.quiz.dtos.QuizDetailResponse;
 import com.fawry.lms.quiz.dtos.QuizStudentQuestionResponse;
 import com.fawry.lms.quiz.dtos.QuizStudentOptionResponse;
 import com.fawry.lms.quiz.dtos.QuizAnswerResponse;
+import com.fawry.lms.quiz.dtos.SubmitAnswerRequest;
+import com.fawry.lms.quiz.dtos.SubmitQuizRequest;
+import com.fawry.lms.quiz.dtos.SubmitQuizResponse;
 import com.fawry.lms.quiz.entities.Quiz;
 import com.fawry.lms.quiz.entities.Question;
 import com.fawry.lms.quiz.entities.QuestionOption;
 import com.fawry.lms.quiz.entities.QuizAttempt;
+import com.fawry.lms.quiz.entities.QuizAnswer;
 import com.fawry.lms.quiz.repositories.QuestionOptionRepository;
 import com.fawry.lms.quiz.repositories.QuestionRepository;
 import com.fawry.lms.quiz.repositories.QuizAnswerRepository;
@@ -33,6 +37,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.time.Instant;
+import java.util.Map;
+import java.util.stream.Collectors;
+import com.fawry.lms.common.ConflictException;
 
 @Service
 public class QuizService {
@@ -140,6 +147,58 @@ public class QuizService {
                 attempt == null ? null : attempt.getTotalQuestions(),
                 quiz.getQuestions().stream().map(this::toStudentQuestionResponse).toList(),
                 answers);
+    }
+
+    @Transactional
+    public SubmitQuizResponse submit(Long quizId, User student, SubmitQuizRequest request) {
+        Quiz quiz = findQuiz(quizId);
+        if (!quiz.isPublished()) {
+            throw new IllegalArgumentException("Quiz is not published.");
+        }
+        QuizAttempt attempt = attemptRepository.findByQuizIdAndStudentId(quizId, student.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Quiz attempt has not been started."));
+        if (attempt.getSubmittedAt() != null) {
+            throw new ConflictException("Quiz attempt has already been submitted.");
+        }
+        if (Instant.now().isAfter(attempt.getStartedAt().plusSeconds(quiz.getDurationMinutes().longValue() * 60))) {
+            throw new IllegalArgumentException("Quiz attempt has expired.");
+        }
+
+        Map<Long, SubmitAnswerRequest> submitted = request.answers().stream()
+                .collect(Collectors.toMap(SubmitAnswerRequest::questionId, answer -> answer, (first, second) -> second));
+        List<QuizAnswer> answers = new java.util.ArrayList<>();
+        int score = 0;
+        for (Question question : quiz.getQuestions()) {
+            SubmitAnswerRequest answerRequest = submitted.get(question.getId());
+            QuestionOption selected = answerRequest == null || answerRequest.selectedOptionId() == null
+                    ? null
+                    : question.getOptions().stream()
+                            .filter(option -> option.getId().equals(answerRequest.selectedOptionId()))
+                            .findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("Selected option does not belong to the question."));
+            boolean correct = selected != null && selected.isCorrect();
+            if (correct) score++;
+            QuizAnswer answer = new QuizAnswer();
+            answer.setAttempt(attempt);
+            answer.setQuestion(question);
+            answer.setSelectedOption(selected);
+            answer.setCorrect(correct);
+            answers.add(answer);
+        }
+        answerRepository.saveAllAndFlush(answers);
+        attempt.setScore(score);
+        attempt.setTotalQuestions(quiz.getQuestions().size());
+        attempt.setSubmittedAt(Instant.now());
+        attemptRepository.saveAndFlush(attempt);
+        return new SubmitQuizResponse(
+                attempt.getId(),
+                score,
+                attempt.getTotalQuestions(),
+                attempt.getSubmittedAt(),
+                answers.stream().map(answer -> new QuizAnswerResponse(
+                        answer.getQuestion().getId(),
+                        answer.getSelectedOption() == null ? null : answer.getSelectedOption().getId(),
+                        answer.isCorrect())).toList());
     }
 
     @Transactional
