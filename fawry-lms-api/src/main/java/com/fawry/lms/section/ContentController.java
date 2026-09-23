@@ -1,8 +1,8 @@
 package com.fawry.lms.section;
 
-import com.fawry.lms.section.dto.ContentResponse;
-import com.fawry.lms.section.dto.CreateContentRequest;
-import com.fawry.lms.section.dto.UpdateContentRequest;
+import com.fawry.lms.section.dtos.ContentResponse;
+import com.fawry.lms.section.dtos.CreateContentRequest;
+import com.fawry.lms.section.dtos.UpdateContentRequest;
 
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;

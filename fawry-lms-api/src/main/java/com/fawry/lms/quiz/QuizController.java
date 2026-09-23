@@ -1,12 +1,12 @@
 package com.fawry.lms.quiz;
 
-import com.fawry.lms.quiz.dto.CreateQuizRequest;
-import com.fawry.lms.quiz.dto.QuizResponse;
-import com.fawry.lms.quiz.dto.UpdateQuizRequest;
-import com.fawry.lms.quiz.dto.CreateQuestionRequest;
-import com.fawry.lms.quiz.dto.UpdateQuestionRequest;
-import com.fawry.lms.quiz.dto.QuestionResponse;
-import com.fawry.lms.quiz.dto.QuizDetailResponse;
+import com.fawry.lms.quiz.dtos.CreateQuizRequest;
+import com.fawry.lms.quiz.dtos.QuizResponse;
+import com.fawry.lms.quiz.dtos.UpdateQuizRequest;
+import com.fawry.lms.quiz.dtos.CreateQuestionRequest;
+import com.fawry.lms.quiz.dtos.UpdateQuestionRequest;
+import com.fawry.lms.quiz.dtos.QuestionResponse;
+import com.fawry.lms.quiz.dtos.QuizDetailResponse;
 import com.fawry.lms.user.entities.User;
 
 import jakarta.validation.Valid;

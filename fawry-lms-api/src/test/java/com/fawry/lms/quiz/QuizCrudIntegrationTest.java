@@ -2,6 +2,7 @@ package com.fawry.lms.quiz;
 
 import com.fawry.lms.course.CourseRepository;
 import com.fawry.lms.course.entities.Course;
+import com.fawry.lms.quiz.repositories.QuizRepository;
 import com.fawry.lms.security.JwtTokenProvider;
 import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
@@ -51,17 +52,17 @@ class QuizCrudIntegrationTest {
         saveQuiz(course, "Draft", false);
 
         mockMvc.perform(post("/api/courses/" + course.getId() + "/enroll")
-                        .header("Authorization", bearerToken(student)))
+                .header("Authorization", bearerToken(student)))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/api/courses/" + course.getId() + "/quizzes")
-                        .header("Authorization", bearerToken(student)))
+                .header("Authorization", bearerToken(student)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].published").value(true));
 
         mockMvc.perform(get("/api/courses/" + course.getId() + "/quizzes")
-                        .header("Authorization", bearerToken(instructor)))
+                .header("Authorization", bearerToken(instructor)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2));
     }
@@ -74,9 +75,9 @@ class QuizCrudIntegrationTest {
         var quiz = saveQuiz(course, "Quiz", false);
 
         mockMvc.perform(patch("/api/quizzes/" + quiz.getId())
-                        .header("Authorization", bearerToken(other))
-                        .contentType("application/json")
-                        .content("{\"published\":true}"))
+                .header("Authorization", bearerToken(other))
+                .contentType("application/json")
+                .content("{\"published\":true}"))
                 .andExpect(status().isForbidden());
     }
 

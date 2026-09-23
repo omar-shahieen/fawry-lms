@@ -1,11 +1,11 @@
 package com.fawry.lms.course;
 
-import com.fawry.lms.course.dto.CourseResponse;
-import com.fawry.lms.course.dto.CreateCourseRequest;
-import com.fawry.lms.course.dto.UpdateCourseRequest;
-import com.fawry.lms.course.dto.AssignInstructorRequest;
-import com.fawry.lms.course.dto.CourseStudentResponse;
-import com.fawry.lms.course.dto.EnrollmentResponse;
+import com.fawry.lms.course.dtos.CourseResponse;
+import com.fawry.lms.course.dtos.CreateCourseRequest;
+import com.fawry.lms.course.dtos.UpdateCourseRequest;
+import com.fawry.lms.course.dtos.AssignInstructorRequest;
+import com.fawry.lms.course.dtos.CourseStudentResponse;
+import com.fawry.lms.course.dtos.EnrollmentResponse;
 import com.fawry.lms.user.entities.User;
 
 import org.springframework.data.domain.Page;

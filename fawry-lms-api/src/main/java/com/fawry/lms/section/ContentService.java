@@ -1,10 +1,12 @@
 package com.fawry.lms.section;
 
-import com.fawry.lms.section.dto.ContentResponse;
-import com.fawry.lms.section.dto.CreateContentRequest;
-import com.fawry.lms.section.dto.UpdateContentRequest;
+import com.fawry.lms.section.dtos.ContentResponse;
+import com.fawry.lms.section.dtos.CreateContentRequest;
+import com.fawry.lms.section.dtos.UpdateContentRequest;
 import com.fawry.lms.section.entities.MarkdownContent;
 import com.fawry.lms.section.entities.Section;
+import com.fawry.lms.section.repositories.MarkdownContentRepository;
+import com.fawry.lms.section.repositories.SectionRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -46,8 +48,10 @@ public class ContentService {
     @Transactional
     public ContentResponse update(Long id, UpdateContentRequest request) {
         MarkdownContent content = findContent(id);
-        if (request.title() != null) content.setTitle(request.title());
-        if (request.body() != null) content.setBody(request.body());
+        if (request.title() != null)
+            content.setTitle(request.title());
+        if (request.body() != null)
+            content.setBody(request.body());
         return toResponse(contentRepository.saveAndFlush(content));
     }
 

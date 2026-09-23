@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fawry.lms.auth.dto.*;
+import com.fawry.lms.auth.dtos.*;
 import com.fawry.lms.user.entities.User;
 
 @RestController

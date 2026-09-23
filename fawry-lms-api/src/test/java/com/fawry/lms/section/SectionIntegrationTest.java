@@ -2,6 +2,7 @@ package com.fawry.lms.section;
 
 import com.fawry.lms.course.CourseRepository;
 import com.fawry.lms.course.entities.Course;
+import com.fawry.lms.section.repositories.SectionRepository;
 import com.fawry.lms.security.JwtTokenProvider;
 import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
@@ -49,22 +50,22 @@ class SectionIntegrationTest {
         Course course = saveCourse(instructor);
         String enrollment = "";
         mockMvc.perform(post("/api/courses/" + course.getId() + "/enroll")
-                        .header("Authorization", bearerToken(student)))
+                .header("Authorization", bearerToken(student)))
                 .andExpect(status().isOk());
 
         mockMvc.perform(post("/api/courses/" + course.getId() + "/sections")
-                        .header("Authorization", bearerToken(instructor))
-                        .contentType("application/json")
-                        .content("{\"title\":\"Second\",\"orderIndex\":2}"))
+                .header("Authorization", bearerToken(instructor))
+                .contentType("application/json")
+                .content("{\"title\":\"Second\",\"orderIndex\":2}"))
                 .andExpect(status().isOk());
         mockMvc.perform(post("/api/courses/" + course.getId() + "/sections")
-                        .header("Authorization", bearerToken(instructor))
-                        .contentType("application/json")
-                        .content("{\"title\":\"First\",\"orderIndex\":1}"))
+                .header("Authorization", bearerToken(instructor))
+                .contentType("application/json")
+                .content("{\"title\":\"First\",\"orderIndex\":1}"))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/api/courses/" + course.getId() + "/sections")
-                        .header("Authorization", bearerToken(student)))
+                .header("Authorization", bearerToken(student)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("First"))
                 .andExpect(jsonPath("$[1].title").value("Second"));
@@ -78,13 +79,13 @@ class SectionIntegrationTest {
         Course course = saveCourse(instructor);
 
         mockMvc.perform(get("/api/courses/" + course.getId() + "/sections")
-                        .header("Authorization", bearerToken(student)))
+                .header("Authorization", bearerToken(student)))
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/courses/" + course.getId() + "/sections")
-                        .header("Authorization", bearerToken(other))
-                        .contentType("application/json")
-                        .content("{\"title\":\"Denied\",\"orderIndex\":1}"))
+                .header("Authorization", bearerToken(other))
+                .contentType("application/json")
+                .content("{\"title\":\"Denied\",\"orderIndex\":1}"))
                 .andExpect(status().isForbidden());
     }
 

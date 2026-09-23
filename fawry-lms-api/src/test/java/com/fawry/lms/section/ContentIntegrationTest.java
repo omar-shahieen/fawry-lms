@@ -4,6 +4,7 @@ import com.fawry.lms.course.CourseRepository;
 import com.fawry.lms.course.entities.Course;
 import com.fawry.lms.security.JwtTokenProvider;
 import com.fawry.lms.section.entities.Section;
+import com.fawry.lms.section.repositories.SectionRepository;
 import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
@@ -51,23 +52,23 @@ class ContentIntegrationTest {
         Section section = saveSection(course);
 
         mockMvc.perform(post("/api/courses/" + course.getId() + "/enroll")
-                        .header("Authorization", bearerToken(enrolled)))
+                .header("Authorization", bearerToken(enrolled)))
                 .andExpect(status().isOk());
 
         mockMvc.perform(post("/api/sections/" + section.getId() + "/content")
-                        .header("Authorization", bearerToken(instructor))
-                        .contentType("application/json")
-                        .content("{\"title\":\"Intro\",\"body\":\"# Hello\"}"))
+                .header("Authorization", bearerToken(instructor))
+                .contentType("application/json")
+                .content("{\"title\":\"Intro\",\"body\":\"# Hello\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Intro"));
 
         mockMvc.perform(get("/api/sections/" + section.getId() + "/content")
-                        .header("Authorization", bearerToken(enrolled)))
+                .header("Authorization", bearerToken(enrolled)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].body").value("# Hello"));
 
         mockMvc.perform(get("/api/sections/" + section.getId() + "/content")
-                        .header("Authorization", bearerToken(other)))
+                .header("Authorization", bearerToken(other)))
                 .andExpect(status().isForbidden());
     }
 

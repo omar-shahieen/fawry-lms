@@ -2,6 +2,7 @@ package com.fawry.lms.quiz;
 
 import com.fawry.lms.course.CourseRepository;
 import com.fawry.lms.course.entities.Course;
+import com.fawry.lms.quiz.repositories.QuizRepository;
 import com.fawry.lms.security.JwtTokenProvider;
 import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
@@ -55,9 +56,9 @@ class QuestionIntegrationTest {
                 """;
 
         mockMvc.perform(post("/api/quizzes/" + quiz.getId() + "/questions")
-                        .header("Authorization", bearerToken(instructor))
-                        .contentType("application/json")
-                        .content(invalid))
+                .header("Authorization", bearerToken(instructor))
+                .contentType("application/json")
+                .content(invalid))
                 .andExpect(status().isBadRequest());
     }
 
@@ -78,14 +79,14 @@ class QuestionIntegrationTest {
                 """;
 
         mockMvc.perform(post("/api/quizzes/" + quiz.getId() + "/questions")
-                        .header("Authorization", bearerToken(instructor))
-                        .contentType("application/json")
-                        .content(valid))
+                .header("Authorization", bearerToken(instructor))
+                .contentType("application/json")
+                .content(valid))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.options[1].isCorrect").value(true));
 
         mockMvc.perform(get("/api/quizzes/" + quiz.getId() + "/questions")
-                        .header("Authorization", bearerToken(instructor)))
+                .header("Authorization", bearerToken(instructor)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].options[0].isCorrect").value(false));
     }

@@ -2,10 +2,11 @@ package com.fawry.lms.section;
 
 import com.fawry.lms.course.CourseRepository;
 import com.fawry.lms.course.entities.Course;
-import com.fawry.lms.section.dto.CreateSectionRequest;
-import com.fawry.lms.section.dto.SectionResponse;
-import com.fawry.lms.section.dto.UpdateSectionRequest;
+import com.fawry.lms.section.dtos.CreateSectionRequest;
+import com.fawry.lms.section.dtos.SectionResponse;
+import com.fawry.lms.section.dtos.UpdateSectionRequest;
 import com.fawry.lms.section.entities.Section;
+import com.fawry.lms.section.repositories.SectionRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -42,8 +43,10 @@ public class SectionService {
     @Transactional
     public SectionResponse update(Long id, UpdateSectionRequest request) {
         Section section = findSection(id);
-        if (request.title() != null) section.setTitle(request.title());
-        if (request.orderIndex() != null) section.setOrderIndex(request.orderIndex());
+        if (request.title() != null)
+            section.setTitle(request.title());
+        if (request.orderIndex() != null)
+            section.setOrderIndex(request.orderIndex());
         return toResponse(sectionRepository.saveAndFlush(section));
     }
 
@@ -68,6 +71,7 @@ public class SectionService {
     }
 
     private SectionResponse toResponse(Section section) {
-        return new SectionResponse(section.getId(), section.getCourse().getId(), section.getTitle(), section.getOrderIndex());
+        return new SectionResponse(section.getId(), section.getCourse().getId(), section.getTitle(),
+                section.getOrderIndex());
     }
 }

@@ -1,10 +1,10 @@
 package com.fawry.lms.user;
 
-import com.fawry.lms.user.dto.UserProfileResponse;
-import com.fawry.lms.user.dto.UpdateCurrentUserRequest;
-import com.fawry.lms.user.dto.AdminUserResponse;
-import com.fawry.lms.user.dto.CreateUserRequest;
-import com.fawry.lms.user.dto.AdminUpdateUserRequest;
+import com.fawry.lms.user.dtos.UserProfileResponse;
+import com.fawry.lms.user.dtos.UpdateCurrentUserRequest;
+import com.fawry.lms.user.dtos.AdminUserResponse;
+import com.fawry.lms.user.dtos.CreateUserRequest;
+import com.fawry.lms.user.dtos.AdminUpdateUserRequest;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
 

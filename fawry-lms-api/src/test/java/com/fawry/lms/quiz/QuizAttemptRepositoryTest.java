@@ -5,6 +5,8 @@ import com.fawry.lms.course.CourseRepository;
 import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.quiz.entities.Quiz;
 import com.fawry.lms.quiz.entities.QuizAttempt;
+import com.fawry.lms.quiz.repositories.QuizAttemptRepository;
+import com.fawry.lms.quiz.repositories.QuizRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
 

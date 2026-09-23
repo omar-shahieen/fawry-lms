@@ -4,6 +4,7 @@ import com.fawry.lms.course.entities.Course;
 import com.fawry.lms.course.CourseRepository;
 import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.section.entities.Section;
+import com.fawry.lms.section.repositories.SectionRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
 

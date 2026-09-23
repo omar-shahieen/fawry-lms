@@ -17,10 +17,10 @@ com.fawry.lms
     ├── <Entity>Service.java            # at feature package root
     ├── <Entity>Repository.java         # at feature package root
     ├── entities/                       # JPA entities and domain enums
-    └── dto/                            # request/response DTOs
+    └── dtos/                            # request/response DTOs
 ```
 
-One module per bounded concept. Allowed sub-packages: `entities/` and `dto/` only — controllers, services, and repositories stay at the feature package root.
+One module per bounded concept. Allowed sub-packages: `entities/` and `dtos/` only — controllers, services, and repositories stay at the feature package root.
 
 ## Slice rules
 

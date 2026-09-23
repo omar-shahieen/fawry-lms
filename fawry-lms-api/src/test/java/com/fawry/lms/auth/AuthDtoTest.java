@@ -2,9 +2,9 @@ package com.fawry.lms.auth;
 
 import org.junit.jupiter.api.Test;
 
-import com.fawry.lms.auth.dto.AuthResponse;
-import com.fawry.lms.auth.dto.AuthenticatedUserResponse;
-import com.fawry.lms.auth.dto.SignupRequest;
+import com.fawry.lms.auth.dtos.AuthResponse;
+import com.fawry.lms.auth.dtos.AuthenticatedUserResponse;
+import com.fawry.lms.auth.dtos.SignupRequest;
 import com.fawry.lms.user.entities.Role;
 
 import java.util.UUID;

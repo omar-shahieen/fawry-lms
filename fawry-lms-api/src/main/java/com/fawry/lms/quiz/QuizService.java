@@ -2,22 +2,27 @@ package com.fawry.lms.quiz;
 
 import com.fawry.lms.course.CourseRepository;
 import com.fawry.lms.course.entities.Course;
-import com.fawry.lms.quiz.dto.CreateQuizRequest;
-import com.fawry.lms.quiz.dto.QuizResponse;
-import com.fawry.lms.quiz.dto.UpdateQuizRequest;
-import com.fawry.lms.quiz.dto.CreateQuestionRequest;
-import com.fawry.lms.quiz.dto.UpdateQuestionRequest;
-import com.fawry.lms.quiz.dto.QuestionResponse;
-import com.fawry.lms.quiz.dto.QuestionOptionRequest;
-import com.fawry.lms.quiz.dto.QuestionOptionResponse;
-import com.fawry.lms.quiz.dto.QuizDetailResponse;
-import com.fawry.lms.quiz.dto.QuizStudentQuestionResponse;
-import com.fawry.lms.quiz.dto.QuizStudentOptionResponse;
-import com.fawry.lms.quiz.dto.QuizAnswerResponse;
+import com.fawry.lms.quiz.dtos.CreateQuizRequest;
+import com.fawry.lms.quiz.dtos.QuizResponse;
+import com.fawry.lms.quiz.dtos.UpdateQuizRequest;
+import com.fawry.lms.quiz.dtos.CreateQuestionRequest;
+import com.fawry.lms.quiz.dtos.UpdateQuestionRequest;
+import com.fawry.lms.quiz.dtos.QuestionResponse;
+import com.fawry.lms.quiz.dtos.QuestionOptionRequest;
+import com.fawry.lms.quiz.dtos.QuestionOptionResponse;
+import com.fawry.lms.quiz.dtos.QuizDetailResponse;
+import com.fawry.lms.quiz.dtos.QuizStudentQuestionResponse;
+import com.fawry.lms.quiz.dtos.QuizStudentOptionResponse;
+import com.fawry.lms.quiz.dtos.QuizAnswerResponse;
 import com.fawry.lms.quiz.entities.Quiz;
 import com.fawry.lms.quiz.entities.Question;
 import com.fawry.lms.quiz.entities.QuestionOption;
 import com.fawry.lms.quiz.entities.QuizAttempt;
+import com.fawry.lms.quiz.repositories.QuestionOptionRepository;
+import com.fawry.lms.quiz.repositories.QuestionRepository;
+import com.fawry.lms.quiz.repositories.QuizAnswerRepository;
+import com.fawry.lms.quiz.repositories.QuizAttemptRepository;
+import com.fawry.lms.quiz.repositories.QuizRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
 
@@ -76,9 +81,12 @@ public class QuizService {
     @Transactional
     public QuizResponse update(Long id, UpdateQuizRequest request) {
         Quiz quiz = findQuiz(id);
-        if (request.title() != null) quiz.setTitle(request.title());
-        if (request.durationMinutes() != null) quiz.setDurationMinutes(request.durationMinutes());
-        if (request.published() != null) quiz.setPublished(request.published());
+        if (request.title() != null)
+            quiz.setTitle(request.title());
+        if (request.durationMinutes() != null)
+            quiz.setDurationMinutes(request.durationMinutes());
+        if (request.published() != null)
+            quiz.setPublished(request.published());
         return toResponse(quizRepository.saveAndFlush(quiz));
     }
 
@@ -153,8 +161,10 @@ public class QuizService {
     @Transactional
     public QuestionResponse updateQuestion(Long id, UpdateQuestionRequest request) {
         Question question = findQuestion(id);
-        if (request.text() != null) question.setText(request.text());
-        if (request.orderIndex() != null) question.setOrderIndex(request.orderIndex());
+        if (request.text() != null)
+            question.setText(request.text());
+        if (request.orderIndex() != null)
+            question.setOrderIndex(request.orderIndex());
         if (request.options() != null) {
             validateOptions(request.options());
             optionRepository.deleteAll(question.getOptions());
@@ -201,7 +211,8 @@ public class QuizService {
 
     private void validateOptions(List<QuestionOptionRequest> options) {
         if (options.size() < 2 || options.stream().filter(QuestionOptionRequest::isCorrect).count() != 1) {
-            throw new IllegalArgumentException("A question requires at least two options and exactly one correct option.");
+            throw new IllegalArgumentException(
+                    "A question requires at least two options and exactly one correct option.");
         }
     }
 
@@ -212,7 +223,7 @@ public class QuizService {
                 question.getOrderIndex(),
                 question.getOptions().stream()
                         .map(option -> new QuestionOptionResponse(option.getId(), option.getText(), option.isCorrect()))
-                .toList());
+                        .toList());
     }
 
     private QuizStudentQuestionResponse toStudentQuestionResponse(Question question) {

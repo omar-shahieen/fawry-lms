@@ -17,7 +17,7 @@ com.fawry.lms
     ├── <Entity>Repository.java
     ├── <Entity>Controller.java
     ├── <Entity>Service.java
-    └── dto/ (or *Request/*Response types colocated per existing style)
+    └── dtos/ (or *Request/*Response types colocated per existing style)
 ```
 
 One module per bounded concept. No deeper sub-packages unless the existing code already does that.
