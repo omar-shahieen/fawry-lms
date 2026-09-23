@@ -5,6 +5,9 @@ import com.fawry.lms.course.entities.Course;
 import com.fawry.lms.course.dto.CreateCourseRequest;
 import com.fawry.lms.course.dto.UpdateCourseRequest;
 import com.fawry.lms.course.dto.AssignInstructorRequest;
+import com.fawry.lms.course.dto.CourseStudentResponse;
+import com.fawry.lms.course.dto.EnrollmentResponse;
+import com.fawry.lms.course.entities.Enrollment;
 import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
@@ -21,10 +24,15 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
-    public CourseService(CourseRepository courseRepository, UserRepository userRepository) {
+    public CourseService(
+            CourseRepository courseRepository,
+            UserRepository userRepository,
+            EnrollmentRepository enrollmentRepository) {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     @Transactional(readOnly = true)
@@ -78,6 +86,32 @@ public class CourseService {
         Course course = findCourse(id);
         course.setInstructor(findInstructor(request.instructorId()));
         return toResponse(courseRepository.saveAndFlush(course));
+    }
+
+    @Transactional(readOnly = true)
+    public Course getEntity(Long id) {
+        return findCourse(id);
+    }
+
+    @Transactional
+    public EnrollmentResponse enroll(Long id, User student) {
+        Course course = findCourse(id);
+        Enrollment enrollment = new Enrollment();
+        enrollment.setCourse(course);
+        enrollment.setStudent(student);
+        enrollment = enrollmentRepository.saveAndFlush(enrollment);
+        return new EnrollmentResponse(enrollment.getId(), course.getId(), student.getId(), enrollment.getEnrolledAt());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CourseStudentResponse> listStudents(Long id, Pageable pageable) {
+        Course course = findCourse(id);
+        return enrollmentRepository.findByCourse(course, pageable)
+                .map(enrollment -> new CourseStudentResponse(
+                        enrollment.getStudent().getId(),
+                        enrollment.getStudent().getFullName(),
+                        enrollment.getStudent().getEmail(),
+                        enrollment.getStudent().getProfilePictureUrl()));
     }
 
     private Course findCourse(Long id) {

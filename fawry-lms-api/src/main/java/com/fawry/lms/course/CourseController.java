@@ -4,6 +4,9 @@ import com.fawry.lms.course.dto.CourseResponse;
 import com.fawry.lms.course.dto.CreateCourseRequest;
 import com.fawry.lms.course.dto.UpdateCourseRequest;
 import com.fawry.lms.course.dto.AssignInstructorRequest;
+import com.fawry.lms.course.dto.CourseStudentResponse;
+import com.fawry.lms.course.dto.EnrollmentResponse;
+import com.fawry.lms.user.entities.User;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -67,5 +71,21 @@ public class CourseController {
             @PathVariable Long id,
             @Valid @RequestBody AssignInstructorRequest request) {
         return courseService.assignInstructor(id, request);
+    }
+
+    @PostMapping("/{id}/enroll")
+    @PreAuthorize("hasRole('STUDENT')")
+    public EnrollmentResponse enroll(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User student) {
+        return courseService.enroll(id, student);
+    }
+
+    @GetMapping("/{id}/students")
+    @PreAuthorize("@authz.isOwnerOrAdmin(authentication.principal, @courseService.getEntity(#id))")
+    public Page<CourseStudentResponse> listStudents(
+            @PathVariable Long id,
+            Pageable pageable) {
+        return courseService.listStudents(id, pageable);
     }
 }

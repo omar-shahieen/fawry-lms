@@ -31,4 +31,8 @@ public class AuthorizationService {
         }
         return enrollmentRepository.existsByCourseAndStudent(course, user);
     }
+
+    public boolean isOwnerOrAdmin(User user, Course course) {
+        return user.getRole() == Role.ADMIN || user.getId().equals(course.getInstructor().getId());
+    }
 }

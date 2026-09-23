@@ -16,6 +16,6 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration test — admin reassigns instructor; body `{instructorId}` must reference a user with role `INSTRUCTOR` or 400.
   **Commit:** `feat(course): implement assign-instructor endpoint`
 
-- [ ] **5.4 POST /api/courses/{id}/enroll, GET /api/courses/{id}/students**
+- [x] **5.4 POST /api/courses/{id}/enroll, GET /api/courses/{id}/students**
   **Acceptance:** integration tests — student self-enroll twice → second call 409 (unique constraint surfaced as a clean error, not a raw 500); roster visible to admin and the course's own instructor, 403 for other instructors/students. No unenroll endpoint exists — not tested because it's out of scope.
   **Commit:** `feat(course): implement self-enrollment and roster endpoints`
