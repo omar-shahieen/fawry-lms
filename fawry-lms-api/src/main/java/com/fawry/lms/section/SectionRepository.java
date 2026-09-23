@@ -1,6 +1,7 @@
 package com.fawry.lms.section;
 
-import com.fawry.lms.course.Course;
+import com.fawry.lms.course.entities.Course;
+import com.fawry.lms.section.entities.Section;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,6 +1,5 @@
-package com.fawry.lms.course;
+package com.fawry.lms.course.entities;
 
-import com.fawry.lms.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,6 +14,8 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
+
+import com.fawry.lms.user.entities.User;
 
 @Entity
 @Table(name = "courses", indexes = {

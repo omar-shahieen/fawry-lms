@@ -1,7 +1,7 @@
-package com.fawry.lms.communication;
+package com.fawry.lms.quiz.entities;
 
-import com.fawry.lms.course.Course;
-import com.fawry.lms.user.User;
+import com.fawry.lms.course.entities.Course;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,18 +11,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "discussion_posts", indexes = {
-        @Index(name = "idx_discussion_posts_course_created_at", columnList = "course_id, created_at"),
-        @Index(name = "idx_discussion_posts_parent_post_id", columnList = "parent_post_id")
-})
-public class DiscussionPost {
+@Table(name = "quizzes", indexes = @Index(name = "idx_quizzes_course_published", columnList = "course_id, published"))
+public class Quiz {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,18 +33,18 @@ public class DiscussionPost {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "author_id", nullable = false)
-    private User author;
-
+    @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "text")
-    private String body;
+    @Column(name = "duration_minutes", nullable = false)
+    private Integer durationMinutes;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_post_id")
-    private DiscussionPost parentPost;
+    @Column(nullable = false)
+    private boolean published;
+
+    @OneToMany(mappedBy = "quiz", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OrderBy("orderIndex ASC")
+    private List<Question> questions = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -51,7 +52,7 @@ public class DiscussionPost {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    public DiscussionPost() {
+    public Quiz() {
     }
 
     @PrePersist
@@ -66,6 +67,11 @@ public class DiscussionPost {
         updatedAt = Instant.now();
     }
 
+    public void addQuestion(Question question) {
+        questions.add(question);
+        question.setQuiz(this);
+    }
+
     public Long getId() {
         return id;
     }
@@ -78,14 +84,6 @@ public class DiscussionPost {
         this.course = course;
     }
 
-    public User getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
-    }
-
     public String getTitle() {
         return title;
     }
@@ -94,20 +92,24 @@ public class DiscussionPost {
         this.title = title;
     }
 
-    public String getBody() {
-        return body;
+    public Integer getDurationMinutes() {
+        return durationMinutes;
     }
 
-    public void setBody(String body) {
-        this.body = body;
+    public void setDurationMinutes(Integer durationMinutes) {
+        this.durationMinutes = durationMinutes;
     }
 
-    public DiscussionPost getParentPost() {
-        return parentPost;
+    public boolean isPublished() {
+        return published;
     }
 
-    public void setParentPost(DiscussionPost parentPost) {
-        this.parentPost = parentPost;
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
     }
 
     public Instant getCreatedAt() {

@@ -1,4 +1,4 @@
-package com.fawry.lms.quiz;
+package com.fawry.lms.quiz.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

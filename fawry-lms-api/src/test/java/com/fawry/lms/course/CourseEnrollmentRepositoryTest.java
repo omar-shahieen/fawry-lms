@@ -1,8 +1,11 @@
 package com.fawry.lms.course;
 
-import com.fawry.lms.user.Role;
-import com.fawry.lms.user.User;
+import com.fawry.lms.course.entities.Course;
+import com.fawry.lms.course.entities.Enrollment;
 import com.fawry.lms.user.UserRepository;
+import com.fawry.lms.user.entities.Role;
+import com.fawry.lms.user.entities.User;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;

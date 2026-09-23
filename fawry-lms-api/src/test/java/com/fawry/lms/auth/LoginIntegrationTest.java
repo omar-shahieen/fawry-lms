@@ -1,8 +1,9 @@
 package com.fawry.lms.auth;
 
-import com.fawry.lms.user.Role;
-import com.fawry.lms.user.User;
 import com.fawry.lms.user.UserRepository;
+import com.fawry.lms.user.entities.Role;
+import com.fawry.lms.user.entities.User;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,7 +53,7 @@ class LoginIntegrationTest {
         User user = createUser(true);
 
         mockMvc.perform(post("/api/auth/login").contentType("application/json")
-                        .content(loginBody(user.getEmail(), "wrong-password")))
+                .content(loginBody(user.getEmail(), "wrong-password")))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));
     }
@@ -62,7 +63,7 @@ class LoginIntegrationTest {
         User user = createUser(false);
 
         mockMvc.perform(post("/api/auth/login").contentType("application/json")
-                        .content(loginBody(user.getEmail(), "correct-password")))
+                .content(loginBody(user.getEmail(), "correct-password")))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));
     }

@@ -1,9 +1,10 @@
 package com.fawry.lms.auth;
 
 import com.fawry.lms.security.JwtTokenProvider;
-import com.fawry.lms.user.Role;
-import com.fawry.lms.user.User;
 import com.fawry.lms.user.UserRepository;
+import com.fawry.lms.user.entities.Role;
+import com.fawry.lms.user.entities.User;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,14 +41,14 @@ class LogoutIntegrationTest {
         userRepository.saveAndFlush(user);
 
         mockMvc.perform(post("/api/auth/logout")
-                        .header("Authorization", "Bearer " + accessToken))
+                .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isNoContent());
 
         assertThat(userRepository.findById(user.getId()).orElseThrow().getAccessToken()).isNull();
 
         mockMvc.perform(post("/api/auth/refresh")
-                        .contentType("application/json")
-                        .content("{\"refreshToken\":\"" + refreshToken + "\"}"))
+                .contentType("application/json")
+                .content("{\"refreshToken\":\"" + refreshToken + "\"}"))
                 .andExpect(status().isUnauthorized());
     }
 

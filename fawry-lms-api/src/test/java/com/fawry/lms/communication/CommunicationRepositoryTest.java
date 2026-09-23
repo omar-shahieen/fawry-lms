@@ -1,10 +1,13 @@
 package com.fawry.lms.communication;
 
-import com.fawry.lms.course.Course;
+import com.fawry.lms.course.entities.Course;
+import com.fawry.lms.communication.entities.DiscussionPost;
 import com.fawry.lms.course.CourseRepository;
-import com.fawry.lms.user.Role;
-import com.fawry.lms.user.User;
 import com.fawry.lms.user.UserRepository;
+import com.fawry.lms.communication.entities.DiscussionPost;
+import com.fawry.lms.user.entities.Role;
+import com.fawry.lms.user.entities.User;
+
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

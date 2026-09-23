@@ -1,4 +1,4 @@
-package com.fawry.lms.auth;
+package com.fawry.lms.auth.dto;
 
 public record AuthResponse(
         String accessToken,

@@ -1,6 +1,5 @@
 package com.fawry.lms.auth;
 
-import com.fawry.lms.user.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fawry.lms.auth.dto.*;
+import com.fawry.lms.user.entities.User;
 
 @RestController
 @RequestMapping("/api/auth")

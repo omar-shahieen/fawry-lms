@@ -1,4 +1,4 @@
-package com.fawry.lms.user;
+package com.fawry.lms.user.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

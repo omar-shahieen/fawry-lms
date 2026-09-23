@@ -11,16 +11,16 @@ Add features as vertical slices inside the existing monolith. Copy the nearest c
 
 ```
 com.fawry.lms
-├── config/ security/ common/ seed/     # shared cross-cutting
-└── <feature>/                          # user, course, section, quiz, grade, communication, dashboard
-    ├── <Entity>.java
-    ├── <Entity>Repository.java
-    ├── <Entity>Controller.java
-    ├── <Entity>Service.java
-    └── dto/ (or *Request/*Response types colocated per existing style)
+├── config/ security/ common/ seed/     # shared cross-cutting (flat)
+└── <feature>/                          # auth, user, course, section, quiz, grade, communication, dashboard
+    ├── <Entity>Controller.java         # at feature package root
+    ├── <Entity>Service.java            # at feature package root
+    ├── <Entity>Repository.java         # at feature package root
+    ├── entities/                       # JPA entities and domain enums
+    └── dto/                            # request/response DTOs
 ```
 
-One module per bounded concept. No deeper sub-packages unless the existing code already does that.
+One module per bounded concept. Allowed sub-packages: `entities/` and `dto/` only — controllers, services, and repositories stay at the feature package root.
 
 ## Slice rules
 

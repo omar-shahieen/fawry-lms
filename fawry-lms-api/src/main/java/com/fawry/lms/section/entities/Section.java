@@ -1,7 +1,6 @@
-package com.fawry.lms.quiz;
+package com.fawry.lms.section.entities;
 
-import com.fawry.lms.course.Course;
-import jakarta.persistence.CascadeType;
+import com.fawry.lms.course.entities.Course;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,19 +10,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "quizzes", indexes = @Index(name = "idx_quizzes_course_published", columnList = "course_id, published"))
-public class Quiz {
+@Table(name = "sections", indexes = @Index(name = "idx_sections_course_order", columnList = "course_id, order_index"))
+public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,15 +31,8 @@ public class Quiz {
     @Column(nullable = false)
     private String title;
 
-    @Column(name = "duration_minutes", nullable = false)
-    private Integer durationMinutes;
-
-    @Column(nullable = false)
-    private boolean published;
-
-    @OneToMany(mappedBy = "quiz", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @OrderBy("orderIndex ASC")
-    private List<Question> questions = new ArrayList<>();
+    @Column(name = "order_index", nullable = false)
+    private Integer orderIndex;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -52,7 +40,7 @@ public class Quiz {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    public Quiz() {
+    public Section() {
     }
 
     @PrePersist
@@ -65,11 +53,6 @@ public class Quiz {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = Instant.now();
-    }
-
-    public void addQuestion(Question question) {
-        questions.add(question);
-        question.setQuiz(this);
     }
 
     public Long getId() {
@@ -92,24 +75,12 @@ public class Quiz {
         this.title = title;
     }
 
-    public Integer getDurationMinutes() {
-        return durationMinutes;
+    public Integer getOrderIndex() {
+        return orderIndex;
     }
 
-    public void setDurationMinutes(Integer durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
-    public List<Question> getQuestions() {
-        return questions;
+    public void setOrderIndex(Integer orderIndex) {
+        this.orderIndex = orderIndex;
     }
 
     public Instant getCreatedAt() {

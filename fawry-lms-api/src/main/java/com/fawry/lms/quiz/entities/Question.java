@@ -1,4 +1,4 @@
-package com.fawry.lms.quiz;
+package com.fawry.lms.quiz.entities;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

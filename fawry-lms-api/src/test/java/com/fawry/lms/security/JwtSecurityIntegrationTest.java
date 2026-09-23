@@ -1,8 +1,9 @@
 package com.fawry.lms.security;
 
-import com.fawry.lms.user.Role;
-import com.fawry.lms.user.User;
 import com.fawry.lms.user.UserRepository;
+import com.fawry.lms.user.entities.Role;
+import com.fawry.lms.user.entities.User;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,7 +57,7 @@ class JwtSecurityIntegrationTest {
         userRepository.saveAndFlush(student);
 
         mockMvc.perform(get("/test/security/protected")
-                        .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(content().string("ROLE_STUDENT"));
     }

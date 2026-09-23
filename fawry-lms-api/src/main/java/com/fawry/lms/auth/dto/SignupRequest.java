@@ -1,4 +1,4 @@
-package com.fawry.lms.auth;
+package com.fawry.lms.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

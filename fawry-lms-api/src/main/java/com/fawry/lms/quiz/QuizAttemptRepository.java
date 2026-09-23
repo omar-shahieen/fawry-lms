@@ -2,6 +2,8 @@ package com.fawry.lms.quiz;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.fawry.lms.quiz.entities.QuizAttempt;
+
 import java.util.Optional;
 import java.util.UUID;
 

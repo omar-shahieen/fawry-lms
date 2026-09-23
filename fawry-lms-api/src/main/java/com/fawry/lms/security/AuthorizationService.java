@@ -1,9 +1,10 @@
 package com.fawry.lms.security;
 
-import com.fawry.lms.course.Course;
+import com.fawry.lms.course.entities.Course;
 import com.fawry.lms.course.EnrollmentRepository;
-import com.fawry.lms.user.Role;
-import com.fawry.lms.user.User;
+import com.fawry.lms.user.entities.Role;
+import com.fawry.lms.user.entities.User;
+
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;

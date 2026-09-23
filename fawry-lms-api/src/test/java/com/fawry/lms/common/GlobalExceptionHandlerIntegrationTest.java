@@ -8,9 +8,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fawry.lms.security.JwtTokenProvider;
-import com.fawry.lms.user.Role;
-import com.fawry.lms.user.User;
 import com.fawry.lms.user.UserRepository;
+import com.fawry.lms.user.entities.Role;
+import com.fawry.lms.user.entities.User;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

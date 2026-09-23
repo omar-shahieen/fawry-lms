@@ -1,6 +1,5 @@
-package com.fawry.lms.quiz;
+package com.fawry.lms.quiz.entities;
 
-import com.fawry.lms.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,13 +15,11 @@ import jakarta.persistence.UniqueConstraint;
 
 import java.time.Instant;
 
+import com.fawry.lms.user.entities.User;
+
 @Entity
-@Table(name = "quiz_attempts",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_quiz_attempts_quiz_student",
-                columnNames = {"quiz_id", "student_id"}
-        ),
-        indexes = @Index(name = "idx_quiz_attempts_student_id", columnList = "student_id"))
+@Table(name = "quiz_attempts", uniqueConstraints = @UniqueConstraint(name = "uk_quiz_attempts_quiz_student", columnNames = {
+        "quiz_id", "student_id" }), indexes = @Index(name = "idx_quiz_attempts_student_id", columnList = "student_id"))
 public class QuizAttempt {
 
     @Id

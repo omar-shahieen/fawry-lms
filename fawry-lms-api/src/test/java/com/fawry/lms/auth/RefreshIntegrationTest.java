@@ -2,9 +2,10 @@ package com.fawry.lms.auth;
 
 import com.jayway.jsonpath.JsonPath;
 import com.fawry.lms.security.JwtTokenProvider;
-import com.fawry.lms.user.Role;
-import com.fawry.lms.user.User;
 import com.fawry.lms.user.UserRepository;
+import com.fawry.lms.user.entities.Role;
+import com.fawry.lms.user.entities.User;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,7 +45,7 @@ class RefreshIntegrationTest {
         userRepository.saveAndFlush(user);
 
         String response = mockMvc.perform(post("/api/auth/refresh").contentType("application/json")
-                        .content(refreshBody(refreshToken)))
+                .content(refreshBody(refreshToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.refreshToken").doesNotExist())
@@ -61,7 +62,7 @@ class RefreshIntegrationTest {
     @Test
     void invalidTokenReturnsUnauthorized() throws Exception {
         mockMvc.perform(post("/api/auth/refresh").contentType("application/json")
-                        .content(refreshBody("not-a-valid-token")))
+                .content(refreshBody("not-a-valid-token")))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));
     }
@@ -74,7 +75,7 @@ class RefreshIntegrationTest {
         String expiredToken = expiredProvider.generateRefreshToken(user.getId(), user.getRole());
 
         mockMvc.perform(post("/api/auth/refresh").contentType("application/json")
-                        .content(refreshBody(expiredToken)))
+                .content(refreshBody(expiredToken)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));
     }
@@ -85,7 +86,7 @@ class RefreshIntegrationTest {
         String accessToken = tokenProvider.generateAccessToken(user.getId(), user.getRole());
 
         mockMvc.perform(post("/api/auth/refresh").contentType("application/json")
-                        .content(refreshBody(accessToken)))
+                .content(refreshBody(accessToken)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));
     }
@@ -96,7 +97,7 @@ class RefreshIntegrationTest {
         String refreshToken = tokenProvider.generateRefreshToken(user.getId(), user.getRole());
 
         mockMvc.perform(post("/api/auth/refresh").contentType("application/json")
-                        .content(refreshBody(refreshToken)))
+                .content(refreshBody(refreshToken)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));
     }

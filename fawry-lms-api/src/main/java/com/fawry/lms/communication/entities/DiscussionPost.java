@@ -1,4 +1,7 @@
-package com.fawry.lms.section;
+package com.fawry.lms.communication.entities;
+
+import com.fawry.lms.course.entities.Course;
+import com.fawry.lms.user.entities.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,22 +19,32 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 
 @Entity
-@Table(name = "markdown_content", indexes = @Index(name = "idx_content_section_id", columnList = "section_id"))
-public class MarkdownContent {
+@Table(name = "discussion_posts", indexes = {
+        @Index(name = "idx_discussion_posts_course_created_at", columnList = "course_id, created_at"),
+        @Index(name = "idx_discussion_posts_parent_post_id", columnList = "parent_post_id")
+})
+public class DiscussionPost {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "section_id", nullable = false)
-    private Section section;
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
+
     private String title;
 
     @Column(nullable = false, columnDefinition = "text")
     private String body;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_post_id")
+    private DiscussionPost parentPost;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -39,7 +52,7 @@ public class MarkdownContent {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    public MarkdownContent() {
+    public DiscussionPost() {
     }
 
     @PrePersist
@@ -58,12 +71,20 @@ public class MarkdownContent {
         return id;
     }
 
-    public Section getSection() {
-        return section;
+    public Course getCourse() {
+        return course;
     }
 
-    public void setSection(Section section) {
-        this.section = section;
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
     public String getTitle() {
@@ -80,6 +101,14 @@ public class MarkdownContent {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public DiscussionPost getParentPost() {
+        return parentPost;
+    }
+
+    public void setParentPost(DiscussionPost parentPost) {
+        this.parentPost = parentPost;
     }
 
     public Instant getCreatedAt() {

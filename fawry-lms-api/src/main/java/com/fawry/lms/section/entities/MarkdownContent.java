@@ -1,7 +1,5 @@
-package com.fawry.lms.communication;
+package com.fawry.lms.section.entities;
 
-import com.fawry.lms.course.Course;
-import com.fawry.lms.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,23 +16,16 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 
 @Entity
-@Table(name = "announcements", indexes = @Index(
-        name = "idx_announcements_course_created_at",
-        columnList = "course_id, created_at"
-))
-public class Announcement {
+@Table(name = "markdown_content", indexes = @Index(name = "idx_content_section_id", columnList = "section_id"))
+public class MarkdownContent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "course_id", nullable = false)
-    private Course course;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "author_id", nullable = false)
-    private User author;
+    @JoinColumn(name = "section_id", nullable = false)
+    private Section section;
 
     @Column(nullable = false)
     private String title;
@@ -48,7 +39,7 @@ public class Announcement {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    public Announcement() {
+    public MarkdownContent() {
     }
 
     @PrePersist
@@ -67,20 +58,12 @@ public class Announcement {
         return id;
     }
 
-    public Course getCourse() {
-        return course;
+    public Section getSection() {
+        return section;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
-    }
-
-    public User getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
+    public void setSection(Section section) {
+        this.section = section;
     }
 
     public String getTitle() {

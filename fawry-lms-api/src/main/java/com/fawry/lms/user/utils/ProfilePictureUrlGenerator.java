@@ -1,4 +1,4 @@
-package com.fawry.lms.user;
+package com.fawry.lms.user.utils;
 
 import org.springframework.stereotype.Component;
 

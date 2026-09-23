@@ -1,12 +1,14 @@
 package com.fawry.lms.security;
 
-import com.fawry.lms.user.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
+
+import com.fawry.lms.user.entities.Role;
+
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -33,7 +35,8 @@ public final class JwtTokenProvider {
         }
         this.signingKey = Keys.hmacShaKeyFor(secretBytes);
         this.accessTokenLifetime = Objects.requireNonNull(accessTokenLifetime, "accessTokenLifetime must not be null");
-        this.refreshTokenLifetime = Objects.requireNonNull(refreshTokenLifetime, "refreshTokenLifetime must not be null");
+        this.refreshTokenLifetime = Objects.requireNonNull(refreshTokenLifetime,
+                "refreshTokenLifetime must not be null");
     }
 
     public String generateAccessToken(UUID userId, Role role) {

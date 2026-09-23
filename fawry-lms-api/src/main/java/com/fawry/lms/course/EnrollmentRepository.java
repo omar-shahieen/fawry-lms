@@ -1,9 +1,16 @@
 package com.fawry.lms.course;
 
-import com.fawry.lms.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.fawry.lms.course.entities.Course;
+import com.fawry.lms.course.entities.Enrollment;
+import com.fawry.lms.user.entities.User;
+
+import java.util.List;
 
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     boolean existsByCourseAndStudent(Course course, User student);
+
+    List<Enrollment> findByStudent(User student);
 }

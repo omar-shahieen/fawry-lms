@@ -535,15 +535,16 @@ com.fawry.lms
 ├── security/          # JwtTokenProvider, JwtAuthFilter, UserDetailsServiceImpl, AuthorizationService
 ├── common/            # GlobalExceptionHandler, ApiErrorResponse
 ├── seed/              # DataSeeder (CommandLineRunner) — see §7.7
-├── user/              # User entity, repo, service, controller, DTOs
-├── course/            # Course, Enrollment, service, controller, DTOs
-├── section/           # Section, MarkdownContent, service, controller, DTOs
-├── quiz/              # Quiz, Question, QuestionOption, QuizAttempt, QuizAnswer, service, controller, DTOs
+├── auth/              # AuthController, AuthService at root; dto/
+├── user/              # UserController, UserService, UserRepository at root; entities/, dto/
+├── course/            # Course, Enrollment repositories at root; entities/
+├── section/           # Section, MarkdownContent repositories at root; entities/
+├── quiz/              # Quiz, Question, QuestionOption, QuizAttempt, QuizAnswer repositories at root; entities/
 ├── grade/             # Grade aggregation service, controller
-├── communication/     # DiscussionPost, Announcement, service, controller, DTOs
+├── communication/     # DiscussionPost, Announcement repositories at root; entities/
 └── dashboard/         # DashboardService, DashboardController
 ```
-One module per bounded concept, each with its own `entity`/`dto`/`repository`/`service`/`controller` files inline (no need for deeper sub-packages at this scale).
+One module per bounded concept. Each feature package uses exactly two sub-packages: `entities/` (JPA entities and domain enums) and `dto/` (request/response types). `*Controller`, `*Service`, and `*Repository` files stay at the feature package root. Cross-cutting packages (`config`, `security`, `common`, `seed`) remain flat.
 
 ---
 

@@ -1,7 +1,8 @@
 package com.fawry.lms.security;
 
-import com.fawry.lms.user.User;
 import com.fawry.lms.user.UserRepository;
+import com.fawry.lms.user.entities.User;
+
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -66,7 +67,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             context.setAuthentication(authentication);
             SecurityContextHolder.setContext(context);
         } catch (JwtException | IllegalArgumentException exception) {
-            // Invalid tokens are left unauthenticated and rejected by the security entry point.
+            // Invalid tokens are left unauthenticated and rejected by the security entry
+            // point.
         }
     }
 }

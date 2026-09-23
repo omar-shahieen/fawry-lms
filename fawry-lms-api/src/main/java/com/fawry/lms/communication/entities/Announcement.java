@@ -1,6 +1,8 @@
-package com.fawry.lms.section;
+package com.fawry.lms.communication.entities;
 
-import com.fawry.lms.course.Course;
+import com.fawry.lms.course.entities.Course;
+import com.fawry.lms.user.entities.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,8 +19,8 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 
 @Entity
-@Table(name = "sections", indexes = @Index(name = "idx_sections_course_order", columnList = "course_id, order_index"))
-public class Section {
+@Table(name = "announcements", indexes = @Index(name = "idx_announcements_course_created_at", columnList = "course_id, created_at"))
+public class Announcement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,11 +30,15 @@ public class Section {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
+
     @Column(nullable = false)
     private String title;
 
-    @Column(name = "order_index", nullable = false)
-    private Integer orderIndex;
+    @Column(nullable = false, columnDefinition = "text")
+    private String body;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -40,7 +46,7 @@ public class Section {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    public Section() {
+    public Announcement() {
     }
 
     @PrePersist
@@ -67,6 +73,14 @@ public class Section {
         this.course = course;
     }
 
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -75,12 +89,12 @@ public class Section {
         this.title = title;
     }
 
-    public Integer getOrderIndex() {
-        return orderIndex;
+    public String getBody() {
+        return body;
     }
 
-    public void setOrderIndex(Integer orderIndex) {
-        this.orderIndex = orderIndex;
+    public void setBody(String body) {
+        this.body = body;
     }
 
     public Instant getCreatedAt() {
