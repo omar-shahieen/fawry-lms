@@ -4,6 +4,7 @@ import com.fawry.lms.course.dto.CourseResponse;
 import com.fawry.lms.course.entities.Course;
 import com.fawry.lms.course.dto.CreateCourseRequest;
 import com.fawry.lms.course.dto.UpdateCourseRequest;
+import com.fawry.lms.course.dto.AssignInstructorRequest;
 import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
@@ -69,6 +70,13 @@ public class CourseService {
     public CourseResponse deactivate(Long id) {
         Course course = findCourse(id);
         course.setActive(false);
+        return toResponse(courseRepository.saveAndFlush(course));
+    }
+
+    @Transactional
+    public CourseResponse assignInstructor(Long id, AssignInstructorRequest request) {
+        Course course = findCourse(id);
+        course.setInstructor(findInstructor(request.instructorId()));
         return toResponse(courseRepository.saveAndFlush(course));
     }
 

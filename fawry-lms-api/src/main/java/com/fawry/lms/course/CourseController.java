@@ -3,6 +3,7 @@ package com.fawry.lms.course;
 import com.fawry.lms.course.dto.CourseResponse;
 import com.fawry.lms.course.dto.CreateCourseRequest;
 import com.fawry.lms.course.dto.UpdateCourseRequest;
+import com.fawry.lms.course.dto.AssignInstructorRequest;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,5 +60,12 @@ public class CourseController {
     @DeleteMapping("/{id}")
     public CourseResponse deactivate(@PathVariable Long id) {
         return courseService.deactivate(id);
+    }
+
+    @PatchMapping("/{id}/assign-instructor")
+    public CourseResponse assignInstructor(
+            @PathVariable Long id,
+            @Valid @RequestBody AssignInstructorRequest request) {
+        return courseService.assignInstructor(id, request);
     }
 }

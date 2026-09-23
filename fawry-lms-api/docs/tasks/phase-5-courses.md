@@ -12,7 +12,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration tests — instructor calling create → 403; instructor editing someone else's course → 403; instructor editing their own → 200; creating a course with a `code` that already exists (in any `term`) → 409; delete sets `isActive=false` (row still exists, children not cascade-deleted).
   **Commit:** `feat(course): implement course create, update, and soft-delete endpoints`
 
-- [ ] **5.3 PATCH /api/courses/{id}/assign-instructor**
+- [x] **5.3 PATCH /api/courses/{id}/assign-instructor**
   **Acceptance:** integration test — admin reassigns instructor; body `{instructorId}` must reference a user with role `INSTRUCTOR` or 400.
   **Commit:** `feat(course): implement assign-instructor endpoint`
 
