@@ -2,7 +2,7 @@
 
 Status legend: `[x]` done, `[ ]` not yet.
 
-- [ ] **5.1 GET /api/courses, GET /api/courses/{id}**
+- [x] **5.1 GET /api/courses, GET /api/courses/{id}**
   Any authenticated user; only `isActive=true` in the list; `?search=` (title, LIKE), `?term=` (exact), `?code=` (exact), combinable with each other and pagination.
   **Acceptance:** integration test — soft-deleted course excluded from list but still fetchable by id; a query combining `?search=&term=&page=` returns the expected filtered/paginated subset; non-existent id → 404.
   **Commit:** `feat(course): implement course list and get-by-id endpoints`
