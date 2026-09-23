@@ -10,6 +10,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,6 +33,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleEntityNotFound(EntityNotFoundException exception) {
         String message = exception.getMessage() == null ? "The requested resource was not found." : exception.getMessage();
         return response(HttpStatus.NOT_FOUND, message);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleNoResourceFound(NoResourceFoundException exception) {
+        return response(HttpStatus.NOT_FOUND, "The requested endpoint was not found.");
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleNoHandlerFound(NoHandlerFoundException exception) {
+        return response(HttpStatus.NOT_FOUND, "The requested endpoint was not found.");
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

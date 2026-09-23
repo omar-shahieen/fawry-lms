@@ -34,6 +34,16 @@ class GlobalExceptionHandlerIntegrationTest {
                 .andExpect(jsonPath("$.message", not(containsString("sensitive test detail"))));
     }
 
+    @Test
+    void unknownApiPathReturnsStandardNotFoundResponse() throws Exception {
+        mockMvc.perform(get("/api/route-that-does-not-exist"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("The requested endpoint was not found."));
+    }
+
     @RestController
     static class ThrowingController {
         @GetMapping("/test/errors/unexpected")
