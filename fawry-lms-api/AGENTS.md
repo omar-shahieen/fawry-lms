@@ -28,7 +28,7 @@ Do not invent requirements that are not supported by the specification.
 * Spring Boot 4.1.1
 * Spring Security + JWT
 * Spring Data JPA / Hibernate
-* PostgreSQL 18 (`postgres:18-alpine`)
+* PostgreSQL 18 (`postgres:16-alpine`)
 * Maven
 * Docker Compose
 * springdoc-openapi 3.1.1

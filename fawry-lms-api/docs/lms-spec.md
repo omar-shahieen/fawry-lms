@@ -13,7 +13,7 @@
 | Language/Framework | Java 25 (LTS) + Spring Boot 4.1.1 |
 | Auth | Spring Security + JWT (access + refresh tokens) |
 | Persistence | Spring Data JPA + Hibernate |
-| Database | PostgreSQL 18 (`postgres:18-alpine`), run via Docker Compose |
+| Database | PostgreSQL 18 (`postgres:16-alpine`), run via Docker Compose |
 | API Docs | springdoc-openapi 3.1.1 → auto Swagger UI at `/swagger-ui.html` |
 | Validation | `jakarta.validation` (`@Valid`, `@NotBlank`, etc.) on request DTOs |
 | Pagination | Spring Data `Pageable` on all list endpoints (`?page=0&size=20&sort=field,asc`) |
@@ -25,7 +25,7 @@ The whole stack — API and database — runs with a single `docker-compose up`.
 ```yaml
 services:
   postgres:
-    image: postgres:18-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_DB: lms
       POSTGRES_USER: lms_user
