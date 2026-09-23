@@ -7,7 +7,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration test — valid signup → 201, response includes both tokens and the created user is `STUDENT`; posting a body that also includes `"role":"ADMIN"` → still creates a `STUDENT` (no error, field is just ignored); duplicate email → 409; missing/invalid field (bad email format, blank password) → 400/422; created user's `profilePictureUrl` is non-null.
   **Commit:** `feat(auth): implement POST /api/auth/signup`
 
-- [ ] **3.2 POST /api/auth/login**
+- [x] **3.2 POST /api/auth/login**
   Validates email/password against bcrypt hash, issues access+refresh tokens.
   **Acceptance:** integration test — seed a user, correct credentials → 200 with both tokens; wrong password → 401; a deactivated (`isActive=false`) user → 401 even with correct credentials; response never includes the password field.
   **Commit:** `feat(auth): implement POST /api/auth/login`
