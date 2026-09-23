@@ -1,0 +1,138 @@
+erDiagram
+    User {
+        UUID id PK
+        String fullName
+        String email UK "idx_users_email"
+        String password "bcrypt hashed"
+        Role role "idx_users_role (STUDENT, INSTRUCTOR, ADMIN)"
+        String studentOrEmployeeId
+        String profilePictureUrl "nullable"
+        boolean isActive "idx_users_is_active (default true)"
+        Timestamp createdAt
+        Timestamp updatedAt
+    }
+
+    Course {
+        Long id PK
+        String title
+        Text description
+        String code "e.g. CS301"
+        String term "e.g. Fall 2026"
+        UUID instructor_id FK "idx_courses_instructor_id"
+        boolean isActive "idx_courses_is_active (soft delete flag)"
+        Timestamp createdAt
+        Timestamp updatedAt
+    }
+
+    Enrollment {
+        Long id PK
+        UUID student_id FK "UK_student_course (leading column)"
+        Long course_id FK "UK_student_course, idx_enrollment_course_id"
+        Timestamp enrolledAt
+    }
+
+    Section {
+        Long id PK
+        Long course_id FK "idx_sections_course_order"
+        String title
+        Integer orderIndex "idx_sections_course_order"
+        Timestamp createdAt
+        Timestamp updatedAt
+    }
+
+    MarkdownContent {
+        Long id PK
+        Long section_id FK "idx_content_section_id"
+        String title
+        Text body "raw markdown"
+        Timestamp createdAt
+        Timestamp updatedAt
+    }
+
+    Quiz {
+        Long id PK
+        Long course_id FK "idx_quizzes_course_published"
+        String title
+        Integer durationMinutes "enforced time limit"
+        boolean published "idx_quizzes_course_published"
+        Timestamp createdAt
+        Timestamp updatedAt
+    }
+
+    Question {
+        Long id PK
+        Long quiz_id FK "idx_questions_quiz_id"
+        Text text
+        Integer orderIndex
+    }
+
+    QuestionOption {
+        Long id PK
+        Long question_id FK "idx_options_question_id"
+        String text
+        boolean isCorrect
+    }
+
+    QuizAttempt {
+        Long id PK
+        Long quiz_id FK "idx_attempts_quiz_student"
+        UUID student_id FK "idx_attempts_quiz_student"
+        Timestamp startedAt
+        Timestamp submittedAt
+        Integer score "count of correct answers"
+        Integer totalQuestions "snapshot at attempt time"
+    }
+
+    QuizAnswer {
+        Long id PK
+        Long attempt_id FK "idx_answers_attempt_id"
+        Long question_id FK
+        Long selectedOption_id FK
+        boolean isCorrect "computed at submit time"
+    }
+
+    DiscussionPost {
+        Long id PK
+        Long course_id FK "idx_posts_course_created"
+        UUID author_id FK
+        String title "nullable for replies"
+        Text body
+        Long parentPost_id FK "idx_posts_parent_id (nullable)"
+        Timestamp createdAt "idx_posts_course_created"
+        Timestamp updatedAt
+    }
+
+    Announcement {
+        Long id PK
+        Long course_id FK "idx_announcements_course_created"
+        UUID author_id FK "Instructor or Admin"
+        String title
+        Text body
+        Timestamp createdAt "idx_announcements_course_created"
+        Timestamp updatedAt
+    }
+
+    %% Relationships
+    User ||--o{ Course : "instructs (idx_courses_instructor_id)"
+    User ||--o{ Enrollment : "enrolls in (UK_student_course)"
+    Course ||--o{ Enrollment : "has roster (idx_enrollment_course_id)"
+
+    Course ||--o{ Section : "contains (idx_sections_course_order)"
+    Section ||--o{ MarkdownContent : "contains (idx_content_section_id)"
+
+    Course ||--o{ Quiz : "contains (idx_quizzes_course_published)"
+    Quiz ||--o{ Question : "has (idx_questions_quiz_id)"
+    Question ||--o{ QuestionOption : "has choices (idx_options_question_id)"
+
+    User ||--o{ QuizAttempt : "takes (idx_attempts_quiz_student)"
+    Quiz ||--o{ QuizAttempt : "has attempts (idx_attempts_quiz_student)"
+    QuizAttempt ||--o{ QuizAnswer : "contains (idx_answers_attempt_id)"
+    Question ||--o{ QuizAnswer : "answered in"
+    QuestionOption ||--o{ QuizAnswer : "selected as"
+
+    Course ||--o{ DiscussionPost : "hosts (idx_posts_course_created)"
+    User ||--o{ DiscussionPost : "authors"
+    DiscussionPost ||--o| DiscussionPost : "parent of reply (idx_posts_parent_id)"
+
+    Course ||--o{ Announcement : "publishes (idx_announcements_course_created)"
+    User ||--o{ Announcement : "authors"
