@@ -27,7 +27,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** `@DataJpaTest` — saving a second `QuizAttempt` for the same `(quiz, student)` throws `DataIntegrityViolationException`.
   **Commit:** `feat(quiz): add QuizAttempt and QuizAnswer entities, repositories`
 
-- [ ] **1.6 DiscussionPost + Announcement entities/repos**
+- [x] **1.6 DiscussionPost + Announcement entities/repos**
   Composite `(course_id, createdAt)` on both; `parentPost` self-FK on `DiscussionPost` indexed.
   **Acceptance:** `@DataJpaTest` — a reply saved with a non-null `parentPost` loads with its parent; querying by `course` + `createdAt DESC` paginates correctly.
   **Commit:** `feat(communication): add DiscussionPost and Announcement entities, repositories`
