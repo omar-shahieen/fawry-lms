@@ -17,7 +17,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** `@DataJpaTest` — sections for a course come back ordered by `orderIndex` when queried with `findByCourseOrderByOrderIndexAsc`.
   **Commit:** `feat(section): add Section and MarkdownContent entities, repositories`
 
-- [ ] **1.4 Quiz + Question + QuestionOption entities/repos**
+- [x] **1.4 Quiz + Question + QuestionOption entities/repos**
   Composite `(course_id, published)` on `Quiz`.
   **Acceptance:** `@DataJpaTest` — a `Quiz` with 2 `Question`s, each with options, persists and reloads via cascade with the full tree intact.
   **Commit:** `feat(quiz): add Quiz, Question, QuestionOption entities, repositories`
