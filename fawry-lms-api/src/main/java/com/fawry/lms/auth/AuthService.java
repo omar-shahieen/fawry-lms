@@ -5,10 +5,11 @@ import com.fawry.lms.user.ProfilePictureUrlGenerator;
 import com.fawry.lms.user.Role;
 import com.fawry.lms.user.User;
 import com.fawry.lms.user.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import io.jsonwebtoken.JwtException;
 
 @Service
 public class AuthService {
@@ -61,5 +62,26 @@ public class AuthService {
                 tokenProvider.generateAccessToken(user.getId(), user.getRole()),
                 tokenProvider.generateRefreshToken(user.getId(), user.getRole()),
                 userResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public RefreshResponse refresh(RefreshRequest request) {
+        JwtTokenProvider.TokenClaims claims;
+        try {
+            claims = tokenProvider.parseToken(request.refreshToken());
+        } catch (JwtException | IllegalArgumentException exception) {
+            throw new BadCredentialsException("Invalid refresh token.");
+        }
+
+        if (claims.tokenType() != JwtTokenProvider.TokenType.REFRESH) {
+            throw new BadCredentialsException("Invalid refresh token.");
+        }
+
+        User user = userRepository.findById(claims.userId())
+                .filter(User::isActive)
+                .filter(candidate -> candidate.getRole() == claims.role())
+                .orElseThrow(() -> new BadCredentialsException("Invalid refresh token."));
+
+        return new RefreshResponse(tokenProvider.generateAccessToken(user.getId(), user.getRole()));
     }
 }

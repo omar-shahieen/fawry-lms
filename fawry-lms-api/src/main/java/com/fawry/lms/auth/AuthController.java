@@ -27,4 +27,9 @@ public class AuthController {
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
+
+    @PostMapping("/refresh")
+    public RefreshResponse refresh(@Valid @RequestBody RefreshRequest request) {
+        return authService.refresh(request);
+    }
 }
