@@ -7,7 +7,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration test — soft-deleted course excluded from list but still fetchable by id; a query combining `?search=&term=&page=` returns the expected filtered/paginated subset; non-existent id → 404.
   **Commit:** `feat(course): implement course list and get-by-id endpoints`
 
-- [ ] **5.2 POST /api/courses, PATCH /api/courses/{id}, DELETE /api/courses/{id}**
+- [x] **5.2 POST /api/courses, PATCH /api/courses/{id}, DELETE /api/courses/{id}**
   Admin-only create/delete; admin-or-owning-instructor update. Instructors cannot create courses under any path.
   **Acceptance:** integration tests — instructor calling create → 403; instructor editing someone else's course → 403; instructor editing their own → 200; creating a course with a `code` that already exists (in any `term`) → 409; delete sets `isActive=false` (row still exists, children not cascade-deleted).
   **Commit:** `feat(course): implement course create, update, and soft-delete endpoints`

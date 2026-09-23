@@ -60,6 +60,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException exception) {
+        String message = exception.getMessage() == null ? "The request is invalid." : exception.getMessage();
+        return response(HttpStatus.BAD_REQUEST, message);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnexpectedException(Exception exception) {
         return response(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.");
