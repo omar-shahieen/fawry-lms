@@ -6,7 +6,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration test — student list only sees `published=true`; instructor/admin see both; non-owning instructor editing/publishing → 403.
   **Commit:** `feat(quiz): implement quiz CRUD and published toggle`
 
-- [ ] **7.2 Questions/options CRUD**
+- [x] **7.2 Questions/options CRUD**
   `POST .../questions` (2+ options, exactly one `isCorrect`), `PATCH/DELETE /api/questions/{id}`.
   **Acceptance:** integration tests — zero options or no option marked correct → validation error (400/422); more than one `isCorrect` on a question → rejected; instructor/admin detail view includes `isCorrect` per option.
   **Commit:** `feat(quiz): implement question and option management`

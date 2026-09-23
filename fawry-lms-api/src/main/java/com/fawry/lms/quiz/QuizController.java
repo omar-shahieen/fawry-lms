@@ -3,6 +3,9 @@ package com.fawry.lms.quiz;
 import com.fawry.lms.quiz.dto.CreateQuizRequest;
 import com.fawry.lms.quiz.dto.QuizResponse;
 import com.fawry.lms.quiz.dto.UpdateQuizRequest;
+import com.fawry.lms.quiz.dto.CreateQuestionRequest;
+import com.fawry.lms.quiz.dto.UpdateQuestionRequest;
+import com.fawry.lms.quiz.dto.QuestionResponse;
 import com.fawry.lms.user.entities.User;
 
 import jakarta.validation.Valid;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
 @RestController
 @RequestMapping
@@ -55,5 +59,33 @@ public class QuizController {
     @PreAuthorize("hasRole('ADMIN') or @authz.isOwnerOrAdmin(authentication.principal, @quizService.getCourse(#id))")
     public void delete(@PathVariable Long id) {
         quizService.delete(id);
+    }
+
+    @GetMapping("/api/quizzes/{id}/questions")
+    @PreAuthorize("hasRole('ADMIN') or @authz.isOwnerOrAdmin(authentication.principal, @quizService.getCourse(#id))")
+    public List<QuestionResponse> getQuestions(@PathVariable Long id) {
+        return quizService.getQuestions(id);
+    }
+
+    @PostMapping("/api/quizzes/{id}/questions")
+    @PreAuthorize("hasRole('ADMIN') or @authz.isOwnerOrAdmin(authentication.principal, @quizService.getCourse(#id))")
+    public QuestionResponse addQuestion(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateQuestionRequest request) {
+        return quizService.addQuestion(id, request);
+    }
+
+    @PatchMapping("/api/questions/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @authz.isOwnerOrAdmin(authentication.principal, @quizService.getQuestionCourse(#id))")
+    public QuestionResponse updateQuestion(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateQuestionRequest request) {
+        return quizService.updateQuestion(id, request);
+    }
+
+    @DeleteMapping("/api/questions/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @authz.isOwnerOrAdmin(authentication.principal, @quizService.getQuestionCourse(#id))")
+    public void deleteQuestion(@PathVariable Long id) {
+        quizService.deleteQuestion(id);
     }
 }
