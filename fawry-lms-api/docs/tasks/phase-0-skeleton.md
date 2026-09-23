@@ -7,7 +7,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** `mvn spring-boot:run` starts; `GET /actuator/health` → 200 `{"status":"UP"}`.
   **Commit:** `chore: initialize Spring Boot project skeleton`
 
-- [ ] **0.2 Add Postgres via Docker Compose**
+- [x] **0.2 Add Postgres via Docker Compose**
   `docker-compose.yml` (postgres:16-alpine), `application.yml` datasource pointing at it, `spring-boot-starter-data-jpa` + `postgresql` driver added.
   **Acceptance:** `docker compose up -d` → `docker compose ps` shows healthy; `mvn spring-boot:run` logs a successful Hibernate/JDBC connection, no errors.
   **Commit:** `chore: add Postgres via docker-compose and configure datasource`
