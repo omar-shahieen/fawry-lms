@@ -2,7 +2,7 @@
 
 Status legend: `[x]` done, `[ ]` not yet.
 
-- [ ] **7.1 Quiz CRUD (metadata only) + published toggle**
+- [x] **7.1 Quiz CRUD (metadata only) + published toggle**
   **Acceptance:** integration test — student list only sees `published=true`; instructor/admin see both; non-owning instructor editing/publishing → 403.
   **Commit:** `feat(quiz): implement quiz CRUD and published toggle`
 
