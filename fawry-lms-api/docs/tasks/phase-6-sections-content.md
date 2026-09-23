@@ -2,7 +2,7 @@
 
 Status legend: `[x]` done, `[ ]` not yet.
 
-- [ ] **6.1 Sections CRUD**
+- [x] **6.1 Sections CRUD**
   `GET .../sections`, `POST`, `PATCH` (incl. reordering), `DELETE`.
   **Acceptance:** integration tests — enrollment check enforced on GET (unenrolled student → 403); an instructor `POST`ing a section against a course they don't own → 403 (not just a read-time check); reordering two sections' `orderIndex` reflects in the next GET.
   **Commit:** `feat(section): implement sections CRUD with enrollment-gated reads`
