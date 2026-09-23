@@ -7,7 +7,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** plain JUnit test — token generated then parsed returns the same `userId`/`role`; an expired token (mint with `-1s` expiry) fails validation; a tampered token fails validation.
   **Commit:** `feat(security): add JwtTokenProvider with unit tests`
 
-- [ ] **2.2 JwtAuthFilter + SecurityConfig (secure-by-default)**
+- [x] **2.2 JwtAuthFilter + SecurityConfig (secure-by-default)**
   `anyRequest().authenticated()` except `/api/auth/**` and swagger paths; roles mapped to `ROLE_*` `GrantedAuthority`.
   **Acceptance:** `@SpringBootTest` (MockMvc) — request to a throwaway authenticated-only endpoint with no token → 401; with a valid token → 200.
   **Commit:** `feat(security): add JwtAuthFilter and secure-by-default SecurityConfig`
