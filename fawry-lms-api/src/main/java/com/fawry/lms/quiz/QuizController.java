@@ -6,6 +6,7 @@ import com.fawry.lms.quiz.dto.UpdateQuizRequest;
 import com.fawry.lms.quiz.dto.CreateQuestionRequest;
 import com.fawry.lms.quiz.dto.UpdateQuestionRequest;
 import com.fawry.lms.quiz.dto.QuestionResponse;
+import com.fawry.lms.quiz.dto.QuizDetailResponse;
 import com.fawry.lms.user.entities.User;
 
 import jakarta.validation.Valid;
@@ -41,6 +42,14 @@ public class QuizController {
             @AuthenticationPrincipal User user,
             Pageable pageable) {
         return quizService.list(courseId, user, pageable);
+    }
+
+    @GetMapping("/api/quizzes/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @authz.isEnrolledOrStaff(authentication.principal, @quizService.getCourse(#id))")
+    public QuizDetailResponse detail(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+        return quizService.getDetail(id, user);
     }
 
     @PostMapping("/api/courses/{courseId}/quizzes")

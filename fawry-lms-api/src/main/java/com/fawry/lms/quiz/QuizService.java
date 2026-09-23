@@ -10,9 +10,14 @@ import com.fawry.lms.quiz.dto.UpdateQuestionRequest;
 import com.fawry.lms.quiz.dto.QuestionResponse;
 import com.fawry.lms.quiz.dto.QuestionOptionRequest;
 import com.fawry.lms.quiz.dto.QuestionOptionResponse;
+import com.fawry.lms.quiz.dto.QuizDetailResponse;
+import com.fawry.lms.quiz.dto.QuizStudentQuestionResponse;
+import com.fawry.lms.quiz.dto.QuizStudentOptionResponse;
+import com.fawry.lms.quiz.dto.QuizAnswerResponse;
 import com.fawry.lms.quiz.entities.Quiz;
 import com.fawry.lms.quiz.entities.Question;
 import com.fawry.lms.quiz.entities.QuestionOption;
+import com.fawry.lms.quiz.entities.QuizAttempt;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
 
@@ -22,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.time.Instant;
 
 @Service
 public class QuizService {
@@ -30,16 +36,22 @@ public class QuizService {
     private final CourseRepository courseRepository;
     private final QuestionRepository questionRepository;
     private final QuestionOptionRepository optionRepository;
+    private final QuizAttemptRepository attemptRepository;
+    private final QuizAnswerRepository answerRepository;
 
     public QuizService(
             QuizRepository quizRepository,
             CourseRepository courseRepository,
             QuestionRepository questionRepository,
-            QuestionOptionRepository optionRepository) {
+            QuestionOptionRepository optionRepository,
+            QuizAttemptRepository attemptRepository,
+            QuizAnswerRepository answerRepository) {
         this.quizRepository = quizRepository;
         this.courseRepository = courseRepository;
         this.questionRepository = questionRepository;
         this.optionRepository = optionRepository;
+        this.attemptRepository = attemptRepository;
+        this.answerRepository = answerRepository;
     }
 
     @Transactional(readOnly = true)
@@ -78,6 +90,48 @@ public class QuizService {
     @Transactional(readOnly = true)
     public List<QuestionResponse> getQuestions(Long id) {
         return findQuiz(id).getQuestions().stream().map(this::toQuestionResponse).toList();
+    }
+
+    @Transactional
+    public QuizDetailResponse getDetail(Long id, User user) {
+        Quiz quiz = findQuiz(id);
+        QuizAttempt attempt = null;
+        if (user.getRole() == Role.STUDENT) {
+            if (!quiz.isPublished()) {
+                throw new EntityNotFoundException("Quiz not found.");
+            }
+            attempt = attemptRepository.findByQuizIdAndStudentId(id, user.getId()).orElse(null);
+            if (attempt == null) {
+                attempt = new QuizAttempt();
+                attempt.setQuiz(quiz);
+                attempt.setStudent(user);
+                attempt.setTotalQuestions(quiz.getQuestions().size());
+                attempt = attemptRepository.saveAndFlush(attempt);
+            }
+        }
+        Instant expiresAt = attempt == null ? null
+                : attempt.getStartedAt().plusSeconds(quiz.getDurationMinutes().longValue() * 60);
+        List<QuizAnswerResponse> answers = attempt == null || attempt.getSubmittedAt() == null
+                ? List.of()
+                : answerRepository.findByAttempt(attempt).stream()
+                        .map(answer -> new QuizAnswerResponse(
+                                answer.getQuestion().getId(),
+                                answer.getSelectedOption() == null ? null : answer.getSelectedOption().getId(),
+                                answer.isCorrect()))
+                        .toList();
+        return new QuizDetailResponse(
+                quiz.getId(),
+                quiz.getCourse().getId(),
+                quiz.getTitle(),
+                quiz.getDurationMinutes(),
+                quiz.isPublished(),
+                attempt == null ? null : attempt.getStartedAt(),
+                expiresAt,
+                attempt == null ? null : attempt.getSubmittedAt(),
+                attempt == null ? null : attempt.getScore(),
+                attempt == null ? null : attempt.getTotalQuestions(),
+                quiz.getQuestions().stream().map(this::toStudentQuestionResponse).toList(),
+                answers);
     }
 
     @Transactional
@@ -158,6 +212,16 @@ public class QuizService {
                 question.getOrderIndex(),
                 question.getOptions().stream()
                         .map(option -> new QuestionOptionResponse(option.getId(), option.getText(), option.isCorrect()))
+                .toList());
+    }
+
+    private QuizStudentQuestionResponse toStudentQuestionResponse(Question question) {
+        return new QuizStudentQuestionResponse(
+                question.getId(),
+                question.getText(),
+                question.getOrderIndex(),
+                question.getOptions().stream()
+                        .map(option -> new QuizStudentOptionResponse(option.getId(), option.getText()))
                         .toList());
     }
 
