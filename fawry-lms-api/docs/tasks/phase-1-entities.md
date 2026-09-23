@@ -12,7 +12,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** `@DataJpaTest` — saving a duplicate `(student, course)` enrollment throws `DataIntegrityViolationException`; saving a second course with an already-used `code` (any `term`) throws `DataIntegrityViolationException`.
   **Commit:** `feat(course): add Course and Enrollment entities, repositories`
 
-- [ ] **1.3 Section + MarkdownContent entities/repos**
+- [x] **1.3 Section + MarkdownContent entities/repos**
   Composite index `(course_id, orderIndex)` on `Section`.
   **Acceptance:** `@DataJpaTest` — sections for a course come back ordered by `orderIndex` when queried with `findByCourseOrderByOrderIndexAsc`.
   **Commit:** `feat(section): add Section and MarkdownContent entities, repositories`
