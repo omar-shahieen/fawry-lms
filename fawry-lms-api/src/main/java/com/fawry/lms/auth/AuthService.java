@@ -6,6 +6,7 @@ import com.fawry.lms.user.Role;
 import com.fawry.lms.user.User;
 import com.fawry.lms.user.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,21 @@ public class AuthService {
         user.setActive(true);
         user.setProfilePictureUrl(profilePictureUrlGenerator.generate());
         user = userRepository.saveAndFlush(user);
+
+        AuthenticatedUserResponse userResponse = new AuthenticatedUserResponse(
+                user.getId(), user.getFullName(), user.getEmail(), user.getRole(), user.getProfilePictureUrl());
+        return new AuthResponse(
+                tokenProvider.generateAccessToken(user.getId(), user.getRole()),
+                tokenProvider.generateRefreshToken(user.getId(), user.getRole()),
+                userResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .filter(User::isActive)
+                .filter(candidate -> passwordEncoder.matches(request.password(), candidate.getPassword()))
+                .orElseThrow(() -> new BadCredentialsException("Invalid email or password."));
 
         AuthenticatedUserResponse userResponse = new AuthenticatedUserResponse(
                 user.getId(), user.getFullName(), user.getEmail(), user.getRole(), user.getProfilePictureUrl());
