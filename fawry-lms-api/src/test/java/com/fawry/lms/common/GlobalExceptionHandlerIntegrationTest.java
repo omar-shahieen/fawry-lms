@@ -63,7 +63,10 @@ class GlobalExceptionHandlerIntegrationTest {
         user.setPassword("hashed-test-password");
         user.setRole(Role.ADMIN);
         user = userRepository.saveAndFlush(user);
-        return "Bearer " + tokenProvider.generateAccessToken(user.getId(), user.getRole());
+        String token = tokenProvider.generateAccessToken(user.getId(), user.getRole());
+        user.setAccessToken(token);
+        userRepository.saveAndFlush(user);
+        return "Bearer " + token;
     }
 
     @RestController

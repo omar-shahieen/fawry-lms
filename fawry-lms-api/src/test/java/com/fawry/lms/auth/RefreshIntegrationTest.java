@@ -40,6 +40,8 @@ class RefreshIntegrationTest {
     void validRefreshTokenReturnsOnlyANewAccessToken() throws Exception {
         User user = createUser(true);
         String refreshToken = tokenProvider.generateRefreshToken(user.getId(), user.getRole());
+        user.setAccessToken(tokenProvider.generateAccessToken(user.getId(), user.getRole()));
+        userRepository.saveAndFlush(user);
 
         String response = mockMvc.perform(post("/api/auth/refresh").contentType("application/json")
                         .content(refreshBody(refreshToken)))

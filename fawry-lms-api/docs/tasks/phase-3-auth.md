@@ -16,9 +16,9 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration test — valid refresh token → 200 new access token; expired/invalid refresh token → 401.
   **Commit:** `feat(auth): implement POST /api/auth/refresh`
 
-- [ ] **3.4 POST /api/auth/logout**
-  Simplest viable version per spec (client discards tokens); document as no-op 204 unless a blacklist table is added.
-  **Acceptance:** integration test — authenticated call → 204.
+- [x] **3.4 POST /api/auth/logout**
+  Authenticated logout clears the user's database-stored access token and returns 204. The JWT filter rejects the cleared token, and refresh rejects the user's refresh token while no access token is stored.
+  **Acceptance:** integration test — authenticated call → 204; stored access token becomes null; old access and refresh tokens are rejected.
   **Commit:** `feat(auth): implement POST /api/auth/logout`
 
 - [ ] **3.5 GlobalExceptionHandler: auth + validation cases**

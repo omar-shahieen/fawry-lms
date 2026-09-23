@@ -52,6 +52,8 @@ class JwtSecurityIntegrationTest {
         student.setRole(Role.STUDENT);
         student = userRepository.saveAndFlush(student);
         String token = tokenProvider.generateAccessToken(student.getId(), student.getRole());
+        student.setAccessToken(token);
+        userRepository.saveAndFlush(student);
 
         mockMvc.perform(get("/test/security/protected")
                         .header("Authorization", "Bearer " + token))

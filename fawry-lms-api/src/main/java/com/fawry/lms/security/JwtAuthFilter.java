@@ -55,7 +55,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
             User user = userResult.get();
-            if (!user.isActive() || user.getRole() != claims.role()) {
+            if (!user.isActive() || user.getRole() != claims.role()
+                    || !token.equals(user.getAccessToken())) {
                 return;
             }
 

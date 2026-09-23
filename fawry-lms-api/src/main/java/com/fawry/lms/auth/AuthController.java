@@ -1,8 +1,11 @@
 package com.fawry.lms.auth;
 
+import com.fawry.lms.user.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +34,12 @@ public class AuthController {
     @PostMapping("/refresh")
     public RefreshResponse refresh(@Valid @RequestBody RefreshRequest request) {
         return authService.refresh(request);
+    }
+
+    @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal User user) {
+        authService.logout(user.getId());
+        return ResponseEntity.noContent().build();
     }
 }

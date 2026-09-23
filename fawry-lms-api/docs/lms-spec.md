@@ -264,7 +264,7 @@ Auth conventions: 🔓 public · 🔐 any authenticated user · role tags = rest
 | POST | `/api/auth/signup` | 🔓 | public self-registration. Server hardcodes `role = STUDENT`; any `role` field in the request body is ignored (the `SignupRequest` DTO has no `role` field at all). Body: `fullName`, `email`, `password` (validated). `profilePictureUrl` auto-generated (see Users). Returns access + refresh tokens immediately — no separate login round-trip. |
 | POST | `/api/auth/login` | 🔓 | returns access + refresh token |
 | POST | `/api/auth/refresh` | 🔓 | exchanges refresh token for new access token |
-| POST | `/api/auth/logout` | 🔐 | invalidate refresh token (simplest: client just discards tokens, or keep a server-side blacklist table if time allows — optional) |
+| POST | `/api/auth/logout` | 🔐 | clears the user's database-stored access token; the JWT filter rejects that access token and refresh rejects the user's refresh token until a new login/signup stores a new access token |
 
 > **Admin & instructor accounts:** signup only ever creates STUDENT accounts. The initial ADMIN account, plus demo INSTRUCTOR/STUDENT accounts, are created by seed data on startup (see §7.7 and Users notes). From there, `POST /api/users` (ADMIN-only, below) is the only way INSTRUCTOR and additional ADMIN accounts are created; `PATCH /api/users/{id}` covers promoting an existing STUDENT to INSTRUCTOR later if needed.
 
@@ -560,7 +560,7 @@ This is a 4-day take-home assessment for a Fawry internship. Priorities, in orde
 
 ### 7.2 Security & secrets
 - JWT signing secret is supplied via environment variable (`JWT_SECRET`), never hardcoded in source or committed `application.yml`. A `.env.example` documents the required variables without real values.
-- Access tokens: short-lived (e.g. 15 min). Refresh tokens: longer-lived (e.g. 7 days), no server-side blacklist/revocation store — logout is client-side token discard only (already noted as optional in §3).
+- Access tokens: short-lived (e.g. 15 min) and stored as the user's active session token. Refresh tokens: longer-lived (e.g. 7 days); logout clears the stored access token, which invalidates the access token and prevents refresh until the user authenticates again.
 - No rate limiting or login-throttling is implemented. Acceptable for assessment scope; would be a production requirement (e.g. via Bucket4j or an API gateway).
 - Public self-signup (§3 Auth) always creates a STUDENT account server-side; the request DTO has no `role` field, so there is no way for a client to escalate role at signup.
 - Seeded/default credentials (admin + demo users) are for local evaluation only and documented in the README, not meant to represent production secret-handling practice.

@@ -42,6 +42,9 @@ public class User {
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
+    @Column(name = "access_token", length = 2048)
+    private String accessToken;
+
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
@@ -108,6 +111,14 @@ public class User {
 
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
     public boolean isActive() {

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import io.jsonwebtoken.JwtException;
 
+import java.util.UUID;
+
 @Service
 public class AuthService {
 
@@ -41,30 +43,38 @@ public class AuthService {
         user.setProfilePictureUrl(profilePictureUrlGenerator.generate());
         user = userRepository.saveAndFlush(user);
 
+        String accessToken = tokenProvider.generateAccessToken(user.getId(), user.getRole());
+        user.setAccessToken(accessToken);
+        userRepository.saveAndFlush(user);
+
         AuthenticatedUserResponse userResponse = new AuthenticatedUserResponse(
                 user.getId(), user.getFullName(), user.getEmail(), user.getRole(), user.getProfilePictureUrl());
         return new AuthResponse(
-                tokenProvider.generateAccessToken(user.getId(), user.getRole()),
+                accessToken,
                 tokenProvider.generateRefreshToken(user.getId(), user.getRole()),
                 userResponse);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .filter(User::isActive)
                 .filter(candidate -> passwordEncoder.matches(request.password(), candidate.getPassword()))
                 .orElseThrow(() -> new BadCredentialsException("Invalid email or password."));
 
+        String accessToken = tokenProvider.generateAccessToken(user.getId(), user.getRole());
+        user.setAccessToken(accessToken);
+        userRepository.saveAndFlush(user);
+
         AuthenticatedUserResponse userResponse = new AuthenticatedUserResponse(
                 user.getId(), user.getFullName(), user.getEmail(), user.getRole(), user.getProfilePictureUrl());
         return new AuthResponse(
-                tokenProvider.generateAccessToken(user.getId(), user.getRole()),
+                accessToken,
                 tokenProvider.generateRefreshToken(user.getId(), user.getRole()),
                 userResponse);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public RefreshResponse refresh(RefreshRequest request) {
         JwtTokenProvider.TokenClaims claims;
         try {
@@ -80,8 +90,20 @@ public class AuthService {
         User user = userRepository.findById(claims.userId())
                 .filter(User::isActive)
                 .filter(candidate -> candidate.getRole() == claims.role())
+                .filter(candidate -> candidate.getAccessToken() != null)
                 .orElseThrow(() -> new BadCredentialsException("Invalid refresh token."));
 
-        return new RefreshResponse(tokenProvider.generateAccessToken(user.getId(), user.getRole()));
+        String accessToken = tokenProvider.generateAccessToken(user.getId(), user.getRole());
+        user.setAccessToken(accessToken);
+        userRepository.saveAndFlush(user);
+        return new RefreshResponse(accessToken);
+    }
+
+    @Transactional
+    public void logout(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadCredentialsException("Invalid authenticated user."));
+        user.setAccessToken(null);
+        userRepository.saveAndFlush(user);
     }
 }
