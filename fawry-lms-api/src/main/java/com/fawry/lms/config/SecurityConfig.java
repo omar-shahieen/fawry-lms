@@ -60,7 +60,7 @@ public class SecurityConfig {
 
         @Bean
         JwtTokenProvider jwtTokenProvider(
-                        @Value("${JWT_SECRET}") String jwtSecret,
+                        @Value("${jwt.secret}") String jwtSecret,
                         @Value("${jwt.access-token-expiration:PT15M}") Duration accessTokenLifetime,
                         @Value("${jwt.refresh-token-expiration:P7D}") Duration refreshTokenLifetime) {
                 return new JwtTokenProvider(jwtSecret, accessTokenLifetime, refreshTokenLifetime);

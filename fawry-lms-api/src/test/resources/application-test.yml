@@ -8,6 +8,6 @@ spring:
     hibernate:
       ddl-auto: create-drop
 jwt:
+  secret: test-only-jwt-secret-with-at-least-32-bytes
   access-token-expiration: PT15M
   refresh-token-expiration: P7D
-JWT_SECRET: test-only-jwt-secret-with-at-least-32-bytes

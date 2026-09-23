@@ -8,6 +8,8 @@ management:
       show-details: never
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/lms}
     username: ${SPRING_DATASOURCE_USERNAME:lms_user}
@@ -19,3 +21,8 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:PT15M}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:P7D}
