@@ -2,6 +2,8 @@ package com.fawry.lms.user;
 
 import com.fawry.lms.user.dto.UserProfileResponse;
 import com.fawry.lms.user.dto.UpdateCurrentUserRequest;
+import com.fawry.lms.user.dto.AdminUserResponse;
+import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -9,8 +11,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -35,5 +42,17 @@ public class UserController {
             @AuthenticationPrincipal User user,
             @RequestBody UpdateCurrentUserRequest request) {
         return userService.updateProfile(user, request);
+    }
+
+    @GetMapping
+    public Page<AdminUserResponse> listUsers(
+            @RequestParam(required = false) Role role,
+            Pageable pageable) {
+        return userService.listUsers(role, pageable);
+    }
+
+    @GetMapping("/{id}")
+    public AdminUserResponse getUser(@PathVariable UUID id) {
+        return userService.getUser(id);
     }
 }

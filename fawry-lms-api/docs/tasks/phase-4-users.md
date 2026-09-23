@@ -7,12 +7,12 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration test as a student → payload includes enrollments; as instructor → field omitted/empty and no N+1 query blow-up (assert query count with a Hibernate statistics check, or just correctness if that's overkill for the deadline).
   **Commit:** `feat(user): implement GET /api/users/me`
 
-- [ ] **4.2 PATCH /api/users/me**
+- [x] **4.2 PATCH /api/users/me**
   Only `fullName`/`profilePictureUrl` editable; `role`/`email`/`isActive` ignored even if sent.
   **Acceptance:** integration test — sending a `role` field in the body does not change the caller's role.
   **Commit:** `feat(user): implement PATCH /api/users/me`
 
-- [ ] **4.3 Admin user list/read**
+- [x] **4.3 Admin user list/read**
   `GET /api/users` (paginated, `?role=`), `GET /api/users/{id}`.
   **Acceptance:** integration test — non-admin gets 403; admin with `?role=STUDENT` gets only students; pagination metadata present.
   **Commit:** `feat(user): implement admin user list and get-by-id endpoints`
