@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,6 +82,33 @@ class UserProfileIntegrationTest {
     void profileRequiresAuthentication() throws Exception {
         mockMvc.perform(get("/api/users/me"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void currentUserUpdateChangesOnlyAllowedFields() throws Exception {
+        User student = saveUser(Role.STUDENT, "Student");
+
+        mockMvc.perform(patch("/api/users/me")
+                        .header("Authorization", bearerToken(student))
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "fullName": "Updated Student",
+                                  "profilePictureUrl": "https://example.com/avatar.png",
+                                  "email": "changed@example.com",
+                                  "role": "ADMIN",
+                                  "isActive": false
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fullName").value("Updated Student"))
+                .andExpect(jsonPath("$.profilePictureUrl").value("https://example.com/avatar.png"))
+                .andExpect(jsonPath("$.email").value(student.getEmail()))
+                .andExpect(jsonPath("$.role").value("STUDENT"));
+
+        User reloaded = userRepository.findById(student.getId()).orElseThrow();
+        org.junit.jupiter.api.Assertions.assertEquals(Role.STUDENT, reloaded.getRole());
+        org.junit.jupiter.api.Assertions.assertTrue(reloaded.isActive());
     }
 
     private User saveUser(Role role, String name) {

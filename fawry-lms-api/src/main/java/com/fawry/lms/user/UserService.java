@@ -4,6 +4,7 @@ package com.fawry.lms.user;
 import com.fawry.lms.course.EnrollmentRepository;
 import com.fawry.lms.user.dto.EnrolledCourseResponse;
 import com.fawry.lms.user.dto.UserProfileResponse;
+import com.fawry.lms.user.dto.UpdateCurrentUserRequest;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
 
@@ -38,5 +39,16 @@ public class UserService {
                                 user.getRole(),
                                 user.getProfilePictureUrl(),
                                 enrolledCourses);
+        }
+
+        @Transactional
+        public UserProfileResponse updateProfile(User user, UpdateCurrentUserRequest request) {
+                if (request.fullName() != null) {
+                        user.setFullName(request.fullName());
+                }
+                if (request.profilePictureUrl() != null) {
+                        user.setProfilePictureUrl(request.profilePictureUrl());
+                }
+                return getProfile(user);
         }
 }
