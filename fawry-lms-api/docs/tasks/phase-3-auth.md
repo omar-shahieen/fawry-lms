@@ -21,5 +21,5 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration test — authenticated call → 204; stored access token becomes null; old access and refresh tokens are rejected.
   **Commit:** `feat(auth): implement POST /api/auth/logout`
 
-- [ ] **3.5 GlobalExceptionHandler: auth + validation cases**
+- [x] **3.5 GlobalExceptionHandler: auth + validation cases**
   Done as part of step 0.4's commit (see note there) — pulled forward because login needed it. No separate commit.
