@@ -12,7 +12,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** `docker compose up -d` → `docker compose ps` shows healthy; `mvn spring-boot:run` logs a successful Hibernate/JDBC connection, no errors.
   **Commit:** `chore: add Postgres via docker-compose and configure datasource`
 
-- [ ] **0.3 Add springdoc-openapi**
+- [x] **0.3 Add springdoc-openapi**
   **Acceptance:** `GET /swagger-ui.html` → 200; `GET /v3/api-docs` → 200 valid JSON.
   **Commit:** `chore: add springdoc-openapi swagger UI`
 
