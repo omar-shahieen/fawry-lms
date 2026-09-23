@@ -24,14 +24,16 @@ Do not invent requirements that are not supported by the specification.
 
 ## Stack
 
-* Java
-* Spring Boot
+* Java 25 (LTS)
+* Spring Boot 4.1.1
 * Spring Security + JWT
 * Spring Data JPA / Hibernate
-* PostgreSQL
+* PostgreSQL 18 (`postgres:18-alpine`)
 * Maven
 * Docker Compose
-* springdoc-openapi
+* springdoc-openapi 3.1.1
+
+Versions are pinned here and in `pom.xml` / `docker-compose.yml`. Prefer the latest stable releases of these packages when upgrading; do not pin to milestones (e.g. Spring Boot 4.2.0-M1).
 
 ## Architecture
 

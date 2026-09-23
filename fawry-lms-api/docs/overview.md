@@ -1,4 +1,4 @@
-The system is a **university Learning Management System (LMS) API**. It supports three main actors—**students, instructors, and administrators**—with authentication and role-based access. The API is a single Spring Boot monolith backed by PostgreSQL. 
+The system is a **university Learning Management System (LMS) API**. It supports three main actors—**students, instructors, and administrators**—with authentication and role-based access. The API is a single Spring Boot 4.1.1 monolith (Java 25) backed by PostgreSQL 18.
 
 ### 1. Users and Access
 

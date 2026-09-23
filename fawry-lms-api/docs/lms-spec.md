@@ -1,6 +1,6 @@
 # University LMS API — Implementation Spec
 
-**Stack:** Spring Boot, Spring Security (JWT), Spring Data JPA, PostgreSQL (Docker), springdoc-openapi (Swagger)
+**Stack:** Spring Boot 4.1.1, Spring Security (JWT), Spring Data JPA, PostgreSQL 18 (Docker), springdoc-openapi 3.1.1 (Swagger)
 **Architecture:** Single monolithic Spring Boot app. No microservices, no message queues, no separate auth service. One database. Package-by-feature modules inside one deployable.
 **Context:** 4-day take-home technical assessment for a Fawry backend internship. See §7 for scope/timeframe rationale.
 
@@ -10,11 +10,11 @@
 
 | Concern | Choice |
 |---|---|
-| Language/Framework | Java + Spring Boot |
+| Language/Framework | Java 25 (LTS) + Spring Boot 4.1.1 |
 | Auth | Spring Security + JWT (access + refresh tokens) |
 | Persistence | Spring Data JPA + Hibernate |
-| Database | PostgreSQL, run via Docker Compose |
-| API Docs | springdoc-openapi → auto Swagger UI at `/swagger-ui.html` |
+| Database | PostgreSQL 18 (`postgres:18-alpine`), run via Docker Compose |
+| API Docs | springdoc-openapi 3.1.1 → auto Swagger UI at `/swagger-ui.html` |
 | Validation | `jakarta.validation` (`@Valid`, `@NotBlank`, etc.) on request DTOs |
 | Pagination | Spring Data `Pageable` on all list endpoints (`?page=0&size=20&sort=field,asc`) |
 | Build tool | Maven or Gradle (your call — pick whichever you're faster in) |
@@ -25,7 +25,7 @@ The whole stack — API and database — runs with a single `docker-compose up`.
 ```yaml
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: lms
       POSTGRES_USER: lms_user
@@ -64,7 +64,7 @@ volumes:
 ### Dockerfile (multi-stage — build the app image)
 ```dockerfile
 # Stage 1: build
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline
@@ -72,7 +72,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: run
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
