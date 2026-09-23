@@ -22,7 +22,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** `@DataJpaTest` — a `Quiz` with 2 `Question`s, each with options, persists and reloads via cascade with the full tree intact.
   **Commit:** `feat(quiz): add Quiz, Question, QuestionOption entities, repositories`
 
-- [ ] **1.5 QuizAttempt + QuizAnswer entities/repos**
+- [x] **1.5 QuizAttempt + QuizAnswer entities/repos**
   Composite unique `(quiz_id, student_id)` on `QuizAttempt` — this is the single-attempt guard, not just an index.
   **Acceptance:** `@DataJpaTest` — saving a second `QuizAttempt` for the same `(quiz, student)` throws `DataIntegrityViolationException`.
   **Commit:** `feat(quiz): add QuizAttempt and QuizAnswer entities, repositories`
