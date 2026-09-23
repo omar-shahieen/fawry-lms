@@ -2,7 +2,7 @@
 
 Status legend: `[x]` done, `[ ]` not yet.
 
-- [ ] **4.1 GET /api/users/me**
+- [x] **4.1 GET /api/users/me**
   Includes `enrolledCourses` when `role == STUDENT`.
   **Acceptance:** integration test as a student → payload includes enrollments; as instructor → field omitted/empty and no N+1 query blow-up (assert query count with a Hibernate statistics check, or just correctness if that's overkill for the deadline).
   **Commit:** `feat(user): implement GET /api/users/me`
