@@ -12,7 +12,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration test — seed a user, correct credentials → 200 with both tokens; wrong password → 401; a deactivated (`isActive=false`) user → 401 even with correct credentials; response never includes the password field.
   **Commit:** `feat(auth): implement POST /api/auth/login`
 
-- [ ] **3.3 POST /api/auth/refresh**
+- [x] **3.3 POST /api/auth/refresh**
   **Acceptance:** integration test — valid refresh token → 200 new access token; expired/invalid refresh token → 401.
   **Commit:** `feat(auth): implement POST /api/auth/refresh`
 
