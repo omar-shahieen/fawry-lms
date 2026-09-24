@@ -1,0 +1,24 @@
+{
+  "name": "fawry-lms-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "fawry-lms-front-end"
+  ],
+  "scripts": {
+    "nx": "nx",
+    "dev": "nx run fawry-lms-front-end:dev",
+    "dev:api": "nx run fawry-lms-api:serve",
+    "dev:all": "nx run-many -t serve dev --parallel",
+    "build": "nx run-many -t build",
+    "test": "nx run-many -t test",
+    "lint": "nx run-many -t lint",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build"
+  },
+  "devDependencies": {
+    "nx": "^20.4.0",
+    "prettier": "^3.9.9"
+  }
+}

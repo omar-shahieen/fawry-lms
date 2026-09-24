@@ -1,0 +1,42 @@
+# Nx
+.nx/cache
+.nx/workspace-data
+
+# Python Virtual Environment
+.venv/
+__pycache__/
+*.pyc
+
+# IDE / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.iml
+*.sw?
+.DS_Store
+
+# Backend (Java / Maven)
+fawry-lms-api/target/
+fawry-lms-api/.mvn/timing.properties
+fawry-lms-api/.mvn/wrapper/maven-wrapper.jar
+
+# Frontend (Node / Vite)
+node_modules/
+fawry-lms-front-end/node_modules/
+fawry-lms-front-end/dist/
+fawry-lms-front-end/dist-ssr/
+fawry-lms-front-end/*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Secrets & Environment
+.env
+.env.*
+!.env.example
+!.env.development
+fawry-lms-api/.env
+
+# Temporary backups
+.backup-pre-merge/

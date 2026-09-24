@@ -1,0 +1,9 @@
+node_modules
+dist
+dist-ssr
+.git
+.gitignore
+.env*.local
+README.md
+docs
+.opencode

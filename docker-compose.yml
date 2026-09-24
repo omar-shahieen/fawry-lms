@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fawry-lms-db
+    environment:
+      POSTGRES_DB: ${SPRING_DATASOURCE_DB:-lms}
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME:-lms_user}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-lms_pass}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lms-network
+
+  api:
+    build:
+      context: ./fawry-lms-api
+      dockerfile: Dockerfile
+    container_name: fawry-lms-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${SPRING_DATASOURCE_DB:-lms}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-lms_user}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-lms_pass}
+      JWT_SECRET: ${JWT_SECRET:-local-development-only-secret-change-me}
+      JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION:-PT15M}
+      JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:-P7D}
+      ADMIN_SEED_EMAIL: ${ADMIN_SEED_EMAIL:-admin@lms.com}
+      ADMIN_SEED_PASSWORD: ${ADMIN_SEED_PASSWORD:-Admin123!}
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    restart: unless-stopped
+    networks:
+      - lms-network
+
+  frontend:
+    build:
+      context: ./fawry-lms-front-end
+      dockerfile: Dockerfile
+    container_name: fawry-lms-ui
+    depends_on:
+      - api
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    restart: unless-stopped
+    networks:
+      - lms-network
+
+volumes:
+  pgdata:
+
+networks:
+  lms-network:
+    driver: bridge

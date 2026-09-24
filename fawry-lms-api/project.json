@@ -1,0 +1,36 @@
+{
+  "name": "fawry-lms-api",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "fawry-lms-api/src",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "mvnw.cmd spring-boot:run",
+        "cwd": "fawry-lms-api"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "mvnw.cmd clean package -DskipTests",
+        "cwd": "fawry-lms-api"
+      },
+      "outputs": ["{projectRoot}/target"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "mvnw.cmd test",
+        "cwd": "fawry-lms-api"
+      }
+    },
+    "docker": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker build -t fawry-lms-api fawry-lms-api"
+      }
+    }
+  }
+}
