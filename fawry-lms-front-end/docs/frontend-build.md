@@ -79,9 +79,9 @@ npm install react-router @tanstack/react-query react-markdown remark-gfm
 npm install -D tailwindcss @tailwindcss/vite openapi-typescript
 ```
 
-- [ ] **2.1a** Project scaffolds; `npm run dev` serves the app; `npm run build` passes.
-- [ ] **2.1b** `vite.config.ts` loads `@tailwindcss/vite`; `src/index.css` contains `@import "tailwindcss";`; a Tailwind utility class visibly renders.
-- [ ] **2.1c** Confirm the installed package is `react-router`, not `react-router-dom` — check `package.json`.
+- [x] **2.1a** Project scaffolds; `npm run dev` serves the app; `npm run build` passes.
+- [x] **2.1b** `vite.config.ts` loads `@tailwindcss/vite`; `src/index.css` contains `@import "tailwindcss";`; a Tailwind utility class visibly renders.
+- [x] **2.1c** Confirm the installed package is `react-router`, not `react-router-dom` — check `package.json`.
 
 ### 2.2 Environment
 
@@ -116,7 +116,7 @@ src/
     └── dashboards/
 ```
 
-- [ ] **2.3a** Folders exist; every API call lives in `src/api` or `src/features/<f>/api.ts` — no `fetch` calls inside JSX/components.
+- [x] **2.3a** Folders exist; every API call lives in `src/api` or `src/features/<f>/api.ts` — no `fetch` calls inside JSX/components.
 
 ---
 

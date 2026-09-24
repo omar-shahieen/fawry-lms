@@ -34,9 +34,12 @@ Vite 8 + React 19 + TypeScript 7, **`react-router` v8** (declarative mode — `r
 ```bash
 npm run dev        # dev server
 npm run build      # tsc -b && vite build — must stay green
-npm run lint       # eslint
-npm run gen:api    # openapi-typescript "$VITE_API_BASE_URL/v3/api-docs" -o src/api/schema.d.ts (backend must be up)
+npm run lint       # oxlint (current Vite react-ts template default — not ESLint)
+npm run format     # prettier
+npm run gen:api    # openapi-typescript http://localhost:8080/v3/api-docs -o src/api/schema.d.ts (backend must be up)
 ```
+
+Note: `gen:api` embeds the dev backend host because npm scripts run under cmd on Windows, which cannot expand `$VITE_API_BASE_URL`. This is a dev-time codegen script only — runtime code reads `import.meta.env.VITE_API_BASE_URL` exclusively.
 
 Backend: `http://localhost:8080` (see `.env.development`). Re-run `gen:api` whenever the contract changes and commit `schema.d.ts`.
 
