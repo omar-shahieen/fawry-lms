@@ -9,6 +9,8 @@ import { CatalogScreen } from '../features/courses/CatalogScreen'
 import { CourseDetailScreen, CourseEditScreen } from '../features/courses/CourseScreens'
 import { RosterScreen } from '../features/courses/RosterScreen'
 import { AdminCoursesScreen } from '../features/courses/AdminCoursesScreen'
+import { ContentReaderScreen } from '../features/sections/ContentReaderScreen'
+import { ContentManageScreen } from '../features/sections/ContentManageScreen'
 import { DashboardPlaceholder } from './DashboardPlaceholder'
 import { NotFoundPage } from './pages'
 import { RootLayout } from './RootLayout'
@@ -53,6 +55,8 @@ export function AppRoutes() {
         <Route path="/courses/:id" element={<CourseDetailScreen />} />
         <Route path="/courses/:id/edit" element={<CourseEditScreen />} />
         <Route path="/courses/:id/students" element={<RosterScreen />} />
+        <Route path="/courses/:id/content" element={<ContentReaderScreen />} />
+        <Route path="/courses/:id/content/manage" element={<ContentManageScreen />} />
         <Route
           path="/admin/courses"
           element={

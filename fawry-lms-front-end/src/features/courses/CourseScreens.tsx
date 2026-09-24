@@ -112,6 +112,16 @@ export function CourseDetailScreen() {
                 <Button variant="secondary">Students</Button>
               </Link>
             )}
+            {(canManage || (user.role === 'STUDENT' && enrolled)) && (
+              <Link to={`/courses/${id}/content`}>
+                <Button variant="secondary">Content</Button>
+              </Link>
+            )}
+            {canManage && (
+              <Link to={`/courses/${id}/content/manage`}>
+                <Button variant="secondary">Manage content</Button>
+              </Link>
+            )}
             {user.role === 'ADMIN' && (
               <Button variant="danger" onClick={() => setConfirmDelete(true)}>
                 Delete
