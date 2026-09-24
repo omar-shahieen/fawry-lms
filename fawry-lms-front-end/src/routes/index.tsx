@@ -11,6 +11,8 @@ import { RosterScreen } from '../features/courses/RosterScreen'
 import { AdminCoursesScreen } from '../features/courses/AdminCoursesScreen'
 import { ContentReaderScreen } from '../features/sections/ContentReaderScreen'
 import { ContentManageScreen } from '../features/sections/ContentManageScreen'
+import { CourseQuizzesScreen, QuizManageScreen } from '../features/quizzes/QuizListScreens'
+import { QuizEditScreen } from '../features/quizzes/QuizEditScreen'
 import { DashboardPlaceholder } from './DashboardPlaceholder'
 import { NotFoundPage } from './pages'
 import { RootLayout } from './RootLayout'
@@ -57,6 +59,9 @@ export function AppRoutes() {
         <Route path="/courses/:id/students" element={<RosterScreen />} />
         <Route path="/courses/:id/content" element={<ContentReaderScreen />} />
         <Route path="/courses/:id/content/manage" element={<ContentManageScreen />} />
+        <Route path="/courses/:id/quizzes" element={<CourseQuizzesScreen />} />
+        <Route path="/courses/:id/quizzes/manage" element={<QuizManageScreen />} />
+        <Route path="/quizzes/:id/edit" element={<QuizEditScreen />} />
         <Route
           path="/admin/courses"
           element={

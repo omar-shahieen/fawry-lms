@@ -113,9 +113,14 @@ export function CourseDetailScreen() {
               </Link>
             )}
             {(canManage || (user.role === 'STUDENT' && enrolled)) && (
-              <Link to={`/courses/${id}/content`}>
-                <Button variant="secondary">Content</Button>
-              </Link>
+              <>
+                <Link to={`/courses/${id}/content`}>
+                  <Button variant="secondary">Content</Button>
+                </Link>
+                <Link to={`/courses/${id}/quizzes`}>
+                  <Button variant="secondary">Quizzes</Button>
+                </Link>
+              </>
             )}
             {canManage && (
               <Link to={`/courses/${id}/content/manage`}>
