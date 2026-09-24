@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useParams, useSearchParams } from 'react-router'
 import { isApiError } from '../../api/errors'
 import { Badge, Card, PageHeader } from '../../components/Layout'
 import { Button } from '../../components/Button'
@@ -89,7 +88,13 @@ export function MyGradesScreen() {
 
 export function CourseGradesScreen() {
   const { id: courseId = '' } = useParams()
-  const [page, setPage] = useState(0)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const page = Number(searchParams.get('page') ?? '0') || 0
+  const setPage = (next: number) => {
+    const params = new URLSearchParams(searchParams)
+    params.set('page', String(next))
+    setSearchParams(params)
+  }
   const gradesQuery = useCourseGrades(courseId, page)
 
   return (

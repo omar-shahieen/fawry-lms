@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { useParams } from 'react-router'
+import { useParams, useSearchParams } from 'react-router'
 import { isApiError } from '../../api/errors'
 import { Badge, Card, PageHeader } from '../../components/Layout'
 import { ErrorState, EmptyState, ForbiddenState, Skeleton } from '../../components/States'
@@ -8,7 +7,13 @@ import { useCourseStudents } from './queries'
 
 export function RosterScreen() {
   const { id = '' } = useParams()
-  const [page, setPage] = useState(0)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const page = Number(searchParams.get('page') ?? '0') || 0
+  const setPage = (next: number) => {
+    const params = new URLSearchParams(searchParams)
+    params.set('page', String(next))
+    setSearchParams(params)
+  }
   const studentsQuery = useCourseStudents(id, page)
 
   return (

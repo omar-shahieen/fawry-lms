@@ -92,7 +92,7 @@ VITE_API_BASE_URL=http://localhost:8080
 
 `VITE_API_BASE_URL` is the **host only** — every endpoint path used anywhere in this app, in every feature module, should be copy-pasted verbatim from `lms-endpoints.md` **including its leading `/api/`**. Do not strip `/api` and re-add it in the client wrapper, and do not bake `/api` into `VITE_API_BASE_URL`. One source of truth for each path, character-for-character matching the spec table, eliminates an entire class of typo bugs.
 
-- [ ] **2.2a** `VITE_API_BASE_URL` read via `import.meta.env.VITE_API_BASE_URL`; no other hardcoded hostnames anywhere; `.env` files with real values are never committed.
+- [x] **2.2a** `VITE_API_BASE_URL` read via `import.meta.env.VITE_API_BASE_URL`; no other hardcoded hostnames anywhere; `.env` files with real values are never committed.
 
 ### 2.3 Folder layout
 
@@ -213,7 +213,7 @@ interface Page<T> {
 Shared list-query convention to try first: `?page=0&size=20&sort=<field>,asc|desc` plus each endpoint's own filters (`search`, `term`, `code` on courses; `role` on users — combinable where the table says so).
 
 - [x] **4.4a** One shared `Pagination` component used by every paginated list (users, courses, roster, attempts, staff grades, discussion, announcements).
-- [ ] **4.4b** Page state lives in URL search params (shareable, back-button-friendly), not local component state.
+- [x] **4.4b** Page state lives in URL search params (shareable, back-button-friendly), not local component state.
 
 ### 4.5 TanStack Query defaults
 
@@ -235,7 +235,7 @@ Shared list-query convention to try first: `?page=0&size=20&sort=<field>,asc|des
 `lms-endpoints.md` doesn't state a token lifetime, so don't hardcode an expiry assumption into the UI (e.g. a countdown on the session itself) — rely on `401` responses to trigger refresh reactively rather than a client-side timer.
 
 - [x] **5.1a** No token is ever written to `localStorage`, logged, or put in a URL.
-- [ ] **5.1b** On app boot: if a refresh token exists in `sessionStorage`, silently `POST /api/auth/refresh` once to restore the access token; on failure, clear storage and land on `/login`.
+- [x] **5.1b** On app boot: if a refresh token exists in `sessionStorage`, silently `POST /api/auth/refresh` once to restore the access token; on failure, clear storage and land on `/login`.
 
 ### 5.2 Single-flight refresh
 
@@ -244,8 +244,8 @@ Shared list-query convention to try first: `?page=0&size=20&sort=<field>,asc|des
 3. On success: store the new access token, replay the original request **once**.
 4. On failure: clear tokens, redirect to `/login?next=<current-path>`.
 
-- [ ] **5.2a** Two concurrent `401`s trigger exactly **one** refresh call.
-- [ ] **5.2b** A request retried after a failed refresh never loops — at most one retry per request, ever.
+- [x] **5.2a** Two concurrent `401`s trigger exactly **one** refresh call.
+- [x] **5.2b** A request retried after a failed refresh never loops — at most one retry per request, ever.
 
 ### 5.3 AuthProvider
 
@@ -259,7 +259,7 @@ State: `user | null` (from `GET /api/users/me`), `status: idle | loading | authe
 | Refresh | `POST /api/auth/refresh` | See §5.2 |
 
 - [x] **5.3a** Signup form fields are exactly `fullName`, `email`, `password` — no role selector exists anywhere in the signup UI.
-- [ ] **5.3b** Signup success does **not** navigate to `/login` — it's already authenticated; go straight to `/dashboard`.
+- [x] **5.3b** Signup success does **not** navigate to `/login` — it's already authenticated; go straight to `/dashboard`.
 - [ ] **5.3c** Login `401` → "Invalid email or password." (`lms-endpoints.md` doesn't state whether a deactivated account gets a distinct status; test a deactivated seeded/admin-created user against the live API and adjust this copy/handling once you know — don't assume `401` covers it until confirmed, per Appendix A.)
 - [ ] **5.3d** Signup duplicate email → expect `409`, shown inline on the email field (confirm the actual status against the live API — not explicitly pinned by either doc, but `409 Conflict` is the conventional choice and matches how the guide treats other duplicate-resource cases like course-code and re-enrollment).
 
@@ -311,7 +311,7 @@ Derived from the §3 authorization model applied to every endpoint in `lms-endpo
 * Home redirect: guest → `/login`; authenticated → `/dashboard`.
 * `/login` and `/signup` are standalone pages; everything else nests under a `RootLayout`.
 
-- [ ] **6.2a** Nav items render strictly per role (a Student never sees `/admin/*` links, etc.).
+- [x] **6.2a** Nav items render strictly per role (a Student never sees `/admin/*` links, etc.).
 - [x] **6.2b** Deep links survive a hard reload (Vite dev server's default history fallback covers this; confirm the production static host does too).
 - [x] **6.2c** A 404 page exists for unknown routes; a 403 page is rendered both by guards and by whole-screen API `403`s.
 
@@ -332,8 +332,8 @@ Each guide lists endpoints (verbatim from `lms-endpoints.md`), screens, build st
 3. Map errors per §5.3.
 
 - [ ] 7.1a Login works against a real account created through the flows below (there's no documented seed-credentials table in the provided docs — get them from whoever runs the backend, or create one via `/signup` and promote it, §7.2).
-- [ ] 7.1b Signup always lands as Student; no role field anywhere in the form.
-- [ ] 7.1c A guest hitting any protected route lands on `/login` with `next` preserved and restored after login.
+- [x] 7.1b Signup always lands as Student; no role field anywhere in the form.
+- [x] 7.1c A guest hitting any protected route lands on `/login` with `next` preserved and restored after login.
 
 ### 7.2 Admin — User management ⚠️ previously missing from this guide, load-bearing for the rest of the app
 
@@ -361,7 +361,7 @@ Steps:
 - [ ] 7.2a Admin can create an Instructor account and immediately use it to log in elsewhere in the app.
 - [ ] 7.2b Admin can promote an existing Student to Instructor via edit, and that account gains instructor-only access on next login/refresh.
 - [ ] 7.2c Deactivate persists and is reflected in the list; a deactivated user's login behavior is confirmed against the live API (Appendix A) and handled with real error copy, not a generic message.
-- [ ] 7.2d This screen is completely unreachable for Student/Instructor — no nav link, and a direct URL hit renders the 403 page.
+- [x] 7.2d This screen is completely unreachable for Student/Instructor — no nav link, and a direct URL hit renders the 403 page.
 
 ### 7.3 Profile
 
@@ -375,7 +375,7 @@ Steps:
 
 - [ ] 7.3a Editing name/URL persists after reload.
 - [x] 7.3b No role/email/isActive controls exist on `/profile`.
-- [ ] 7.3c Student's own profile view includes their enrolled courses; Instructor/Admin views don't render that section.
+- [x] 7.3c Student's own profile view includes their enrolled courses; Instructor/Admin views don't render that section.
 
 ### 7.4 Courses
 
@@ -404,7 +404,7 @@ Steps:
 4. Assign-instructor: dropdown populated from `GET /api/users?role=INSTRUCTOR` (paginated) — only offer instructors so the request can't be sent with a non-instructor id in the first place.
 5. Roster: paginated student list.
 
-- [ ] 7.4a Filters + pagination combine and survive a reload (URL sync).
+- [x] 7.4a Filters + pagination combine and survive a reload (URL sync).
 - [ ] 7.4b Instructor can edit their own course; the edit action is hidden on others' courses; a `403` if the server disagrees is still handled.
 - [ ] 7.4c Enroll success and duplicate-enroll `409` both behave as above.
 - [ ] 7.4d A soft-deleted course drops out of the catalog list (server-side `isActive` filtering, per §1).
@@ -481,7 +481,7 @@ Steps:
 
 - [ ] 7.6.1a A full quiz with questions builds and publishes.
 - [ ] 7.6.1b Client validation blocks 0-option and 0-correct submissions; server `400` is also mapped to the form.
-- [ ] 7.6.1c Unpublished quizzes are absent from the student-facing list (server-enforced; UI also doesn't link them).
+- [x] 7.6.1c Unpublished quizzes are absent from the student-facing list (server-enforced; UI also doesn't link them).
 - [ ] 7.6.1d The option-marking control supports selecting more than one correct option, and this has been tested against the live API rather than assumed.
 
 #### 7.6.2 Quiz taking (Student)
@@ -532,11 +532,11 @@ Steps:
 4. Error paths: `400` (no attempt — recover by re-running the §7.6.2 step-1 flow from `attempts/me`); `409` → "You have already submitted this quiz — single attempt only," redirect to review; late-rejection → "The time limit has passed — your submission was not accepted," then offer the review view.
 5. A second visit after submission is review-only; the `GET` is safe post-submission, but still avoid pointless refetch loops.
 
-- [ ] 7.6.2a The attempt is created **only** by the Start click — merely opening the course page, or hovering a quiz link, never fires `GET /api/quizzes/{id}` as a student.
+- [x] 7.6.2a The attempt is created **only** by the Start click — merely opening the course page, or hovering a quiz link, never fires `GET /api/quizzes/{id}` as a student.
 - [ ] 7.6.2b Refreshing the take screen mid-attempt does not reset the countdown (compare `expiresAt`/`secondsRemaining` across reloads and confirm it's unchanged).
-- [ ] 7.6.2c No correctness field is visible anywhere — DOM or network payload used for rendering — before submission.
+- [x] 7.6.2c No correctness field is visible anywhere — DOM or network payload used for rendering — before submission.
 - [ ] 7.6.2d Submit → score + review; a second submit attempt shows the `409` copy and stays in review.
-- [ ] 7.6.2e Countdown hitting zero disables inputs.
+- [x] 7.6.2e Countdown hitting zero disables inputs.
 - [ ] 7.6.2f Post-submission navigation always shows the permanent review; `GET /api/quizzes/{id}/attempts/me` reflects the stored attempt.
 
 ### 7.7 Grades
@@ -551,7 +551,7 @@ Steps:
 
 - [ ] 7.7a Student sees only their own results, grouped by course.
 - [ ] 7.7b Instructor sees the table for their own course only; Admin sees any course.
-- [ ] 7.7c No fabricated aggregate/average grade is displayed anywhere.
+- [x] 7.7c No fabricated aggregate/average grade is displayed anywhere.
 
 ### 7.8 Discussion
 
