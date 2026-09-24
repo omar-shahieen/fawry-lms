@@ -9,4 +9,8 @@ import com.fawry.lms.communication.entities.DiscussionPost;
 public interface DiscussionPostRepository extends JpaRepository<DiscussionPost, Long> {
 
     Page<DiscussionPost> findByCourse_IdOrderByCreatedAtDesc(Long courseId, Pageable pageable);
+
+    Page<DiscussionPost> findByCourse_IdAndParentPostIsNullOrderByCreatedAtDesc(Long courseId, Pageable pageable);
+
+    java.util.List<DiscussionPost> findByParentPost_IdOrderByCreatedAtAsc(Long parentPostId);
 }
