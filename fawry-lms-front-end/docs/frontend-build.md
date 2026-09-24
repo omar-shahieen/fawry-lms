@@ -235,14 +235,14 @@ Shared list-query convention to try first: `?page=0&size=20&sort=<field>,asc|des
 `lms-endpoints.md` doesn't state a token lifetime, so don't hardcode an expiry assumption into the UI (e.g. a countdown on the session itself) — rely on `401` responses to trigger refresh reactively rather than a client-side timer.
 
 - [x] **5.1a** No token is ever written to `localStorage`, logged, or put in a URL.
-- [x] **5.1b** On app boot: if a refresh token exists in `sessionStorage`, silently `POST /api/auth/refresh` once to restore the access token; on failure, clear storage and land on `/login`.
+- [x] **5.1b** On app boot: if a refresh token exists in `sessionStorage`, silently `POST /api/auth/refresh` once to restore the access token; on a rejection, clear storage and land on `/login` (an unreachable server leaves the token in place for the next load — see §5.2 step 4).
 
 ### 5.2 Single-flight refresh
 
 1. A request returns `401`.
 2. If a refresh is already in flight, await that same promise; otherwise start `POST /api/auth/refresh` with the stored refresh token.
 3. On success: store the new access token, replay the original request **once**.
-4. On failure: clear tokens, redirect to `/login?next=<current-path>`.
+4. On failure: clear tokens, redirect to `/login?next=<current-path>`. *Failure means the server actually rejected the refresh — a request that never got a response (offline, proxy down, or aborted by a navigation mid-flight) is not proof the tokens are dead, so it must leave them in place for the next load to retry.*
 
 - [x] **5.2a** Two concurrent `401`s trigger exactly **one** refresh call.
 - [x] **5.2b** A request retried after a failed refresh never loops — at most one retry per request, ever.
@@ -674,6 +674,8 @@ The backend is complete, so nothing here waits on backend work — this is a dep
 
 Run this against the real, running backend with whatever accounts you have (seed data is mentioned by `lms-endpoints.md` as existing — an initial Admin plus demo Instructor/Student — but no credentials are given in either source doc; get them from whoever runs the backend, or bootstrap your own via signup + the admin user-management screen from step 5 of §9). No direct database access.
 
+The whole pass is scripted in `scripts/walkthrough.mjs` (fresh accounts and course per run, seeded admin `admin@lms.com`), so re-running it after any change is one command: `node scripts/walkthrough.mjs`. It creates throwaway data each time — that is expected.
+
 1. Sign up a new user → lands as Student on the Student dashboard.
 2. Log in as an Admin → create an Instructor via `/admin/users` → create a Course → assign that Instructor to it.
 3. Log in as the new Student → browse the catalog → enroll in the course.
@@ -686,7 +688,7 @@ Run this against the real, running backend with whatever accounts you have (seed
 10. As the Admin → dashboard shows counts; `/admin/users` and `/admin/courses` both work fully.
 11. Negative pass: Student hitting `/admin/users` directly → 403 page; an unenrolled student hitting course content directly → "Not enrolled" state, not a crash; logout → tokens are dead (the back button cannot resume the session without logging in again).
 
-- [ ] **All 11 steps pass**, and every feature acceptance box across §7 is checked → build complete.
+- [x] **All 11 steps pass**, and every feature acceptance box across §7 is checked → build complete. **Confirmed live:** automated as `scripts/walkthrough.mjs` (headless Chrome via `playwright-core`, `node scripts/walkthrough.mjs` with the backend on `:8080` and `npm run dev` on `:5173`) — 33/33 assertions green, including the §7.6.2 reload-stable countdown and the 409 double-submit from a second tab.
 
 ---
 
