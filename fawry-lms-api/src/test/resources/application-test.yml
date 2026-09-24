@@ -11,6 +11,6 @@ jwt:
   secret: test-only-jwt-secret-with-at-least-32-bytes
   access-token-expiration: PT15M
   refresh-token-expiration: P7D
-lms:
+lms:      
   seed:
     enabled: false

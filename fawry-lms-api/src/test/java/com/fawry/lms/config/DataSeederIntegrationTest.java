@@ -21,7 +21,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(properties = "lms.seed.enabled=true")
+@SpringBootTest(properties = {
+        "lms.seed.enabled=true",
+        "ADMIN_SEED_EMAIL=admin@lms.com",
+        "ADMIN_SEED_PASSWORD=Admin123!"
+})
 @ActiveProfiles("test")
 class DataSeederIntegrationTest {
 

@@ -1,6 +1,7 @@
 package com.fawry.lms.auth;
 
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,16 +25,19 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
+    @SecurityRequirements
     public ResponseEntity<AuthResponse> signup(@Valid @RequestBody SignupRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signup(request));
     }
 
     @PostMapping("/login")
+    @SecurityRequirements
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
 
     @PostMapping("/refresh")
+    @SecurityRequirements
     public RefreshResponse refresh(@Valid @RequestBody RefreshRequest request) {
         return authService.refresh(request);
     }
