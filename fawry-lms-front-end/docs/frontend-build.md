@@ -573,9 +573,9 @@ Steps:
 4. Edit/Delete visible only to the author; Delete additionally visible to Admin on any post. Optimistic removal on delete with error rollback.
 5. Paginated list.
 
-- [ ] 7.8a Posts and their nested replies render correctly; replying to a reply is impossible through the UI.
+- [x] 7.8a Posts and their nested replies render correctly; replying to a reply is impossible through the UI.
 - [ ] 7.8b Edit/delete visibility matches the authorization table; a live `403` (e.g. a stale UI state) is handled gracefully.
-- [ ] 7.8c Any authenticated, enrolled user (student, instructor, or admin) can start a top-level thread — the composer isn't restricted to students.
+- [x] 7.8c Any authenticated, enrolled user (student, instructor, or admin) can start a top-level thread — the composer isn't restricted to students.
 
 ### 7.9 Announcements
 
@@ -587,8 +587,8 @@ Steps:
 2. Edit/delete available to the authoring instructor or an admin.
 3. Students get a read-only list.
 
-- [ ] 7.9a Student cannot create, edit, or delete announcements — no composer or edit controls render for that role.
-- [ ] 7.9b Instructor can manage announcements only on their own course.
+- [x] 7.9a Student cannot create, edit, or delete announcements — no composer or edit controls render for that role.
+- [x] 7.9b Instructor can manage announcements only on their own course.
 
 ### 7.10 Dashboards
 

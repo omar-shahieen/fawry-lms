@@ -15,6 +15,8 @@ import { CourseQuizzesScreen, QuizManageScreen } from '../features/quizzes/QuizL
 import { QuizEditScreen } from '../features/quizzes/QuizEditScreen'
 import { QuizViewScreen } from '../features/quizzes/QuizViewScreen'
 import { CourseGradesScreen, MyGradesScreen } from '../features/grades/GradesScreens'
+import { DiscussionScreen } from '../features/discussion/DiscussionScreen'
+import { AnnouncementsScreen } from '../features/announcements/AnnouncementsScreen'
 import { DashboardPlaceholder } from './DashboardPlaceholder'
 import { NotFoundPage } from './pages'
 import { RootLayout } from './RootLayout'
@@ -74,6 +76,8 @@ export function AppRoutes() {
           }
         />
         <Route path="/courses/:id/grades" element={<CourseGradesScreen />} />
+        <Route path="/courses/:id/discussion" element={<DiscussionScreen />} />
+        <Route path="/courses/:id/announcements" element={<AnnouncementsScreen />} />
         <Route
           path="/admin/courses"
           element={

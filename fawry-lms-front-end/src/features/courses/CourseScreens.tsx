@@ -120,6 +120,12 @@ export function CourseDetailScreen() {
                 <Link to={`/courses/${id}/quizzes`}>
                   <Button variant="secondary">Quizzes</Button>
                 </Link>
+                <Link to={`/courses/${id}/discussion`}>
+                  <Button variant="secondary">Discussion</Button>
+                </Link>
+                <Link to={`/courses/${id}/announcements`}>
+                  <Button variant="secondary">Announcements</Button>
+                </Link>
               </>
             )}
             {canManage && (
