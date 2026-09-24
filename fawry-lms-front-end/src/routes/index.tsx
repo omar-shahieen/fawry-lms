@@ -17,7 +17,7 @@ import { QuizViewScreen } from '../features/quizzes/QuizViewScreen'
 import { CourseGradesScreen, MyGradesScreen } from '../features/grades/GradesScreens'
 import { DiscussionScreen } from '../features/discussion/DiscussionScreen'
 import { AnnouncementsScreen } from '../features/announcements/AnnouncementsScreen'
-import { DashboardPlaceholder } from './DashboardPlaceholder'
+import { DashboardScreen } from '../features/dashboards/DashboardScreens'
 import { NotFoundPage } from './pages'
 import { RootLayout } from './RootLayout'
 
@@ -55,7 +55,7 @@ export function AppRoutes() {
           </RequireAuth>
         }
       >
-        <Route path="/dashboard" element={<DashboardPlaceholder />} />
+        <Route path="/dashboard" element={<DashboardScreen />} />
         <Route path="/profile" element={<ProfileScreen />} />
         <Route path="/courses" element={<CatalogScreen />} />
         <Route path="/courses/:id" element={<CourseDetailScreen />} />

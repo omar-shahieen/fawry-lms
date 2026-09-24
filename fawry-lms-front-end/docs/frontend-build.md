@@ -610,9 +610,9 @@ Steps:
 2. Cards/sections link out to the relevant feature screens (a course card → course detail; a quiz status → the take/review screen as appropriate).
 3. Loading and empty states ("No courses yet") for every region independently.
 
-- [ ] 7.10a Each role sees only the regions listed for it above.
-- [ ] 7.10b Student dashboard never shows another student's data (the server guarantees this; the UI just renders whatever it's given, unfiltered).
-- [ ] 7.10c No invented widgets beyond what `overview.md` §9 describes, unless the schema explicitly supports them.
+- [x] 7.10a Each role sees only the regions listed for it above.
+- [x] 7.10b Student dashboard never shows another student's data (the server guarantees this; the UI just renders whatever it's given, unfiltered).
+- [x] 7.10c No invented widgets beyond what `overview.md` §9 describes, unless the schema explicitly supports them.
 
 ---
 
