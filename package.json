@@ -20,5 +20,5 @@
   "devDependencies": {
     "nx": "^20.4.0",
     "prettier": "^3.9.9"
-  }
+    }
 }
