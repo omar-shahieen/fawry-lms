@@ -72,10 +72,11 @@ class CourseReadIntegrationTest {
     @Test
     void listWithoutSearchTermOrCodeReturnsActiveCourses() throws Exception {
         User instructor = saveUser("Instructor");
-        Course active = saveCourse(instructor, "Operating Systems", "CS-OS", "Fall 2026", true);
-        saveCourse(instructor, "Hidden Course", "CS-HIDE", "Fall 2026", false);
+        Course active = saveCourse(instructor, "Operating Systems", "CS-OS", "Term-Null-Search", true);
+        saveCourse(instructor, "Hidden Course", "CS-HIDE", "Term-Null-Search", false);
 
         mockMvc.perform(get("/api/courses")
+                .param("term", "Term-Null-Search")
                 .param("page", "0")
                 .param("size", "10")
                 .header("Authorization", bearerToken(instructor)))
