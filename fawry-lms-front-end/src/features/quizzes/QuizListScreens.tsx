@@ -95,7 +95,7 @@ export function CourseQuizzesScreen() {
                     </Button>
                   </Link>
                 ) : quiz.published ? (
-                  <Link to={`/quizzes/${quiz.id}`}>
+                  <Link to={`/quizzes/${quiz.id}`} state={{ quizTitle: quiz.title, durationMinutes: quiz.durationMinutes, questionCount: quiz.questions?.length }}>
                     <Button size="sm">Open</Button>
                   </Link>
                 ) : null}

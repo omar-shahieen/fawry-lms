@@ -219,7 +219,7 @@ Shared list-query convention to try first: `?page=0&size=20&sort=<field>,asc|des
 
 - [x] **4.5a** `QueryClient` defaults: `staleTime` ~30s, no retry on `4xx` (retry up to 2× on network/`5xx`), `refetchOnWindowFocus: false`.
 - [x] **4.5b** Query keys centralized in `src/api/keys.ts` (`['courses', filters]`, `['quiz', id]`, …); mutations invalidate exactly the keys they affect.
-- [ ] **4.5c** The student's quiz-detail query is **exempt** from these defaults entirely — see the hard rules in §7.6.
+- [x] **4.5c** The student's quiz-detail query is **exempt** from these defaults entirely — see the hard rules in §7.6.
 
 ---
 
