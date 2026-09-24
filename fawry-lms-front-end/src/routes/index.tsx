@@ -3,6 +3,7 @@ import { useAuth } from '../auth/context'
 import { FullPageSpinner, GuestOnly, RequireAuth } from '../auth/guards'
 import { LoginScreen } from '../features/auth/LoginScreen'
 import { SignupScreen } from '../features/auth/SignupScreen'
+import { ProfileScreen } from '../features/profile/ProfileScreen'
 import { DashboardPlaceholder } from './DashboardPlaceholder'
 import { NotFoundPage } from './pages'
 import { RootLayout } from './RootLayout'
@@ -42,6 +43,7 @@ export function AppRoutes() {
         }
       >
         <Route path="/dashboard" element={<DashboardPlaceholder />} />
+        <Route path="/profile" element={<ProfileScreen />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

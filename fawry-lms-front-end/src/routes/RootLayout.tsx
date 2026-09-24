@@ -10,7 +10,10 @@ interface NavItem {
 }
 
 /** Role-filtered per frontend-build.md §6.1; grows as feature steps land. */
-const NAV_ITEMS: NavItem[] = [{ to: '/dashboard', label: 'Dashboard' }]
+const NAV_ITEMS: NavItem[] = [
+  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/profile', label: 'Profile' },
+]
 
 function navItemsForRole(role: Role): NavItem[] {
   return NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(role))
