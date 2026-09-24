@@ -2,7 +2,7 @@
 
 Status legend: `[x]` done, `[ ]` not yet.
 
-- [ ] **8.1 GET /api/students/me/grades**
+- [x] **8.1 GET /api/students/me/grades**
   **Acceptance:** integration test — response grouped by enrolled course, each with that course's quiz results (one score per attempted quiz, since single-attempt means no best-of/averaging logic to verify); a student cannot retrieve another student's grades via this endpoint (there's no id param — scoped to `authentication.principal`).
   **Commit:** `feat(grade): implement student grades view`
 

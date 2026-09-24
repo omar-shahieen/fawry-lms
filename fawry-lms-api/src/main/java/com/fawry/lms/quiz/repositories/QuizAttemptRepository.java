@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import com.fawry.lms.quiz.entities.QuizAttempt;
 
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> {
@@ -14,4 +15,6 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> 
     Optional<QuizAttempt> findByQuizIdAndStudentId(Long quizId, UUID studentId);
 
     Page<QuizAttempt> findByQuizId(Long quizId, Pageable pageable);
+
+    List<QuizAttempt> findByStudent_Id(UUID studentId);
 }
