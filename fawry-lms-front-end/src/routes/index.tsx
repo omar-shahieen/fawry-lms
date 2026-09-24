@@ -14,6 +14,7 @@ import { ContentManageScreen } from '../features/sections/ContentManageScreen'
 import { CourseQuizzesScreen, QuizManageScreen } from '../features/quizzes/QuizListScreens'
 import { QuizEditScreen } from '../features/quizzes/QuizEditScreen'
 import { QuizViewScreen } from '../features/quizzes/QuizViewScreen'
+import { CourseGradesScreen, MyGradesScreen } from '../features/grades/GradesScreens'
 import { DashboardPlaceholder } from './DashboardPlaceholder'
 import { NotFoundPage } from './pages'
 import { RootLayout } from './RootLayout'
@@ -64,6 +65,15 @@ export function AppRoutes() {
         <Route path="/courses/:id/quizzes/manage" element={<QuizManageScreen />} />
         <Route path="/quizzes/:id" element={<QuizViewScreen />} />
         <Route path="/quizzes/:id/edit" element={<QuizEditScreen />} />
+        <Route
+          path="/grades"
+          element={
+            <RequireRole roles={['STUDENT']}>
+              <MyGradesScreen />
+            </RequireRole>
+          }
+        />
+        <Route path="/courses/:id/grades" element={<CourseGradesScreen />} />
         <Route
           path="/admin/courses"
           element={

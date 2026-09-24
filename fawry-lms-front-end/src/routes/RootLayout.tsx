@@ -13,6 +13,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/courses', label: 'Courses' },
+  { to: '/grades', label: 'Grades', roles: ['STUDENT'] },
   { to: '/profile', label: 'Profile' },
   { to: '/admin/users', label: 'Users', roles: ['ADMIN'] },
   { to: '/admin/courses', label: 'Manage courses', roles: ['ADMIN'] },
