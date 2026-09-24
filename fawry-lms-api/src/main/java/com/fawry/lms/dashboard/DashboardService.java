@@ -1,7 +1,13 @@
 package com.fawry.lms.dashboard;
 
 import com.fawry.lms.course.EnrollmentRepository;
+import com.fawry.lms.course.CourseRepository;
 import com.fawry.lms.course.entities.Enrollment;
+import com.fawry.lms.communication.AnnouncementRepository;
+import com.fawry.lms.communication.entities.Announcement;
+import com.fawry.lms.dashboard.dtos.InstructorAnnouncementResponse;
+import com.fawry.lms.dashboard.dtos.InstructorCourseSummaryResponse;
+import com.fawry.lms.dashboard.dtos.InstructorDashboardResponse;
 import com.fawry.lms.dashboard.dtos.StudentDashboardCourseResponse;
 import com.fawry.lms.dashboard.dtos.StudentDashboardQuizResponse;
 import com.fawry.lms.quiz.entities.Quiz;
@@ -23,14 +29,20 @@ public class DashboardService {
     private final EnrollmentRepository enrollmentRepository;
     private final QuizRepository quizRepository;
     private final QuizAttemptRepository attemptRepository;
+    private final CourseRepository courseRepository;
+    private final AnnouncementRepository announcementRepository;
 
     public DashboardService(
             EnrollmentRepository enrollmentRepository,
             QuizRepository quizRepository,
-            QuizAttemptRepository attemptRepository) {
+            QuizAttemptRepository attemptRepository,
+            CourseRepository courseRepository,
+            AnnouncementRepository announcementRepository) {
         this.enrollmentRepository = enrollmentRepository;
         this.quizRepository = quizRepository;
         this.attemptRepository = attemptRepository;
+        this.courseRepository = courseRepository;
+        this.announcementRepository = announcementRepository;
     }
 
     @Transactional(readOnly = true)
@@ -41,6 +53,39 @@ public class DashboardService {
         return enrollmentRepository.findByStudent(student).stream()
                 .map(enrollment -> toCourseResponse(enrollment, attemptsByQuiz))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public InstructorDashboardResponse getInstructorDashboard(User instructor) {
+        var courses = courseRepository.findByInstructor_Id(instructor.getId());
+        Map<Long, List<QuizAttempt>> attemptsByCourse = attemptRepository
+                .findByQuiz_Course_Instructor_IdAndScoreIsNotNull(instructor.getId()).stream()
+                .collect(Collectors.groupingBy(attempt -> attempt.getQuiz().getCourse().getId()));
+        List<InstructorCourseSummaryResponse> summaries = courses.stream()
+                .map(course -> toCourseSummary(course.getId(), course.getTitle(),
+                        attemptsByCourse.getOrDefault(course.getId(), List.of())))
+                .toList();
+        List<InstructorAnnouncementResponse> announcements = announcementRepository
+                .findByAuthor_IdAndCourse_Instructor_IdOrderByCreatedAtDesc(instructor.getId(), instructor.getId())
+                .stream().map(this::toInstructorAnnouncement).toList();
+        return new InstructorDashboardResponse(summaries, announcements);
+    }
+
+    private InstructorCourseSummaryResponse toCourseSummary(
+            Long courseId, String courseName, List<QuizAttempt> attempts) {
+        Double averageScore = attempts.isEmpty()
+                ? null
+                : attempts.stream().mapToInt(QuizAttempt::getScore).average().orElseThrow();
+        return new InstructorCourseSummaryResponse(courseId, courseName, attempts.size(), averageScore);
+    }
+
+    private InstructorAnnouncementResponse toInstructorAnnouncement(Announcement announcement) {
+        return new InstructorAnnouncementResponse(
+                announcement.getId(),
+                announcement.getCourse().getId(),
+                announcement.getTitle(),
+                announcement.getBody(),
+                announcement.getCreatedAt());
     }
 
     private StudentDashboardCourseResponse toCourseResponse(

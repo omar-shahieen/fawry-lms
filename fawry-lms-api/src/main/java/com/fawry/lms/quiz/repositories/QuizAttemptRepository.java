@@ -21,4 +21,6 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> 
     Page<QuizAttempt> findByQuiz_Course_Id(Long courseId, Pageable pageable);
 
     Page<QuizAttempt> findByQuiz_Course_IdAndScoreIsNotNull(Long courseId, Pageable pageable);
+
+    List<QuizAttempt> findByQuiz_Course_Instructor_IdAndScoreIsNotNull(UUID instructorId);
 }

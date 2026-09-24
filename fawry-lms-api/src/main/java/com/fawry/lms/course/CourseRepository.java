@@ -7,8 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.fawry.lms.course.entities.Course;
+import java.util.List;
+import java.util.UUID;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
+
+    List<Course> findByInstructor_Id(UUID instructorId);
 
     @Query("""
             select c from Course c
