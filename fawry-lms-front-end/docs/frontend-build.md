@@ -234,7 +234,7 @@ Shared list-query convention to try first: `?page=0&size=20&sort=<field>,asc|des
 
 `lms-endpoints.md` doesn't state a token lifetime, so don't hardcode an expiry assumption into the UI (e.g. a countdown on the session itself) — rely on `401` responses to trigger refresh reactively rather than a client-side timer.
 
-- [ ] **5.1a** No token is ever written to `localStorage`, logged, or put in a URL.
+- [x] **5.1a** No token is ever written to `localStorage`, logged, or put in a URL.
 - [ ] **5.1b** On app boot: if a refresh token exists in `sessionStorage`, silently `POST /api/auth/refresh` once to restore the access token; on failure, clear storage and land on `/login`.
 
 ### 5.2 Single-flight refresh
@@ -258,7 +258,7 @@ State: `user | null` (from `GET /api/users/me`), `status: idle | loading | authe
 | Logout | `POST /api/auth/logout` | Best-effort server call (it clears the DB-stored access token, invalidating refresh too per §1) → clear memory + `sessionStorage` regardless of the call's outcome → `/login` |
 | Refresh | `POST /api/auth/refresh` | See §5.2 |
 
-- [ ] **5.3a** Signup form fields are exactly `fullName`, `email`, `password` — no role selector exists anywhere in the signup UI.
+- [x] **5.3a** Signup form fields are exactly `fullName`, `email`, `password` — no role selector exists anywhere in the signup UI.
 - [ ] **5.3b** Signup success does **not** navigate to `/login` — it's already authenticated; go straight to `/dashboard`.
 - [ ] **5.3c** Login `401` → "Invalid email or password." (`lms-endpoints.md` doesn't state whether a deactivated account gets a distinct status; test a deactivated seeded/admin-created user against the live API and adjust this copy/handling once you know — don't assume `401` covers it until confirmed, per Appendix A.)
 - [ ] **5.3d** Signup duplicate email → expect `409`, shown inline on the email field (confirm the actual status against the live API — not explicitly pinned by either doc, but `409 Conflict` is the conventional choice and matches how the guide treats other duplicate-resource cases like course-code and re-enrollment).
@@ -269,9 +269,9 @@ State: `user | null` (from `GET /api/users/me`), `status: idle | loading | authe
 * `<RequireRole roles={['ADMIN']}>` (etc.) — wrong role → render a 403 page.
 * Every screen still handles a live `401`/`403` from the API regardless of what the guard decided (§8.1).
 
-- [ ] **5.4a** Every non-public route is wrapped in `RequireAuth`.
+- [x] **5.4a** Every non-public route is wrapped in `RequireAuth`.
 - [ ] **5.4b** Admin-only and instructor-only sections are wrapped in `RequireRole`.
-- [ ] **5.4c** Team/agent understands: hiding a button is not authorization. Use the §3 table to decide what to show, but never treat a hidden button as a substitute for handling the server's real answer.
+- [x] **5.4c** Team/agent understands: hiding a button is not authorization. Use the §3 table to decide what to show, but never treat a hidden button as a substitute for handling the server's real answer.
 
 ---
 
@@ -312,8 +312,8 @@ Derived from the §3 authorization model applied to every endpoint in `lms-endpo
 * `/login` and `/signup` are standalone pages; everything else nests under a `RootLayout`.
 
 - [ ] **6.2a** Nav items render strictly per role (a Student never sees `/admin/*` links, etc.).
-- [ ] **6.2b** Deep links survive a hard reload (Vite dev server's default history fallback covers this; confirm the production static host does too).
-- [ ] **6.2c** A 404 page exists for unknown routes; a 403 page is rendered both by guards and by whole-screen API `403`s.
+- [x] **6.2b** Deep links survive a hard reload (Vite dev server's default history fallback covers this; confirm the production static host does too).
+- [x] **6.2c** A 404 page exists for unknown routes; a 403 page is rendered both by guards and by whole-screen API `403`s.
 
 ---
 

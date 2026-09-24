@@ -39,6 +39,13 @@ function refreshSession(): Promise<boolean> {
   return refreshInFlight
 }
 
+/** Proactive refresh for session boot. Clears tokens on failure; does not notify (caller owns state). */
+export async function tryRefreshSession(): Promise<boolean> {
+  const refreshed = await refreshSession()
+  if (!refreshed) clearTokens()
+  return refreshed
+}
+
 export interface ApiRequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown
   /** Internal: prevents the refresh call itself from re-entering retry logic. */
