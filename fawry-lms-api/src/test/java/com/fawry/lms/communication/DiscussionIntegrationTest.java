@@ -19,7 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -89,6 +91,62 @@ class DiscussionIntegrationTest {
                         .contentType("application/json")
                         .content("{\"title\":\"Blocked\",\"body\":\"Blocked body\"}"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void repliesAreOneLevelAndEditsAndDeletesRespectAuthorAndAdminRules() throws Exception {
+        User instructor = saveUser(Role.INSTRUCTOR, "Owner Instructor");
+        User author = saveUser(Role.STUDENT, "Author");
+        User otherStudent = saveUser(Role.STUDENT, "Other Student");
+        User admin = saveUser(Role.ADMIN, "Moderator");
+        Course course = saveCourse(instructor);
+        enroll(author, course);
+        enroll(otherStudent, course);
+        DiscussionPost root = savePost(course, author, "Root", "Original body");
+
+        var replyResult = mockMvc.perform(post("/api/discussion/{postId}/reply", root.getId())
+                        .header("Authorization", bearerToken(otherStudent))
+                        .contentType("application/json")
+                        .content("{\"body\":\"First reply\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.body").value("First reply"))
+                .andReturn();
+        Number replyIdValue = com.jayway.jsonpath.JsonPath.read(
+                replyResult.getResponse().getContentAsString(), "$.id");
+        Long replyId = replyIdValue.longValue();
+
+        mockMvc.perform(post("/api/discussion/{postId}/reply", replyId)
+                        .header("Authorization", bearerToken(author))
+                        .contentType("application/json")
+                        .content("{\"body\":\"Second-level reply\"}"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(patch("/api/discussion/{id}", root.getId())
+                        .header("Authorization", bearerToken(otherStudent))
+                        .contentType("application/json")
+                        .content("{\"body\":\"Unauthorized edit\"}"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(patch("/api/discussion/{id}", root.getId())
+                        .header("Authorization", bearerToken(admin))
+                        .contentType("application/json")
+                        .content("{\"body\":\"Admin cannot edit author content\"}"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(patch("/api/discussion/{id}", root.getId())
+                        .header("Authorization", bearerToken(author))
+                        .contentType("application/json")
+                        .content("{\"body\":\"Updated body\"}"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(delete("/api/discussion/{id}", replyId)
+                        .header("Authorization", bearerToken(author)))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(delete("/api/discussion/{id}", replyId)
+                        .header("Authorization", bearerToken(otherStudent)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(delete("/api/discussion/{id}", root.getId())
+                        .header("Authorization", bearerToken(admin)))
+                .andExpect(status().isOk());
     }
 
     private DiscussionPost savePost(Course course, User author, String title, String body) {

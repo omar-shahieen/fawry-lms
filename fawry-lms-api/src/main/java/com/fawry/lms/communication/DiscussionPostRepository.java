@@ -13,4 +13,6 @@ public interface DiscussionPostRepository extends JpaRepository<DiscussionPost, 
     Page<DiscussionPost> findByCourse_IdAndParentPostIsNullOrderByCreatedAtDesc(Long courseId, Pageable pageable);
 
     java.util.List<DiscussionPost> findByParentPost_IdOrderByCreatedAtAsc(Long parentPostId);
+
+    void deleteByParentPost_Id(Long parentPostId);
 }

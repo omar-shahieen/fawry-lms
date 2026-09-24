@@ -22,6 +22,10 @@ public class AuthorizationService {
         return user.getRole() == Role.ADMIN || user.getId().equals(ownerId);
     }
 
+    public boolean isOwner(User user, UUID ownerId) {
+        return user.getId().equals(ownerId);
+    }
+
     public boolean isEnrolledOrStaff(User user, Course course) {
         if (user.getRole() == Role.ADMIN) {
             return true;

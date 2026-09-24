@@ -1,8 +1,10 @@
 package com.fawry.lms.communication;
 
 import com.fawry.lms.communication.dtos.CreateDiscussionPostRequest;
+import com.fawry.lms.communication.dtos.CreateDiscussionReplyRequest;
 import com.fawry.lms.communication.dtos.DiscussionPostResponse;
 import com.fawry.lms.communication.dtos.DiscussionReplyResponse;
+import com.fawry.lms.communication.dtos.UpdateDiscussionPostRequest;
 import com.fawry.lms.communication.entities.DiscussionPost;
 import com.fawry.lms.course.CourseRepository;
 import com.fawry.lms.course.entities.Course;
@@ -42,9 +44,60 @@ public class DiscussionService {
         return toResponse(discussionPostRepository.saveAndFlush(post));
     }
 
+    @Transactional
+    public DiscussionReplyResponse reply(Long postId, User author, CreateDiscussionReplyRequest request) {
+        DiscussionPost parent = findPost(postId);
+        if (parent.getParentPost() != null) {
+            throw new IllegalArgumentException("Replies to replies are not allowed.");
+        }
+        DiscussionPost reply = new DiscussionPost();
+        reply.setCourse(parent.getCourse());
+        reply.setAuthor(author);
+        reply.setParentPost(parent);
+        reply.setBody(request.body());
+        return toReplyResponse(discussionPostRepository.saveAndFlush(reply));
+    }
+
+    @Transactional
+    public void update(Long postId, UpdateDiscussionPostRequest request) {
+        if (request.title() == null && request.body() == null) {
+            throw new IllegalArgumentException("At least one field must be provided.");
+        }
+        DiscussionPost post = findPost(postId);
+        if (request.title() != null) {
+            post.setTitle(request.title());
+        }
+        if (request.body() != null) {
+            post.setBody(request.body());
+        }
+        discussionPostRepository.saveAndFlush(post);
+    }
+
+    @Transactional
+    public void delete(Long postId) {
+        DiscussionPost post = findPost(postId);
+        discussionPostRepository.deleteByParentPost_Id(postId);
+        discussionPostRepository.delete(post);
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.UUID getAuthorId(Long postId) {
+        return findPost(postId).getAuthor().getId();
+    }
+
+    @Transactional(readOnly = true)
+    public Course getCourse(Long postId) {
+        return findPost(postId).getCourse();
+    }
+
     private Course findCourse(Long id) {
         return courseRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found."));
+    }
+
+    private DiscussionPost findPost(Long id) {
+        return discussionPostRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Discussion post not found."));
     }
 
     private DiscussionPostResponse toResponse(DiscussionPost post) {
