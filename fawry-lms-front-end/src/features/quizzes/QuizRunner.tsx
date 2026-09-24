@@ -36,6 +36,7 @@ export function QuizRunner({
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lateRejected, setLateRejected] = useState(false)
+  const [alreadySubmitted, setAlreadySubmitted] = useState(false)
   const queryClient = useQueryClient()
 
   const questions = quiz.questions ?? []
@@ -68,8 +69,9 @@ export function QuizRunner({
       onSubmitted()
     } catch (e) {
       if (isApiError(e) && e.status === 409) {
-        // already submitted — single attempt only → straight to review
-        onSubmitted()
+        // already submitted — single attempt only → surface the 409 copy, then review
+        setError('You have already submitted this quiz — single attempt only.')
+        setAlreadySubmitted(true)
       } else if (isApiError(e) && e.status === 400) {
         const message = e.message.toLowerCase()
         if (message.includes('expired')) {
@@ -120,7 +122,7 @@ export function QuizRunner({
       {error && (
         <div className="flex items-center justify-between gap-3 rounded-md bg-red-50 px-4 py-3 text-sm font-medium text-red-700" role="alert">
           <span>{error}</span>
-          {lateRejected && (
+          {(lateRejected || alreadySubmitted) && (
             <Button size="sm" variant="secondary" onClick={onViewReview}>
               View review
             </Button>
@@ -153,14 +155,14 @@ export function QuizRunner({
                         key={String(optionId ?? option.text)}
                         className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors ${
                           checked ? 'border-indigo-400 bg-indigo-50' : 'border-gray-200 bg-white hover:bg-gray-50'
-                        } ${expired || lateRejected ? 'pointer-events-none opacity-60' : ''}`}
+                        } ${expired || lateRejected || alreadySubmitted ? 'pointer-events-none opacity-60' : ''}`}
                       >
                         <input
                           type="radio"
                           name={`question-${String(questionId ?? index)}`}
                           className="size-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                           checked={checked}
-                          disabled={expired || submitting || lateRejected}
+                          disabled={expired || submitting || lateRejected || alreadySubmitted}
                           onChange={() => {
                             if (questionId !== undefined && questionId !== null && optionId !== undefined && optionId !== null) {
                               select(questionId, optionId)
@@ -182,7 +184,7 @@ export function QuizRunner({
         <p className="text-xs text-gray-500">
           {selectedCount} answer{selectedCount === 1 ? '' : 's'} selected
         </p>
-        <Button onClick={onSubmit} loading={submitting} disabled={lateRejected}>
+        <Button onClick={onSubmit} loading={submitting} disabled={lateRejected || alreadySubmitted}>
           {expired ? 'Submit now' : 'Submit quiz'}
         </Button>
       </div>
