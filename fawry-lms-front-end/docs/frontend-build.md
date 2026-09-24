@@ -171,8 +171,8 @@ One wrapper module, `src/api/client.ts`:
 4. Parse JSON on success; on failure, parse the error body into `ApiError` and throw — never return a raw `Response` to a caller.
 5. On `401`: run the single-flight refresh (§5.2), retry the original request **once**; if refresh fails, clear the session and throw.
 
-- [ ] **4.2a** Every feature's API functions go through this client — no ad hoc `fetch` elsewhere.
-- [ ] **4.2b** Non-JSON or empty response bodies (e.g. a logout response with no body) are handled without throwing a parse error.
+- [x] **4.2a** Every feature's API functions go through this client — no ad hoc `fetch` elsewhere.
+- [x] **4.2b** Non-JSON or empty response bodies (e.g. a logout response with no body) are handled without throwing a parse error.
 
 ### 4.3 Error model
 
@@ -212,13 +212,13 @@ interface Page<T> {
 
 Shared list-query convention to try first: `?page=0&size=20&sort=<field>,asc|desc` plus each endpoint's own filters (`search`, `term`, `code` on courses; `role` on users — combinable where the table says so).
 
-- [ ] **4.4a** One shared `Pagination` component used by every paginated list (users, courses, roster, attempts, staff grades, discussion, announcements).
+- [x] **4.4a** One shared `Pagination` component used by every paginated list (users, courses, roster, attempts, staff grades, discussion, announcements).
 - [ ] **4.4b** Page state lives in URL search params (shareable, back-button-friendly), not local component state.
 
 ### 4.5 TanStack Query defaults
 
-- [ ] **4.5a** `QueryClient` defaults: `staleTime` ~30s, no retry on `4xx` (retry up to 2× on network/`5xx`), `refetchOnWindowFocus: false`.
-- [ ] **4.5b** Query keys centralized in `src/api/keys.ts` (`['courses', filters]`, `['quiz', id]`, …); mutations invalidate exactly the keys they affect.
+- [x] **4.5a** `QueryClient` defaults: `staleTime` ~30s, no retry on `4xx` (retry up to 2× on network/`5xx`), `refetchOnWindowFocus: false`.
+- [x] **4.5b** Query keys centralized in `src/api/keys.ts` (`['courses', filters]`, `['quiz', id]`, …); mutations invalidate exactly the keys they affect.
 - [ ] **4.5c** The student's quiz-detail query is **exempt** from these defaults entirely — see the hard rules in §7.6.
 
 ---

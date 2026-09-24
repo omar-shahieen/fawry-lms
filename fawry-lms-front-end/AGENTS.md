@@ -27,7 +27,7 @@ Do not treat any file not listed above (or a live API response) as authoritative
 
 ## Stack
 
-Vite 8 + React 19 + TypeScript 7, **`react-router` v8** (declarative mode — `react-router-dom` does not exist in v8), `@tanstack/react-query` v5, Tailwind CSS v4 (`@tailwindcss/vite`, CSS-first, no config file), `openapi-typescript` v7, `react-markdown` + `remark-gfm`. Install with `@latest` at scaffold time; the lockfile is the record of what landed.
+Vite 8 + React 19 + TypeScript 6 (pinned `6.0.3` — TypeScript 7 breaks `openapi-typescript`'s runtime, which peer-requires TS ^5.x but works on 6), **`react-router` v8** (declarative mode — `react-router-dom` does not exist in v8), `@tanstack/react-query` v5, Tailwind CSS v4 (`@tailwindcss/vite`, CSS-first, no config file), `openapi-typescript` v7, `react-markdown` + `remark-gfm`. Install with `@latest` at scaffold time; the lockfile is the record of what landed.
 
 ## Commands
 
