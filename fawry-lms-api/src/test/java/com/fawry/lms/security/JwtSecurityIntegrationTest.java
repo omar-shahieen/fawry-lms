@@ -45,6 +45,13 @@ class JwtSecurityIntegrationTest {
     }
 
     @Test
+    void permitsUnauthenticatedHealthCheck() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+    }
+
+    @Test
     void acceptsValidAccessTokenAndMapsRoleToAuthority() throws Exception {
         User student = new User();
         student.setFullName("Security Test Student");

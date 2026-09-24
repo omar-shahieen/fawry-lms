@@ -7,7 +7,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** for each mutating endpoint, one test sending a blank required field → 400 with `fieldErrors`; an invalid enum value (e.g. bad `role`) and an invalid FK reference (e.g. assigning a non-existent instructor) are rejected with a clear error, not a 500.
   **Commit:** `feat(validation): add request DTO validation across all mutating endpoints`
 
-- [ ] **11.2 Dockerize the app + wire full-stack docker-compose**
+- [x] **11.2 Dockerize the app + wire full-stack docker-compose**
   Multi-stage `Dockerfile` (Maven build → JRE runtime, per spec §1); add the `app` service to `docker-compose.yml` alongside the `postgres` service from 0.2, with `depends_on: postgres (service_healthy)` and env vars for the datasource, `JWT_SECRET`, and `ADMIN_SEED_EMAIL`/`ADMIN_SEED_PASSWORD`.
   **Acceptance:** from a clean checkout, a single `docker-compose up` (no separate `mvn spring-boot:run`) brings up both containers; `GET /actuator/health` against the containerized app → 200; no manual setup steps needed.
   **Commit:** `chore(deploy): dockerize app and wire full-stack docker-compose`

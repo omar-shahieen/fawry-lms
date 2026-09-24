@@ -46,6 +46,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**",
                                                                 "/v3/api-docs/**")
                                                 .permitAll()
+                                                .requestMatchers("/actuator/health")
+                                                .permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(exceptions -> exceptions
                                                 .authenticationEntryPoint((request, response, exception) -> writeError(
