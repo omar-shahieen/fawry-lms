@@ -10,6 +10,6 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration tests — replying to a top-level post succeeds; replying to a reply → rejected (one level only); edit/delete restricted to the author; delete additionally allowed for Admin on any post/reply (moderation) even when not the author.
   **Commit:** `feat(discussion): implement reply, edit, and moderated delete`
 
-- [ ] **9.3 Announcements CRUD**
+- [x] **9.3 Announcements CRUD**
   **Acceptance:** integration test — same enrollment-gated read, admin/owning-instructor write pattern as sections; list newest-first; non-existent announcement → 404.
   **Commit:** `feat(announcement): implement announcements CRUD`
