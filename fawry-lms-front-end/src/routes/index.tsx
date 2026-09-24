@@ -5,6 +5,10 @@ import { LoginScreen } from '../features/auth/LoginScreen'
 import { SignupScreen } from '../features/auth/SignupScreen'
 import { ProfileScreen } from '../features/profile/ProfileScreen'
 import { AdminUsersScreen } from '../features/admin-users/AdminUsersScreen'
+import { CatalogScreen } from '../features/courses/CatalogScreen'
+import { CourseDetailScreen, CourseEditScreen } from '../features/courses/CourseScreens'
+import { RosterScreen } from '../features/courses/RosterScreen'
+import { AdminCoursesScreen } from '../features/courses/AdminCoursesScreen'
 import { DashboardPlaceholder } from './DashboardPlaceholder'
 import { NotFoundPage } from './pages'
 import { RootLayout } from './RootLayout'
@@ -45,6 +49,18 @@ export function AppRoutes() {
       >
         <Route path="/dashboard" element={<DashboardPlaceholder />} />
         <Route path="/profile" element={<ProfileScreen />} />
+        <Route path="/courses" element={<CatalogScreen />} />
+        <Route path="/courses/:id" element={<CourseDetailScreen />} />
+        <Route path="/courses/:id/edit" element={<CourseEditScreen />} />
+        <Route path="/courses/:id/students" element={<RosterScreen />} />
+        <Route
+          path="/admin/courses"
+          element={
+            <RequireRole roles={['ADMIN']}>
+              <AdminCoursesScreen />
+            </RequireRole>
+          }
+        />
         <Route
           path="/admin/users"
           element={
