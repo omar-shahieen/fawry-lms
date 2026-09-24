@@ -3,34 +3,49 @@ import { clearTokens, getAccessToken, getRefreshToken, notifySessionEnded, setAc
 
 const BASE_URL: string = import.meta.env.VITE_API_BASE_URL
 
-let refreshInFlight: Promise<boolean> | null = null
+let refreshInFlight: Promise<RefreshOutcome> | null = null
 
-async function performRefresh(): Promise<boolean> {
+/**
+ * `ok` — new access token stored.
+ * `rejected` — the server refused the refresh token; the session is dead, clear it.
+ * `unreachable` — no response at all (offline, proxy down, or the request was aborted by a
+ * navigation mid-flight). Not an auth failure: the refresh token may still be perfectly
+ * valid, so it must NOT be destroyed — the next page load retries it.
+ */
+type RefreshOutcome = 'ok' | 'rejected' | 'unreachable'
+
+async function performRefresh(): Promise<RefreshOutcome> {
   const refreshToken = getRefreshToken()
-  if (!refreshToken) return false
+  if (!refreshToken) return 'rejected'
 
+  let response: Response
   try {
-    const response = await fetch(`${BASE_URL}/api/auth/refresh`, {
+    response = await fetch(`${BASE_URL}/api/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
     })
-    if (!response.ok) return false
+  } catch {
+    return 'unreachable'
+  }
 
+  if (!response.ok) return 'rejected'
+
+  try {
     const text = await response.text()
-    if (!text) return false
+    if (!text) return 'rejected'
     const data = JSON.parse(text) as Record<string, unknown>
     const token = data.accessToken
-    if (typeof token !== 'string' || !token) return false
+    if (typeof token !== 'string' || !token) return 'rejected'
 
     setAccessToken(token)
-    return true
+    return 'ok'
   } catch {
-    return false
+    return 'rejected'
   }
 }
 
-function refreshSession(): Promise<boolean> {
+function refreshSession(): Promise<RefreshOutcome> {
   if (!refreshInFlight) {
     refreshInFlight = performRefresh().finally(() => {
       refreshInFlight = null
@@ -39,11 +54,11 @@ function refreshSession(): Promise<boolean> {
   return refreshInFlight
 }
 
-/** Proactive refresh for session boot. Clears tokens on failure; does not notify (caller owns state). */
+/** Proactive refresh for session boot. Clears tokens only when the server rejected them. */
 export async function tryRefreshSession(): Promise<boolean> {
-  const refreshed = await refreshSession()
-  if (!refreshed) clearTokens()
-  return refreshed
+  const outcome = await refreshSession()
+  if (outcome === 'rejected') clearTokens()
+  return outcome === 'ok'
 }
 
 export interface ApiRequestOptions extends Omit<RequestInit, 'body'> {
@@ -69,12 +84,15 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
   })
 
   if (response.status === 401 && !skipAuthRetry) {
-    const refreshed = await refreshSession()
-    if (refreshed) {
+    const outcome = await refreshSession()
+    if (outcome === 'ok') {
       return apiFetch<T>(path, { ...options, skipAuthRetry: true })
     }
-    clearTokens()
-    notifySessionEnded()
+    if (outcome === 'rejected') {
+      clearTokens()
+      notifySessionEnded()
+    }
+    // `unreachable`: keep the session — a network blip isn't proof the tokens are dead.
     throw await responseToApiError(response)
   }
 
