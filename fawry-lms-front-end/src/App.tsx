@@ -1,12 +1,15 @@
 import { BrowserRouter } from 'react-router'
 import { AuthProvider } from './auth/AuthProvider'
+import { ApiErrorBoundary } from './components/ApiErrorBoundary'
 import { AppRoutes } from './routes'
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <ApiErrorBoundary>
+          <AppRoutes />
+        </ApiErrorBoundary>
       </AuthProvider>
     </BrowserRouter>
   )

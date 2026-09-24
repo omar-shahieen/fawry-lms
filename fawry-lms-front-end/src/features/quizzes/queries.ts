@@ -10,7 +10,16 @@ import {
   updateQuestion,
   updateQuiz,
 } from './api'
+import { listQuizAttempts } from './attempt-api'
 import type { CreateQuizInput, QuestionInput, Quiz } from './api'
+
+export function useQuizAttempts(quizId: string, page: number) {
+  return useQuery({
+    queryKey: queryKeys.quizAttempts(quizId, { page }),
+    queryFn: () => listQuizAttempts(quizId, page),
+    enabled: Boolean(quizId),
+  })
+}
 
 export function useCourseQuizzes(courseId: string) {
   return useQuery({

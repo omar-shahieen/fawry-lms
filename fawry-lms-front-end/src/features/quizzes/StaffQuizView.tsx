@@ -1,6 +1,7 @@
-import { useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import { queryKeys } from '../../api/keys'
 import { Badge, Card, PageHeader } from '../../components/Layout'
+import { Button } from '../../components/Button'
 import { ErrorState, ForbiddenState, Skeleton } from '../../components/States'
 import { useQuery } from '@tanstack/react-query'
 import { isApiError } from '../../api/errors'
@@ -46,7 +47,14 @@ export function StaffQuizView() {
       <PageHeader
         title={quiz.title}
         description={`${quiz.durationMinutes} minutes · staff preview (no attempt is created)`}
-        actions={quiz.published ? <Badge color="green">Published</Badge> : <Badge color="amber">Draft</Badge>}
+        actions={
+          <div className="flex items-center gap-2">
+            <Link to={`/quizzes/${quizId}/attempts`}>
+              <Button variant="secondary">Attempts</Button>
+            </Link>
+            {quiz.published ? <Badge color="green">Published</Badge> : <Badge color="amber">Draft</Badge>}
+          </div>
+        }
       />
 
       <div className="space-y-4">

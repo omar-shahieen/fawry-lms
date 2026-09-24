@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/context'
 import { Badge, Card, PageHeader } from '../../components/Layout'
 import { Button } from '../../components/Button'
 import { EmptyState, ErrorState, Skeleton } from '../../components/States'
+import { formatDate } from '../../components/formatDate'
 import type { DashboardCourseRef, DashboardQuizStatus } from './api'
 import { useAdminDashboard, useInstructorDashboard, useStudentDashboard } from './queries'
 
@@ -235,7 +236,7 @@ function InstructorDashboard() {
               {announcements.map((item, index) => (
                 <li key={String(item.id ?? index)} className="flex items-center justify-between gap-2 py-2 text-sm">
                   <span className="text-gray-800">{item.title ?? 'Announcement'}</span>
-                  {item.createdAt && <span className="text-xs text-gray-400">{item.createdAt.slice(0, 10)}</span>}
+                  {item.createdAt && <span className="text-xs text-gray-400">{formatDate(item.createdAt)}</span>}
                 </li>
               ))}
             </ul>

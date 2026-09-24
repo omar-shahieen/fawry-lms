@@ -1,4 +1,5 @@
 import { apiFetch } from '../../api/client'
+import type { Page } from '../../api/page'
 
 /**
  * Attempt state probe — side-effect-free per lms-endpoints.md.
@@ -53,4 +54,23 @@ export function submitQuiz(quizId: string, answers: SubmitAnswer[]): Promise<Sub
     method: 'POST',
     body: { answers },
   })
+}
+
+/** Staff attempts list — GET /api/quizzes/{id}/attempts (ADMIN, Own(Instructor)). Shape provisional. */
+export interface QuizAttemptRow {
+  id?: number | string
+  student?: { id?: number | string; fullName?: string } | string
+  studentName?: string
+  startedAt?: string
+  submittedAt?: string | null
+  score?: number
+}
+
+export function listQuizAttempts(quizId: string, page = 0, size = 20): Promise<Page<QuizAttemptRow>> {
+  return apiFetch<Page<QuizAttemptRow>>(`/api/quizzes/${quizId}/attempts?page=${page}&size=${size}`)
+}
+
+export function attemptStudentName(row: QuizAttemptRow): string {
+  if (typeof row.student === 'string') return row.student
+  return row.studentName ?? row.student?.fullName ?? 'Student'
 }

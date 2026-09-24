@@ -9,19 +9,11 @@ import { Input, Textarea } from '../../components/FormField'
 import { ConfirmDialog } from '../../components/Modal'
 import { EmptyState, ErrorState, ForbiddenState, Skeleton } from '../../components/States'
 import { Pagination } from '../../components/Pagination'
+import { formatDate } from '../../components/formatDate'
 import { useEnrollCourse } from '../courses/queries'
 import { postAuthorId, postAuthorName } from './api'
 import type { DiscussionPost, DiscussionReply } from './api'
 import { useCreatePost, useDeleteDiscussion, useDiscussion, useReplyToPost, useUpdateDiscussion } from './queries'
-
-function formatDate(value?: string): string {
-  if (!value) return ''
-  try {
-    return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
-  } catch {
-    return value
-  }
-}
 
 function mutationErrorMessage(error: unknown): string {
   if (isApiError(error) && error.status === 403) return 'You do not have permission to do that.'

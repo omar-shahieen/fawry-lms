@@ -639,9 +639,9 @@ Steps:
 
 Every data region on every screen defines: loading (skeleton), empty (`EmptyState` + a relevant call-to-action), error (message + retry), forbidden (per §8.1).
 
-- [ ] 8.3a A shared `ApiErrorBoundary` (or per-route `errorElement`) catches unexpected errors and renders a friendly 500 screen.
-- [ ] 8.3b Dates render localized everywhere; the quiz countdown visibly ticks.
-- [ ] 8.3c No screen ever shows a raw stack trace or a blank white area on failure.
+- [x] 8.3a A shared `ApiErrorBoundary` (or per-route `errorElement`) catches unexpected errors and renders a friendly 500 screen.
+- [x] 8.3b Dates render localized everywhere; the quiz countdown visibly ticks.
+- [x] 8.3c No screen ever shows a raw stack trace or a blank white area on failure.
 
 ---
 

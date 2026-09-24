@@ -9,6 +9,7 @@ import { Input, Textarea } from '../../components/FormField'
 import { ConfirmDialog, Modal } from '../../components/Modal'
 import { EmptyState, ErrorState, ForbiddenState, Skeleton } from '../../components/States'
 import { Pagination } from '../../components/Pagination'
+import { formatDate } from '../../components/formatDate'
 import { useEnrollCourse, useCourse } from '../courses/queries'
 import type { Announcement } from './api'
 import {
@@ -17,15 +18,6 @@ import {
   useDeleteAnnouncement,
   useUpdateAnnouncement,
 } from './queries'
-
-function formatDate(value?: string): string {
-  if (! value) return ''
-  try {
-    return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
-  } catch {
-    return value
-  }
-}
 
 function mutationErrorMessage(error: unknown): string {
   if (isApiError(error) && error.status === 403) return 'You do not have permission to do that.'

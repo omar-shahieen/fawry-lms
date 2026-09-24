@@ -5,17 +5,9 @@ import { Badge, Card, PageHeader } from '../../components/Layout'
 import { Button } from '../../components/Button'
 import { EmptyState, ErrorState, ForbiddenState, Skeleton } from '../../components/States'
 import { Pagination } from '../../components/Pagination'
+import { formatDate } from '../../components/formatDate'
 import { useCourseGrades, useMyGrades } from './queries'
 import { quizName, studentName } from './api'
-
-function formatDate(value?: string): string {
-  if (!value) return ''
-  try {
-    return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
-  } catch {
-    return value
-  }
-}
 
 export function MyGradesScreen() {
   const gradesQuery = useMyGrades()

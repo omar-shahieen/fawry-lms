@@ -14,6 +14,7 @@ import { ContentManageScreen } from '../features/sections/ContentManageScreen'
 import { CourseQuizzesScreen, QuizManageScreen } from '../features/quizzes/QuizListScreens'
 import { QuizEditScreen } from '../features/quizzes/QuizEditScreen'
 import { QuizViewScreen } from '../features/quizzes/QuizViewScreen'
+import { QuizAttemptsScreen } from '../features/quizzes/QuizAttemptsScreen'
 import { CourseGradesScreen, MyGradesScreen } from '../features/grades/GradesScreens'
 import { DiscussionScreen } from '../features/discussion/DiscussionScreen'
 import { AnnouncementsScreen } from '../features/announcements/AnnouncementsScreen'
@@ -66,6 +67,14 @@ export function AppRoutes() {
         <Route path="/courses/:id/quizzes" element={<CourseQuizzesScreen />} />
         <Route path="/courses/:id/quizzes/manage" element={<QuizManageScreen />} />
         <Route path="/quizzes/:id" element={<QuizViewScreen />} />
+        <Route
+          path="/quizzes/:id/attempts"
+          element={
+            <RequireRole roles={['INSTRUCTOR', 'ADMIN']}>
+              <QuizAttemptsScreen />
+            </RequireRole>
+          }
+        />
         <Route path="/quizzes/:id/edit" element={<QuizEditScreen />} />
         <Route
           path="/grades"

@@ -1,5 +1,6 @@
 import { Card, PageHeader } from '../../components/Layout'
 import { Badge } from '../../components/Layout'
+import { formatDate } from '../../components/formatDate'
 import type { Quiz } from './api'
 import type { MyAttempt } from './attempt-api'
 
@@ -43,7 +44,7 @@ export function QuizReview({ quiz, attempt }: { quiz: Quiz; attempt: MyAttempt |
 
       {attempt?.submittedAt && (
         <div className="rounded-md bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
-          Submitted
+          Submitted {formatDate(attempt.submittedAt)}
           {attempt.score !== undefined && attempt.score !== null ? ` · score ${attempt.score}` : ''}.
         </div>
       )}
