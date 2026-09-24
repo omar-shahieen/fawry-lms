@@ -156,8 +156,8 @@ Spring Boot APIs overwhelmingly serve this via springdoc at `GET {VITE_API_BASE_
 }
 ```
 
-- [ ] **4.1a** `npm run gen:api` (backend running) produces `src/api/schema.d.ts`.
-- [ ] **4.1b** Re-run whenever the backend contract changes; commit the generated file so every teammate/agent works from the same shapes.
+- [x] **4.1a** `npm run gen:api` (backend running) produces `src/api/schema.d.ts`.
+- [x] **4.1b** Re-run whenever the backend contract changes; commit the generated file so every teammate/agent works from the same shapes.
 
 > Only these shapes are pinned directly by `lms-endpoints.md` and may be coded before checking `schema.d.ts`: the auth request bodies (`{fullName, email, password}` for signup, `{email, password}` for login), `{instructorId}` for assign-instructor, and the quiz `expiresAt` **or** `secondsRemaining` field (the doc explicitly allows either — check which one the live response actually returns). Everything else — every list/detail response shape, every write-request body beyond what's just listed, pagination envelope field names, dashboard payloads — comes from `schema.d.ts`.
 
@@ -193,8 +193,8 @@ class ApiError extends Error {
 }
 ```
 
-- [ ] **4.3a** Every thrown client error is an `ApiError` with `status` populated, confirmed against at least one real `400` and one real `403`/`404` response from the running backend.
-- [ ] **4.3b** Field errors (however they're actually shaped) get mapped onto individual form fields — never surfaced only as a generic toast.
+- [x] **4.3a** Every thrown client error is an `ApiError` with `status` populated, confirmed against at least one real `400` and one real `403`/`404` response from the running backend.
+- [x] **4.3b** Field errors (however they're actually shaped) get mapped onto individual form fields — never surfaced only as a generic toast.
 
 ### 4.4 Pagination helper
 
@@ -261,7 +261,7 @@ State: `user | null` (from `GET /api/users/me`), `status: idle | loading | authe
 - [x] **5.3a** Signup form fields are exactly `fullName`, `email`, `password` — no role selector exists anywhere in the signup UI.
 - [x] **5.3b** Signup success does **not** navigate to `/login` — it's already authenticated; go straight to `/dashboard`.
 - [ ] **5.3c** Login `401` → "Invalid email or password." (`lms-endpoints.md` doesn't state whether a deactivated account gets a distinct status; test a deactivated seeded/admin-created user against the live API and adjust this copy/handling once you know — don't assume `401` covers it until confirmed, per Appendix A.)
-- [ ] **5.3d** Signup duplicate email → expect `409`, shown inline on the email field (confirm the actual status against the live API — not explicitly pinned by either doc, but `409 Conflict` is the conventional choice and matches how the guide treats other duplicate-resource cases like course-code and re-enrollment).
+- [x] **5.3d** Signup duplicate email → expect `409`, shown inline on the email field (confirm the actual status against the live API — not explicitly pinned by either doc, but `409 Conflict` is the conventional choice and matches how the guide treats other duplicate-resource cases like course-code and re-enrollment). **Confirmed live:** second signup with an existing email → `409` `{timestamp,status,error,message:"The request conflicts with existing data."}`.
 
 ### 5.4 Route guards (UX only — the server is authoritative, always)
 
@@ -694,23 +694,23 @@ Run this against the real, running backend with whatever accounts you have (seed
 
 Nothing below should be hardcoded from assumption. Generate `schema.d.ts` (§4.1) and, where that's not enough, hit the running API directly:
 
-1. Exact `Page<T>` JSON field names actually returned (§4.4).
-2. Login/signup/refresh response JSON key names for the tokens (`accessToken` vs `access_token`, etc.).
-3. `POST /api/quizzes/{id}/submit` request body shape — especially how it represents multiple selected options for a multi-correct question (§7.6.1–7.6.2).
-4. The submit success response's exact score / per-question-correctness payload shape.
-5. Whether `GET /api/quizzes/{id}` returns `expiresAt` or `secondsRemaining` (the doc explicitly allows either).
-6. Whether Instructor/Admin calling `GET /api/quizzes/{id}` triggers any attempt side effect, and what their response payload includes (§7.6.2, rule 5).
-7. Whether scoring on a multi-correct question is all-or-nothing or partial-credit (§7.6.1).
-8. Student / Instructor / Admin dashboard exact JSON structures (§7.10).
-9. `GET /api/users/me`'s field name for a student's enrolled courses; the instructor-dashboard summary's field names.
-10. Section create/update DTO — how `orderIndex` is assigned on create.
-11. Discussion list DTO — exactly how replies nest under their parent, and whether `title` is present/required on replies.
-12. `POST /api/users` (admin create-user) request/response DTO, including the exact role field/enum.
-13. Whether logging in with a deactivated (`isActive=false`) account returns `401` or something more specific (§5.3c).
-14. Whether deleting a section cascades to its content or leaves it orphaned/unreachable (§7.5).
-15. Whether Admin is actually exempt from the "enrollment check" rows' server-side check, as this guide assumes in §3, or whether that assumption needs correcting.
-16. Assign-instructor response body/status (the doc only pins the request body, `{instructorId}`).
-17. `ApiErrorBody` and `fieldErrors` exact shape (§4.3) — confirmed against a real `400`.
+1. Exact `Page<T>` JSON field names actually returned (§4.4) — **confirmed** (schema `Page*Response` + live): `content, totalElements, totalPages, number, size, …`.
+2. Login/signup/refresh response JSON key names for the tokens — **confirmed**: `accessToken` + `refreshToken` on auth responses; refresh returns `accessToken` only.
+3. `POST /api/quizzes/{id}/submit` request body shape — **confirmed** (`SubmitQuizRequest`): `{answers:[{questionId, selectedOptionId?}]}` — one optional option per question (server enforces exactly-one-correct at question write; submit is single-select, no multi-option array).
+4. The submit success response's exact score / per-question-correctness payload shape — **confirmed** (`SubmitQuizResponse`): `{attemptId, score, totalQuestions, submittedAt, answers:[{questionId, selectedOptionId, isCorrect}]}`.
+5. Whether `GET /api/quizzes/{id}` returns `expiresAt` or `secondsRemaining` — **confirmed**: `expiresAt` (detail also carries `startedAt`, `submittedAt`, `score`, `totalQuestions`).
+6. Whether Instructor/Admin calling `GET /api/quizzes/{id}` triggers any attempt side effect, and what their response payload includes — **confirmed from backend source**: `QuizController.detail` never creates an attempt for staff; the payload is the same student-shaped `QuizDetailResponse` (questions **without** correctness). Staff correctness comes only from `GET /api/quizzes/{id}/questions` → `QuestionResponse[]` with `options[].isCorrect`. A live staff probe still needs an admin/instructor account.
+7. Whether scoring on a multi-correct question is all-or-nothing or partial-credit — **confirmed from backend source**: question create/update enforces **exactly one** correct option (`QuizService`), and scoring is all-or-nothing per question via the single `selectedOptionId`. `overview.md`'s "one or more" is not honored by this server — the builder keeps checkboxes but the server rejects ≠1 correct with `400`.
+8. Student / Instructor / Admin dashboard exact JSON structures (§7.10) — **confirmed** (schema): student = bare `StudentDashboardCourseResponse[]` (`courseId, courseName, quizzes[{quizId, quizTitle, attempted, score}]`); instructor = `InstructorDashboardResponse` (`courses[{courseId, courseName, submittedAttemptCount, averageScore}]`, `announcements[{id, courseId, title, body, createdAt}]`); admin = `AdminDashboardResponse` (`userCountsByRole`, `totalCourseCount`, `totalEnrollmentCount`).
+9. `GET /api/users/me`'s field name for a student's enrolled courses; the instructor-dashboard summary's field names — **confirmed**: `enrolledCourses: [{id, title}]` (live `[]` for a fresh student); instructor-dashboard fields confirmed under #8.
+10. Section create/update DTO — how `orderIndex` is assigned on create — **confirmed**: `CreateSectionRequest {title, orderIndex}` — both required; the client appends with `max(existing orderIndex)+1`.
+11. Discussion list DTO — exactly how replies nest under their parent, and whether `title` is present/required on replies — **confirmed** (schema): posts carry a flat `replies: DiscussionReplyResponse[]` (exactly one level); replies have **no** title; `CreateDiscussionPostRequest.title` is **required**.
+12. `POST /api/users` (admin create-user) request/response DTO, including the exact role field/enum — **confirmed**: `CreateUserRequest {fullName, email, password, role: STUDENT|INSTRUCTOR|ADMIN, profilePictureUrl?}` → `AdminUserResponse` (incl. `isActive`).
+13. Whether logging in with a deactivated (`isActive=false`) account returns `401` or something more specific (§5.3c) — **confirmed from backend source**: `AuthService.login` filters `User::isActive` and throws `BadCredentialsException` → same `401` "Invalid email or password." as a bad password. A live probe still needs an admin to deactivate an account first.
+14. Whether deleting a section cascades to its content or leaves it orphaned/unreachable (§7.5) — **confirmed from backend source**: **no cascade**. `MarkdownContent.section_id` is a non-null FK; deleting a section that still has content raises `DataIntegrityViolationException` → **409** "The request conflicts with existing data."; an empty section deletes fine. Keep confirmation copy neutral and surface the `409` if the delete fails.
+15. Whether Admin is actually exempt from the "enrollment check" rows' server-side check — **confirmed from backend source**: `AuthorizationService.isEnrolledOrStaff` returns `true` for `ADMIN` (and for the course's assigned instructor) before consulting enrollment.
+16. Assign-instructor response body/status — **confirmed** (schema): `200` with the full `CourseResponse`.
+17. `ApiErrorBody` and `fieldErrors` exact shape (§4.3) — **confirmed against live `400`/`403`/`409`**: `{timestamp, status, error, message, fieldErrors?: Record<string, string>}`.
 
 ---
 

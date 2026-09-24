@@ -14,6 +14,7 @@ export const queryKeys = {
 
   courseQuizzes: (courseId: string) => ['course', courseId, 'quizzes'] as const,
   quiz: (id: string) => ['quiz', id] as const,
+  quizQuestions: (id: string) => ['quiz', id, 'questions'] as const,
   quizAttemptMine: (id: string) => ['quiz', id, 'attempt-mine'] as const,
   quizAttempts: (id: string, filters?: Record<string, unknown>) =>
     ['quiz', id, 'attempts', filters ?? {}] as const,

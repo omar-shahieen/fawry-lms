@@ -20,7 +20,7 @@ async function performRefresh(): Promise<boolean> {
     const text = await response.text()
     if (!text) return false
     const data = JSON.parse(text) as Record<string, unknown>
-    const token = data.accessToken ?? data.access_token ?? data.token
+    const token = data.accessToken
     if (typeof token !== 'string' || !token) return false
 
     setAccessToken(token)

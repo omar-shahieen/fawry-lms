@@ -1,33 +1,10 @@
-import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { useAuth } from '../../auth/context'
 import { Badge, Card, PageHeader } from '../../components/Layout'
 import { Button } from '../../components/Button'
 import { EmptyState, ErrorState, Skeleton } from '../../components/States'
 import { formatDate } from '../../components/formatDate'
-import type { DashboardCourseRef, DashboardQuizStatus } from './api'
 import { useAdminDashboard, useInstructorDashboard, useStudentDashboard } from './queries'
-
-function quizTitle(quiz: DashboardQuizStatus): string {
-  return quiz.title ?? quiz.quizTitle ?? 'Quiz'
-}
-
-function quizId(quiz: DashboardQuizStatus): number | string | null {
-  return quiz.id ?? quiz.quizId ?? null
-}
-
-function isAttempted(quiz: DashboardQuizStatus): boolean {
-  return quiz.attempted === true || quiz.hasAttempt === true || quiz.score !== undefined || quiz.bestScore !== undefined
-}
-
-function courseTitle(course: DashboardCourseRef): string {
-  return course.title ?? 'Course'
-}
-
-function CourseLink({ course, children }: { course: DashboardCourseRef; children?: ReactNode }) {
-  if (course.id === undefined || course.id === null) return <>{children ?? courseTitle(course)}</>
-  return <Link to={`/courses/${course.id}`} className="font-medium text-indigo-600 hover:text-indigo-500">{children ?? courseTitle(course)}</Link>
-}
 
 function StudentDashboard() {
   const query = useStudentDashboard()
@@ -43,125 +20,79 @@ function StudentDashboard() {
   }
   if (query.isError) return <ErrorState onRetry={() => void query.refetch()} />
 
-  const data = query.data ?? {}
-  const courses = data.enrolledCourses ?? data.courses ?? []
-  const quizStatus = data.quizStatus ?? data.quizzes ?? []
-  const courseQuizzes = data.courseQuizzes ?? []
+  const courses = query.data ?? []
 
   return (
     <div className="space-y-6">
       <PageHeader title="Dashboard" description="Your enrolled courses and quiz status." />
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-900">Enrolled courses</h2>
-        {courses.length === 0 ? (
-          <EmptyState
-            title="No courses yet"
-            description="Browse the catalog to enroll."
-            action={
-              <Link to="/courses">
-                <Button size="sm" variant="secondary">
-                  Browse courses
-                </Button>
-              </Link>
-            }
-          />
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {courses.map((course, index) => (
-              <Card key={String(course.id ?? index)}>
-                <div className="flex items-center justify-between gap-2">
-                  <CourseLink course={course} />
-                  {course.code && <Badge>{course.code}</Badge>}
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-900">Quiz status</h2>
-        {courseQuizzes.length > 0 ? (
-          <div className="space-y-3">
-            {courseQuizzes.map((entry, index) => {
-              const quizzes = entry.quizzes ?? entry.quizStatus ?? []
-              return (
-                <Card key={String(entry.id ?? index)}>
-                  <div className="flex items-center gap-2">
-                    <CourseLink course={entry} />
-                    {entry.code && <Badge>{entry.code}</Badge>}
-                  </div>
-                  {quizzes.length === 0 ? (
-                    <p className="mt-2 text-sm text-gray-500">No quizzes yet.</p>
+      {courses.length === 0 ? (
+        <EmptyState
+          title="No courses yet"
+          description="Browse the catalog to enroll."
+          action={
+            <Link to="/courses">
+              <Button size="sm" variant="secondary">
+                Browse courses
+              </Button>
+            </Link>
+          }
+        />
+      ) : (
+        <div className="space-y-3">
+          {courses.map((course, index) => {
+            const quizzes = course.quizzes ?? []
+            return (
+              <Card key={String(course.courseId ?? index)}>
+                <div className="flex items-center gap-2">
+                  {course.courseId !== undefined && course.courseId !== null ? (
+                    <Link
+                      to={`/courses/${course.courseId}`}
+                      className="font-medium text-indigo-600 hover:text-indigo-500"
+                    >
+                      {course.courseName ?? 'Course'}
+                    </Link>
                   ) : (
-                    <ul className="mt-2 divide-y divide-gray-50">
-                      {quizzes.map((quiz, quizIndex) => {
-                        const id = quizId(quiz)
-                        const attempted = isAttempted(quiz)
-                        return (
-                          <li key={String(id ?? quizIndex)} className="flex items-center justify-between gap-2 py-2 text-sm">
-                            <span className="text-gray-800">{quizTitle(quiz)}</span>
-                            <span className="flex items-center gap-2">
-                              {typeof quiz.bestScore === 'number' ? (
-                                <span className="font-medium text-gray-900">{quiz.bestScore}</span>
-                              ) : typeof quiz.score === 'number' ? (
-                                <span className="font-medium text-gray-900">{quiz.score}</span>
-                              ) : null}
-                              {attempted ? (
-                                <Badge color="green">Attempted</Badge>
-                              ) : (
-                                <Badge color="amber">Not attempted</Badge>
-                              )}
-                              {id !== null && (
-                                <Link
-                                  to={`/quizzes/${id}`}
-                                  className="text-xs font-medium text-indigo-600 hover:text-indigo-500"
-                                >
-                                  Open
-                                </Link>
-                              )}
-                            </span>
-                          </li>
-                        )
-                      })}
-                    </ul>
+                    <span className="font-medium text-gray-900">{course.courseName ?? 'Course'}</span>
                   )}
-                </Card>
-              )
-            })}
-          </div>
-        ) : quizStatus.length === 0 ? (
-          <EmptyState title="No quizzes yet" description="Quizzes appear here once your courses publish them." />
-        ) : (
-          <Card>
-            <ul className="divide-y divide-gray-50">
-              {quizStatus.map((quiz, index) => {
-                const id = quizId(quiz)
-                const attempted = isAttempted(quiz)
-                return (
-                  <li key={String(id ?? index)} className="flex items-center justify-between gap-2 py-2 text-sm">
-                    <span className="text-gray-800">{quizTitle(quiz)}</span>
-                    <span className="flex items-center gap-2">
-                      {typeof quiz.bestScore === 'number' ? (
-                        <span className="font-medium text-gray-900">{quiz.bestScore}</span>
-                      ) : typeof quiz.score === 'number' ? (
-                        <span className="font-medium text-gray-900">{quiz.score}</span>
-                      ) : null}
-                      {attempted ? <Badge color="green">Attempted</Badge> : <Badge color="amber">Not attempted</Badge>}
-                      {id !== null && (
-                        <Link to={`/quizzes/${id}`} className="text-xs font-medium text-indigo-600 hover:text-indigo-500">
-                          Open
-                        </Link>
-                      )}
-                    </span>
-                  </li>
-                )
-              })}
-            </ul>
-          </Card>
-        )}
-      </section>
+                </div>
+                {quizzes.length === 0 ? (
+                  <p className="mt-2 text-sm text-gray-500">No quizzes yet.</p>
+                ) : (
+                  <ul className="mt-2 divide-y divide-gray-50">
+                    {quizzes.map((quiz, quizIndex) => (
+                      <li
+                        key={String(quiz.quizId ?? quizIndex)}
+                        className="flex items-center justify-between gap-2 py-2 text-sm"
+                      >
+                        <span className="text-gray-800">{quiz.quizTitle ?? 'Quiz'}</span>
+                        <span className="flex items-center gap-2">
+                          {typeof quiz.score === 'number' && (
+                            <span className="font-medium text-gray-900">{quiz.score}</span>
+                          )}
+                          {quiz.attempted ? (
+                            <Badge color="green">Attempted</Badge>
+                          ) : (
+                            <Badge color="amber">Not attempted</Badge>
+                          )}
+                          {quiz.quizId !== undefined && quiz.quizId !== null && (
+                            <Link
+                              to={`/quizzes/${quiz.quizId}`}
+                              className="text-xs font-medium text-indigo-600 hover:text-indigo-500"
+                            >
+                              Open
+                            </Link>
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Card>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
@@ -180,9 +111,8 @@ function InstructorDashboard() {
   }
   if (query.isError) return <ErrorState onRetry={() => void query.refetch()} />
 
-  const data = query.data ?? {}
-  const courses = data.courses ?? []
-  const announcements = data.announcements ?? []
+  const courses = query.data?.courses ?? []
+  const announcements = query.data?.announcements ?? []
 
   return (
     <div className="space-y-6">
@@ -194,34 +124,45 @@ function InstructorDashboard() {
           <EmptyState title="No courses yet" description="Courses you are assigned to appear here." />
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
-            {courses.map((course, index) => {
-              const summaries = course.quizResults ?? course.quizResultSummaries ?? []
-              return (
-                <Card key={String(course.id ?? index)}>
-                  <div className="flex items-center justify-between gap-2">
-                    <CourseLink course={course} />
-                    {course.code && <Badge>{course.code}</Badge>}
-                  </div>
-                  {summaries.length > 0 && (
-                    <p className="mt-2 text-xs text-gray-500">
-                      {summaries.length} quiz result summar{summaries.length === 1 ? 'y' : 'ies'}
-                    </p>
+            {courses.map((course, index) => (
+              <Card key={String(course.courseId ?? index)}>
+                <div className="flex items-center justify-between gap-2">
+                  {course.courseId !== undefined && course.courseId !== null ? (
+                    <Link
+                      to={`/courses/${course.courseId}`}
+                      className="font-medium text-indigo-600 hover:text-indigo-500"
+                    >
+                      {course.courseName ?? 'Course'}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-900">{course.courseName ?? 'Course'}</span>
                   )}
+                  {typeof course.averageScore === 'number' && (
+                    <Badge>{course.averageScore.toFixed(1)} avg</Badge>
+                  )}
+                </div>
+                <p className="mt-2 text-xs text-gray-500">
+                  {course.submittedAttemptCount ?? 0} submitted attempt
+                  {(course.submittedAttemptCount ?? 0) === 1 ? '' : 's'}
+                </p>
+                {course.courseId !== undefined && course.courseId !== null && (
                   <div className="mt-3 flex gap-3 text-xs font-medium">
-                    {course.id !== undefined && course.id !== null && (
-                      <>
-                        <Link to={`/courses/${course.id}/grades`} className="text-indigo-600 hover:text-indigo-500">
-                          Grades
-                        </Link>
-                        <Link to={`/courses/${course.id}/quizzes`} className="text-indigo-600 hover:text-indigo-500">
-                          Quizzes
-                        </Link>
-                      </>
-                    )}
+                    <Link
+                      to={`/courses/${course.courseId}/grades`}
+                      className="text-indigo-600 hover:text-indigo-500"
+                    >
+                      Grades
+                    </Link>
+                    <Link
+                      to={`/courses/${course.courseId}/quizzes`}
+                      className="text-indigo-600 hover:text-indigo-500"
+                    >
+                      Quizzes
+                    </Link>
                   </div>
-                </Card>
-              )
-            })}
+                )}
+              </Card>
+            ))}
           </div>
         )}
       </section>
@@ -234,9 +175,12 @@ function InstructorDashboard() {
           <Card>
             <ul className="divide-y divide-gray-50">
               {announcements.map((item, index) => (
-                <li key={String(item.id ?? index)} className="flex items-center justify-between gap-2 py-2 text-sm">
-                  <span className="text-gray-800">{item.title ?? 'Announcement'}</span>
-                  {item.createdAt && <span className="text-xs text-gray-400">{formatDate(item.createdAt)}</span>}
+                <li key={String(item.id ?? index)} className="flex items-start justify-between gap-3 py-2 text-sm">
+                  <div>
+                    <p className="font-medium text-gray-800">{item.title ?? 'Announcement'}</p>
+                    {item.body && <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">{item.body}</p>}
+                  </div>
+                  {item.createdAt && <span className="shrink-0 text-xs text-gray-400">{formatDate(item.createdAt)}</span>}
                 </li>
               ))}
             </ul>
@@ -261,17 +205,18 @@ function AdminDashboard() {
   if (query.isError) return <ErrorState onRetry={() => void query.refetch()} />
 
   const data = query.data ?? {}
+  const roleCounts = Object.entries(data.userCountsByRole ?? {})
   const counts: Array<{ label: string; value: number | undefined }> = [
-    { label: 'Users', value: data.userCount ?? data.users },
-    { label: 'Courses', value: data.courseCount ?? data.courses },
-    { label: 'Enrollments', value: data.enrollmentCount ?? data.enrollments },
+    ...roleCounts.map(([role, value]) => ({ label: role, value })),
+    { label: 'Courses', value: data.totalCourseCount },
+    { label: 'Enrollments', value: data.totalEnrollmentCount },
   ]
 
   return (
     <div className="space-y-6">
       <PageHeader title="Dashboard" description="Overall system counts." />
 
-      {counts.every((c) => c.value === undefined) ? (
+      {counts.length === 0 ? (
         <EmptyState title="No counts available" />
       ) : (
         <div className="grid gap-3 sm:grid-cols-3">

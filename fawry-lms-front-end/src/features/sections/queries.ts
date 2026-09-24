@@ -31,7 +31,8 @@ function useInvalidateSections(courseId: string) {
 export function useCreateSection(courseId: string) {
   const invalidate = useInvalidateSections(courseId)
   return useMutation({
-    mutationFn: (title: string) => createSection(courseId, title),
+    mutationFn: ({ title, orderIndex }: { title: string; orderIndex: number }) =>
+      createSection(courseId, title, orderIndex),
     onSuccess: invalidate,
   })
 }

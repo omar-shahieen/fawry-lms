@@ -1,36 +1,32 @@
 import { apiFetch } from '../../api/client'
 import type { Page } from '../../api/page'
 
-/**
- * Grouped-by-course shape for GET /api/students/me/grades is not pinned
- * (Appendix A). Fields are provisional/optional; rendering is defensive.
- */
-export interface StudentGradeEntry {
-  quizId?: number | string
+/** CourseGradesResponse / QuizGradeResponse / CourseGradeResponse (schema.d.ts). */
+export interface QuizGrade {
+  quizId?: number
   quizTitle?: string
-  quiz?: { id?: number | string; title?: string }
   score?: number
+  totalQuestions?: number
   submittedAt?: string
 }
 
 export interface StudentGradesCourse {
-  courseId?: number | string
+  courseId?: number
   courseTitle?: string
   courseCode?: string
-  course?: { id?: number | string; title?: string; code?: string }
-  grades?: StudentGradeEntry[]
-  results?: StudentGradeEntry[]
+  quizzes?: QuizGrade[]
 }
 
 export function getMyGrades(): Promise<StudentGradesCourse[]> {
   return apiFetch<StudentGradesCourse[]>('/api/students/me/grades')
 }
 
-/** Flat rows — field names {student, quiz, score} pinned by lms-endpoints.md prose. */
 export interface StaffGradeRow {
-  student: { id?: number | string; fullName?: string } | string
-  quiz: { id?: number | string; title?: string } | string
-  score: number
+  student?: { id?: string; fullName?: string; email?: string }
+  quiz?: { id?: number; title?: string }
+  score?: number
+  totalQuestions?: number
+  submittedAt?: string
 }
 
 export interface CourseGradesFilters {
@@ -46,9 +42,9 @@ export function getCourseGrades(courseId: string, filters: CourseGradesFilters =
 }
 
 export function studentName(row: StaffGradeRow): string {
-  return typeof row.student === 'string' ? row.student : (row.student.fullName ?? String(row.student.id ?? ''))
+  return row.student?.fullName ?? row.student?.email ?? 'Student'
 }
 
 export function quizName(row: StaffGradeRow): string {
-  return typeof row.quiz === 'string' ? row.quiz : (row.quiz.title ?? String(row.quiz.id ?? ''))
+  return row.quiz?.title ?? 'Quiz'
 }

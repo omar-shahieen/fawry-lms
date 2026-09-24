@@ -29,7 +29,7 @@ export function useCreateAnnouncement(courseId: string) {
 export function useUpdateAnnouncement(courseId: string) {
   const invalidate = useInvalidateAnnouncements(courseId)
   return useMutation({
-    mutationFn: ({ id, input }: { id: string | number; input: { title?: string; body?: string } }) =>
+    mutationFn: ({ id, input }: { id: string | number; input: { title: string; body: string } }) =>
       updateAnnouncement(id, input),
     onSuccess: invalidate,
   })

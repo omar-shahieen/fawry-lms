@@ -30,9 +30,10 @@ export function createAnnouncement(
   return apiFetch<Announcement>(`/api/courses/${courseId}/announcements`, { method: 'POST', body: input })
 }
 
+/** UpdateAnnouncementRequest (schema.d.ts) — title and body both required. */
 export function updateAnnouncement(
   id: string | number,
-  input: { title?: string; body?: string },
+  input: { title: string; body: string },
 ): Promise<Announcement> {
   return apiFetch<Announcement>(`/api/announcements/${id}`, { method: 'PATCH', body: input })
 }

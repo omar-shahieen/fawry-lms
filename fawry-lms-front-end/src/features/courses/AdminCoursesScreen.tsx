@@ -20,9 +20,10 @@ interface CourseFormValues {
   description: string
   code: string
   term: string
+  instructorId: string
 }
 
-const EMPTY_COURSE: CourseFormValues = { title: '', description: '', code: '', term: '' }
+const EMPTY_COURSE: CourseFormValues = { title: '', description: '', code: '', term: '', instructorId: '' }
 
 export function AdminCoursesScreen() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -40,7 +41,7 @@ export function AdminCoursesScreen() {
 
   const [createOpen, setCreateOpen] = useState(false)
   const [formValues, setFormValues] = useState<CourseFormValues>(EMPTY_COURSE)
-  const [formErrors, setFormErrors] = useState<{ title?: string; code?: string; term?: string; form?: string }>({})
+  const [formErrors, setFormErrors] = useState<{ title?: string; code?: string; term?: string; instructorId?: string; form?: string }>({})
   const [deleting, setDeleting] = useState<Course | null>(null)
   const [assigning, setAssigning] = useState<Course | null>(null)
   const [assignInstructorId, setAssignInstructorId] = useState('')
@@ -59,6 +60,7 @@ export function AdminCoursesScreen() {
     if (!formValues.title.trim()) nextErrors.title = 'Title is required.'
     if (!formValues.code.trim()) nextErrors.code = 'Code is required.'
     if (!formValues.term.trim()) nextErrors.term = 'Term is required.'
+    if (!formValues.instructorId) nextErrors.instructorId = 'Instructor is required.'
     setFormErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
@@ -138,9 +140,7 @@ export function AdminCoursesScreen() {
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
                 {data.content.map((course) => {
-                  const instructorLabel =
-                    course.instructorName ??
-                    (typeof course.instructor?.fullName === 'string' ? course.instructor.fullName : null)
+                const instructorLabel = course.instructorName
                   return (
                     <tr key={String(course.id)}>
                       <td className="px-4 py-3">
@@ -164,9 +164,7 @@ export function AdminCoursesScreen() {
                             onClick={() => {
                               setAssigning(course)
                               setAssignError(null)
-                              setAssignInstructorId(
-                                String(course.instructorId ?? course.instructor?.id ?? ''),
-                              )
+                              setAssignInstructorId(String(course.instructorId ?? ''))
                             }}
                           >
                             Assign
@@ -205,7 +203,31 @@ export function AdminCoursesScreen() {
               {formErrors.form}
             </div>
           )}
-          <CourseFormFields values={formValues} errors={formErrors} onChange={setFormValues} />
+          <CourseFormFields
+            values={formValues}
+            errors={formErrors}
+            onChange={(next) => setFormValues((prev) => ({ ...prev, ...next }))}
+          />
+          {instructorsQuery.isLoading ? (
+            <Skeleton className="h-10 w-full" />
+          ) : instructors.length === 0 ? (
+            <p className="text-sm text-gray-500">No instructor accounts exist yet. Create one from Users first.</p>
+          ) : (
+            <Select
+              label="Instructor"
+              name="createInstructorId"
+              value={formValues.instructorId}
+              onChange={(e) => setFormValues({ ...formValues, instructorId: e.target.value })}
+              error={formErrors.instructorId}
+            >
+              <option value="">Select an instructor…</option>
+              {instructors.map((instructor) => (
+                <option key={String(instructor.id)} value={String(instructor.id)}>
+                  {instructor.fullName} ({instructor.email})
+                </option>
+              ))}
+            </Select>
+          )}
           <div className="flex justify-end">
             <Button type="submit" loading={createCourse.isPending}>
               Create course

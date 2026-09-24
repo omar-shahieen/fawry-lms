@@ -31,7 +31,7 @@ export function QuizTakeScreen() {
   // Quiz summary for the landing card, passed from the course quiz list —
   // never obtained by calling the side-effecting GET before Start.
   const [landingMeta] = useState(() => {
-    const state = window.history.state?.usr as { quizTitle?: string; durationMinutes?: number; questionCount?: number } | null
+    const state = window.history.state?.usr as { quizTitle?: string; durationMinutes?: number } | null
     return state ?? null
   })
 
@@ -72,21 +72,16 @@ export function QuizTakeScreen() {
 
   const quiz = quizQuery.data ?? null
 
-  // Server-clock deadline — derived once per fetched quiz payload (expiresAt preferred, secondsRemaining fallback).
+  // Server-clock deadline — expiresAt on the detail payload (schema.d.ts).
   const [deadline, setDeadline] = useState<number | null>(null)
   useEffect(() => {
     if (!quiz || stance !== 'taking') {
       setDeadline(null)
       return
     }
-    const payload = quiz as unknown as Record<string, unknown>
-    const expiresAt = payload.expiresAt
-    const secondsRemaining = payload.secondsRemaining
-    if (typeof expiresAt === 'string' && expiresAt) {
-      const t = new Date(expiresAt).getTime()
+    if (typeof quiz.expiresAt === 'string' && quiz.expiresAt) {
+      const t = new Date(quiz.expiresAt).getTime()
       setDeadline(Number.isNaN(t) ? null : t)
-    } else if (typeof secondsRemaining === 'number') {
-      setDeadline(Date.now() + secondsRemaining * 1000)
     } else {
       setDeadline(null)
     }
@@ -106,7 +101,6 @@ export function QuizTakeScreen() {
   if (stance === 'need-start') {
     return (
       <LandingCard
-        attempt={attempt}
         meta={landingMeta}
         onStart={() => {
           // Explicit Start — the only place a student's first GET may fire.
@@ -162,21 +156,20 @@ export function QuizTakeScreen() {
       expired={expired}
       onSubmitted={() => setStance('review')}
       onNoAttempt={() => setStance('probing')}
+      onViewReview={() => setStance('review')}
     />
   )
 }
 
 function LandingCard({
-  attempt,
   meta,
   onStart,
 }: {
-  attempt: MyAttempt | null
-  meta: { quizTitle?: string; durationMinutes?: number; questionCount?: number } | null
+  meta: { quizTitle?: string; durationMinutes?: number } | null
   onStart: () => void
 }) {
-  const title = meta?.quizTitle ?? attempt?.quizTitle ?? 'Ready to begin?'
-  const duration = attempt?.durationMinutes ?? meta?.durationMinutes
+  const title = meta?.quizTitle ?? 'Ready to begin?'
+  const duration = meta?.durationMinutes
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
@@ -187,9 +180,6 @@ function LandingCard({
             <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
             <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-600">
               {typeof duration === 'number' && <Badge color="indigo">{duration} minutes</Badge>}
-              {typeof meta?.questionCount === 'number' && (
-                <Badge>{meta.questionCount} question{meta.questionCount === 1 ? '' : 's'}</Badge>
-              )}
               <Badge color="amber">Single attempt</Badge>
             </div>
           </div>

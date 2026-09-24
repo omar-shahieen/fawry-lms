@@ -51,8 +51,9 @@ export function CourseDetailScreen() {
 
   const isInstructorOwner =
     user.role === 'INSTRUCTOR' &&
-    ((course.instructorId !== undefined && course.instructorId !== null && String(course.instructorId) === String(user.id)) ||
-      (course.instructor && String(course.instructor.id) === String(user.id)))
+    course.instructorId !== undefined &&
+    course.instructorId !== null &&
+    String(course.instructorId) === String(user.id)
   const canManage = user.role === 'ADMIN' || isInstructorOwner
 
   const enrolled =
@@ -85,9 +86,7 @@ export function CourseDetailScreen() {
     }
   }
 
-  const instructorLabel =
-    course.instructorName ??
-    (typeof course.instructor?.fullName === 'string' ? course.instructor.fullName : null)
+  const instructorLabel = course.instructorName
 
   return (
     <div className="space-y-6">

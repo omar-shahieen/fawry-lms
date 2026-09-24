@@ -7,11 +7,12 @@ import { Button } from '../../components/Button'
 import { Input, Textarea } from '../../components/FormField'
 import { ConfirmDialog } from '../../components/Modal'
 import { ErrorState, ForbiddenState, Skeleton } from '../../components/States'
-import type { QuestionInput, Quiz, QuizQuestion } from './api'
+import type { QuestionInput, Quiz, StaffQuizQuestion } from './api'
 import {
   useCreateQuestion,
   useDeleteQuestion,
   useQuiz,
+  useQuizQuestions,
   useUpdateQuestion,
   useUpdateQuiz,
 } from './queries'
@@ -25,11 +26,13 @@ function QuestionEditor({
   quiz,
   courseId,
   existing,
+  nextOrderIndex,
   onDone,
 }: {
   quiz: Quiz
   courseId: string
-  existing?: QuizQuestion
+  existing?: StaffQuizQuestion
+  nextOrderIndex: number
   onDone: () => void
 }) {
   const createQuestion = useCreateQuestion(String(quiz.id), courseId)
@@ -38,7 +41,7 @@ function QuestionEditor({
   const [text, setText] = useState(existing?.text ?? '')
   const [options, setOptions] = useState<DraftOption[]>(
     existing?.options?.length
-      ? existing.options.map((o) => ({ text: o.text, correct: o.correct ?? false }))
+      ? existing.options.map((o) => ({ text: o.text ?? '', correct: o.isCorrect ?? false }))
       : [
           { text: '', correct: false },
           { text: '', correct: false },
@@ -73,13 +76,14 @@ function QuestionEditor({
       return
     }
     if (!filled.some((o) => o.correct)) {
-      setError('Mark at least one option as correct.')
+      setError('Mark exactly one option as correct.')
       return
     }
 
     const payload: QuestionInput = {
       text: text.trim(),
-      options: filled.map((o) => ({ text: o.text.trim(), correct: o.correct })),
+      orderIndex: existing?.orderIndex ?? nextOrderIndex,
+      options: filled.map((o) => ({ text: o.text.trim(), isCorrect: o.correct })),
     }
 
     setError(null)
@@ -115,7 +119,7 @@ function QuestionEditor({
 
       <div className="space-y-2">
         <span className="block text-sm font-medium text-gray-800">
-          Options <span className="font-normal text-gray-500">(check every correct answer)</span>
+          Options <span className="font-normal text-gray-500">(exactly one correct answer)</span>
         </span>
         {options.map((option, index) => (
           <div key={index} className="flex items-center gap-2">
@@ -165,7 +169,9 @@ export function QuizEditScreen() {
   const location = useLocation()
 
   const quizQuery = useQuiz(quizId)
+  const questionsQuery = useQuizQuestions(quizId)
   const quiz = quizQuery.data
+  const questions = questionsQuery.data ?? []
 
   const stateCourseId = (location.state as { courseId?: string } | null)?.courseId
   const courseId = String(quiz?.courseId ?? stateCourseId ?? '')
@@ -177,8 +183,8 @@ export function QuizEditScreen() {
   const [duration, setDuration] = useState('')
   const [initialized, setInitialized] = useState(false)
   const [addingQuestion, setAddingQuestion] = useState(false)
-  const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null)
-  const [deletingQuestion, setDeletingQuestion] = useState<QuizQuestion | null>(null)
+  const [editingQuestion, setEditingQuestion] = useState<StaffQuizQuestion | null>(null)
+  const [deletingQuestion, setDeletingQuestion] = useState<StaffQuizQuestion | null>(null)
   const [metaError, setMetaError] = useState<string | null>(null)
 
   if (quiz && !initialized) {
@@ -205,7 +211,10 @@ export function QuizEditScreen() {
 
   if (!quiz) return <ErrorState message="Quiz not found." />
 
-  const questions = quiz.questions ?? []
+  const nextOrderIndex =
+    questions.length === 0
+      ? 0
+      : Math.max(...questions.map((q) => q.orderIndex ?? 0)) + 1
 
   const onSaveMeta = async (event: FormEvent) => {
     event.preventDefault()
@@ -292,8 +301,21 @@ export function QuizEditScreen() {
         </div>
 
         <div className="space-y-4">
+          {questionsQuery.isLoading && <Skeleton className="h-24 w-full" />}
+          {questionsQuery.isError && (
+            <ErrorState
+              message={isApiError(questionsQuery.error) ? questionsQuery.error.message : 'Failed to load questions.'}
+              onRetry={() => void questionsQuery.refetch()}
+            />
+          )}
+
           {addingQuestion && courseId && (
-            <QuestionEditor quiz={quiz} courseId={courseId} onDone={() => setAddingQuestion(false)} />
+            <QuestionEditor
+              quiz={quiz}
+              courseId={courseId}
+              nextOrderIndex={nextOrderIndex}
+              onDone={() => setAddingQuestion(false)}
+            />
           )}
 
           {questions.map((question, index) =>
@@ -303,6 +325,7 @@ export function QuizEditScreen() {
                 quiz={quiz}
                 courseId={courseId}
                 existing={editingQuestion}
+                nextOrderIndex={nextOrderIndex}
                 onDone={() => setEditingQuestion(null)}
               />
             ) : (
@@ -322,13 +345,13 @@ export function QuizEditScreen() {
                 </div>
                 <ul className="mt-2 space-y-1">
                   {(question.options ?? []).map((option, optionIndex) => (
-                    <li key={optionIndex} className="flex items-center gap-2 text-sm text-gray-700">
+                    <li key={String(option.id ?? optionIndex)} className="flex items-center gap-2 text-sm text-gray-700">
                       <span
-                        className={`inline-block size-2 rounded-full ${option.correct ? 'bg-green-500' : 'bg-gray-300'}`}
+                        className={`inline-block size-2 rounded-full ${option.isCorrect ? 'bg-green-500' : 'bg-gray-300'}`}
                         aria-hidden="true"
                       />
                       {option.text}
-                      {option.correct && <span className="text-xs font-medium text-green-700">correct</span>}
+                      {option.isCorrect && <span className="text-xs font-medium text-green-700">correct</span>}
                     </li>
                   ))}
                 </ul>
@@ -336,8 +359,8 @@ export function QuizEditScreen() {
             ),
           )}
 
-          {questions.length === 0 && !addingQuestion && (
-            <p className="text-sm text-gray-500">No questions yet. Add at least two options per question, with one or more marked correct.</p>
+          {questions.length === 0 && !addingQuestion && !questionsQuery.isLoading && (
+            <p className="text-sm text-gray-500">No questions yet. Add at least two options per question, with exactly one marked correct.</p>
           )}
         </div>
       </Card>

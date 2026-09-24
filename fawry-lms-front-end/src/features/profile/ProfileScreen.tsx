@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { Link } from 'react-router'
 import { useAuth } from '../../auth/context'
 import { isApiError } from '../../api/errors'
 import { Badge, Card, PageHeader } from '../../components/Layout'
@@ -116,8 +117,15 @@ export function ProfileScreen() {
             <ul className="mt-3 divide-y divide-gray-100">
               {enrolledCourses.map((course, index) => (
                 <li key={String(course.id ?? index)} className="flex items-center justify-between py-2">
-                  <span className="text-sm text-gray-800">{course.title ?? course.code ?? 'Course'}</span>
-                  {course.code && <Badge>{course.code}</Badge>}
+                  <span className="text-sm text-gray-800">{course.title ?? 'Course'}</span>
+                  {course.id !== undefined && course.id !== null && (
+                    <Link
+                      to={`/courses/${course.id}`}
+                      className="text-xs font-medium text-indigo-600 hover:text-indigo-500"
+                    >
+                      Open
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

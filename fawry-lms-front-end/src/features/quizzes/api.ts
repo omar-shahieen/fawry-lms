@@ -1,37 +1,77 @@
 import { apiFetch } from '../../api/client'
+import type { Page } from '../../api/page'
 
+/** Student-facing option (QuizStudentOptionResponse) — never carries correctness pre-submit. */
 export interface QuizOption {
-  id?: number | string
+  id?: number
   text: string
-  correct?: boolean
 }
 
 export interface QuizQuestion {
-  id?: number | string
+  id?: number
   text: string
+  orderIndex?: number
   options: QuizOption[]
 }
 
+/** QuizAnswerResponse — present on the detail payload after submit. */
+export interface QuizAnswer {
+  questionId?: number
+  selectedOptionId?: number
+  isCorrect?: boolean
+}
+
+/** QuizResponse list item + QuizDetailResponse detail fields (schema.d.ts). */
 export interface Quiz {
-  id: number | string
+  id: number
+  courseId?: number
   title: string
   durationMinutes: number
   published: boolean
-  courseId?: number | string
+  createdAt?: string
+  updatedAt?: string
+  startedAt?: string
+  expiresAt?: string
+  submittedAt?: string
+  score?: number
+  totalQuestions?: number
   questions?: QuizQuestion[]
+  answers?: QuizAnswer[]
 }
 
-export function listCourseQuizzes(courseId: string): Promise<Quiz[]> {
-  return apiFetch<Quiz[]>(`/api/courses/${courseId}/quizzes`)
+/** QuestionOptionResponse — staff question options carry isCorrect (GET /questions only). */
+export interface StaffQuizOption {
+  id?: number
+  text?: string
+  isCorrect?: boolean
+}
+
+/** QuestionResponse — GET /api/quizzes/{id}/questions (staff). */
+export interface StaffQuizQuestion {
+  id?: number
+  text?: string
+  orderIndex?: number
+  options?: StaffQuizOption[]
+}
+
+export async function listCourseQuizzes(courseId: string): Promise<Quiz[]> {
+  const page = await apiFetch<Page<Quiz>>(`/api/courses/${courseId}/quizzes`)
+  return page.content ?? []
 }
 
 export function getQuiz(id: string): Promise<Quiz> {
   return apiFetch<Quiz>(`/api/quizzes/${id}`)
 }
 
+/** Staff questions with correctness — separate from the student detail payload. */
+export function getQuizQuestions(id: string): Promise<StaffQuizQuestion[]> {
+  return apiFetch<StaffQuizQuestion[]>(`/api/quizzes/${id}/questions`)
+}
+
 export interface CreateQuizInput {
   title: string
   durationMinutes: number
+  published: boolean
 }
 
 export function createQuiz(courseId: string, input: CreateQuizInput): Promise<Quiz> {
@@ -40,7 +80,7 @@ export function createQuiz(courseId: string, input: CreateQuizInput): Promise<Qu
 
 export function updateQuiz(
   id: string,
-  input: Partial<CreateQuizInput> & { published?: boolean },
+  input: Partial<CreateQuizInput>,
 ): Promise<Quiz> {
   return apiFetch<Quiz>(`/api/quizzes/${id}`, { method: 'PATCH', body: input })
 }
@@ -50,21 +90,22 @@ export function deleteQuiz(id: string): Promise<void> {
 }
 
 /**
- * Request DTO for add/update question is not pinned by either doc — this shape
- * (text + options[{text, correct}]) is provisional pending schema.d.ts.
- * Cardinality: one-or-more correct options (overview.md §4) — checkboxes, not radios.
+ * CreateQuestionRequest/UpdateQuestionRequest (schema.d.ts): text + orderIndex +
+ * options[{text, isCorrect}]. orderIndex is required on create — caller supplies
+ * the append position. Backend enforces exactly one isCorrect per question.
  */
 export interface QuestionInput {
   text: string
-  options: Array<{ text: string; correct: boolean }>
+  orderIndex?: number
+  options: Array<{ text: string; isCorrect: boolean }>
 }
 
-export function createQuestion(quizId: string, input: QuestionInput): Promise<QuizQuestion> {
-  return apiFetch<QuizQuestion>(`/api/quizzes/${quizId}/questions`, { method: 'POST', body: input })
+export function createQuestion(quizId: string, input: QuestionInput): Promise<StaffQuizQuestion> {
+  return apiFetch<StaffQuizQuestion>(`/api/quizzes/${quizId}/questions`, { method: 'POST', body: input })
 }
 
-export function updateQuestion(questionId: string, input: QuestionInput): Promise<QuizQuestion> {
-  return apiFetch<QuizQuestion>(`/api/questions/${questionId}`, { method: 'PATCH', body: input })
+export function updateQuestion(questionId: string, input: QuestionInput): Promise<StaffQuizQuestion> {
+  return apiFetch<StaffQuizQuestion>(`/api/questions/${questionId}`, { method: 'PATCH', body: input })
 }
 
 export function deleteQuestion(questionId: string): Promise<void> {

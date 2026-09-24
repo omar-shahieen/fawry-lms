@@ -3,7 +3,6 @@ export type Role = 'STUDENT' | 'INSTRUCTOR' | 'ADMIN'
 export interface EnrolledCourseRef {
   id?: number | string
   title?: string
-  code?: string
 }
 
 export interface User {
@@ -13,6 +12,6 @@ export interface User {
   role: Role
   profilePictureUrl?: string
   isActive?: boolean
-  /** Present only for STUDENT — exact field name pending schema.d.ts (Appendix A #9). */
+  /** Present only for STUDENT — EnrolledCourseResponse {id, title} (schema.d.ts, Appendix A #9 confirmed). */
   enrolledCourses?: EnrolledCourseRef[]
 }

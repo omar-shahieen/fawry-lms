@@ -1,13 +1,13 @@
 import { Card, PageHeader } from '../../components/Layout'
 import { Badge } from '../../components/Layout'
 import { formatDate } from '../../components/formatDate'
-import type { Quiz } from './api'
-import type { MyAttempt } from './attempt-api'
+import type { Quiz, QuizAnswer } from './api'
+import type { MyAttempt, SubmitResult } from './attempt-api'
 
-function readStoredResult(quizId: string): Record<string, unknown> | null {
+function readStoredResult(quizId: string): SubmitResult | null {
   try {
     const raw = sessionStorage.getItem(`lms.quizResult.${quizId}`)
-    return raw ? (JSON.parse(raw) as Record<string, unknown>) : null
+    return raw ? (JSON.parse(raw) as SubmitResult) : null
   } catch {
     return null
   }
@@ -16,16 +16,26 @@ function readStoredResult(quizId: string): Record<string, unknown> | null {
 /**
  * Permanent post-submission review. Correctness/score fields render only when
  * the payload actually contains them (never pre-submit — that state cannot reach here).
+ * Student detail payload has no option-level correct flags — correctness comes
+ * from answers[] (per-question selectedOptionId + isCorrect).
  */
 export function QuizReview({ quiz, attempt }: { quiz: Quiz; attempt: MyAttempt | null }) {
   const questions = quiz.questions ?? []
   const stored = readStoredResult(String(quiz.id))
 
-  const score =
-    attempt?.score ??
-    (typeof stored?.score === 'number' ? stored.score : undefined)
-  const totalFromStored = typeof stored?.totalQuestions === 'number' ? stored.totalQuestions : undefined
-  const total = totalFromStored ?? (questions.length > 0 ? questions.length : undefined)
+  const answers: QuizAnswer[] =
+    quiz.answers && quiz.answers.length > 0 ? quiz.answers : (stored?.answers ?? [])
+
+  const answerByQuestion = new Map<string, QuizAnswer>()
+  for (const answer of answers) {
+    if (answer.questionId !== undefined && answer.questionId !== null) {
+      answerByQuestion.set(String(answer.questionId), answer)
+    }
+  }
+
+  const score = attempt?.score ?? quiz.score ?? stored?.score
+  const total = attempt?.totalQuestions ?? quiz.totalQuestions ?? stored?.totalQuestions ??
+    (questions.length > 0 ? questions.length : undefined)
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -52,10 +62,11 @@ export function QuizReview({ quiz, attempt }: { quiz: Quiz; attempt: MyAttempt |
       <div className="space-y-4">
         {questions.map((question, index) => {
           const optionList = question.options ?? []
-          const correctIds = new Set(
-            optionList.filter((o) => o.correct).map((o) => String(o.id ?? o.text)),
-          )
-          const hasCorrectness = correctIds.size > 0
+          const answer =
+            question.id !== undefined && question.id !== null
+              ? answerByQuestion.get(String(question.id))
+              : undefined
+          const selectedId = answer?.selectedOptionId
 
           return (
             <Card key={String(question.id ?? index)}>
@@ -63,27 +74,34 @@ export function QuizReview({ quiz, attempt }: { quiz: Quiz; attempt: MyAttempt |
                 <p className="text-sm font-semibold text-gray-900">
                   {index + 1}. {question.text}
                 </p>
-                {hasCorrectness && <Badge color="green">answered</Badge>}
+                {answer?.isCorrect === true && <Badge color="green">correct</Badge>}
+                {answer?.isCorrect === false && <Badge color="red">incorrect</Badge>}
               </div>
               <ul className="mt-3 space-y-2">
                 {optionList.map((option) => {
-                  const optionId = String(option.id ?? option.text)
-                  const isCorrect = correctIds.has(optionId)
+                  const isSelected = selectedId !== undefined && option.id === selectedId
+                  const isCorrectAnswer = answer !== undefined && isSelected && answer.isCorrect === true
+                  const isWrongAnswer = answer !== undefined && isSelected && answer.isCorrect === false
                   return (
                     <li
-                      key={optionId}
+                      key={String(option.id ?? option.text)}
                       className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm ${
-                        isCorrect
+                        isCorrectAnswer
                           ? 'border-green-300 bg-green-50 text-green-900'
-                          : 'border-gray-200 bg-white text-gray-700'
+                          : isWrongAnswer
+                            ? 'border-red-200 bg-red-50 text-red-800'
+                            : 'border-gray-200 bg-white text-gray-700'
                       }`}
                     >
                       <span
-                        className={`inline-block size-2 rounded-full ${isCorrect ? 'bg-green-500' : 'bg-gray-300'}`}
+                        className={`inline-block size-2 rounded-full ${
+                          isCorrectAnswer ? 'bg-green-500' : isWrongAnswer ? 'bg-red-400' : 'bg-gray-300'
+                        }`}
                         aria-hidden="true"
                       />
                       {option.text}
-                      {isCorrect && <span className="text-xs font-medium text-green-700">correct answer</span>}
+                      {isCorrectAnswer && <span className="text-xs font-medium text-green-700">your answer · correct</span>}
+                      {isWrongAnswer && <span className="text-xs font-medium text-red-700">your answer</span>}
                     </li>
                   )
                 })}

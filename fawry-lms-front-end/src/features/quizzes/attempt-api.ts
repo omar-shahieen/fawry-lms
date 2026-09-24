@@ -5,19 +5,21 @@ import type { Page } from '../../api/page'
  * Attempt state probe — side-effect-free per lms-endpoints.md.
  * Always call this BEFORE GET /api/quizzes/{id} on the student take screen.
  *
- * Exact response shape is not pinned (Appendix A); handled defensively:
- * - 404 or empty body → no attempt yet
- * - object with submittedAt set → permanent review
- * - object with submittedAt null → unsubmitted attempt, resume
+ * Shape: QuizAttemptResponse (schema.d.ts).
+ * - 404 → no attempt yet
+ * - submittedAt set → permanent review
+ * - submittedAt null → unsubmitted attempt, resume
  */
 export interface MyAttempt {
-  id?: number | string
+  id?: number
+  quizId?: number
+  studentId?: string
+  studentName?: string
+  studentEmail?: string
   startedAt?: string
   submittedAt?: string | null
   score?: number
-  /** possible quiz summary fields on the response — used for the landing card if present */
-  quizTitle?: string
-  durationMinutes?: number
+  totalQuestions?: number
 }
 
 export async function getMyAttempt(quizId: string): Promise<MyAttempt | null> {
@@ -32,21 +34,19 @@ export async function getMyAttempt(quizId: string): Promise<MyAttempt | null> {
   }
 }
 
-/**
- * Submit body shape is NOT pinned by either doc (Appendix A #3).
- * This provisional shape — per-question selected option ids, arrays for
- * multi-correct — must be confirmed against schema.d.ts before hardening.
- */
+/** SubmitAnswerRequest (schema.d.ts): one optional selected option per question. */
 export interface SubmitAnswer {
-  questionId: number | string
-  optionIds: Array<number | string>
+  questionId: number
+  selectedOptionId?: number
 }
 
+/** SubmitQuizResponse (schema.d.ts). */
 export interface SubmitResult {
+  attemptId?: number
   score?: number
   totalQuestions?: number
-  maxScore?: number
-  [key: string]: unknown
+  submittedAt?: string
+  answers?: Array<{ questionId?: number; selectedOptionId?: number; isCorrect?: boolean }>
 }
 
 export function submitQuiz(quizId: string, answers: SubmitAnswer[]): Promise<SubmitResult> {
@@ -56,14 +56,17 @@ export function submitQuiz(quizId: string, answers: SubmitAnswer[]): Promise<Sub
   })
 }
 
-/** Staff attempts list — GET /api/quizzes/{id}/attempts (ADMIN, Own(Instructor)). Shape provisional. */
+/** Staff attempts list — QuizAttemptResponse (schema.d.ts), flat fields. */
 export interface QuizAttemptRow {
-  id?: number | string
-  student?: { id?: number | string; fullName?: string } | string
+  id?: number
+  quizId?: number
+  studentId?: string
   studentName?: string
+  studentEmail?: string
   startedAt?: string
   submittedAt?: string | null
   score?: number
+  totalQuestions?: number
 }
 
 export function listQuizAttempts(quizId: string, page = 0, size = 20): Promise<Page<QuizAttemptRow>> {
@@ -71,6 +74,5 @@ export function listQuizAttempts(quizId: string, page = 0, size = 20): Promise<P
 }
 
 export function attemptStudentName(row: QuizAttemptRow): string {
-  if (typeof row.student === 'string') return row.student
-  return row.studentName ?? row.student?.fullName ?? 'Student'
+  return row.studentName ?? 'Student'
 }

@@ -11,8 +11,9 @@ export function listSections(courseId: string): Promise<Section[]> {
   return apiFetch<Section[]>(`/api/courses/${courseId}/sections`)
 }
 
-export function createSection(courseId: string, title: string): Promise<Section> {
-  return apiFetch<Section>(`/api/courses/${courseId}/sections`, { method: 'POST', body: { title } })
+/** CreateSectionRequest (schema.d.ts) — orderIndex required on create. */
+export function createSection(courseId: string, title: string, orderIndex: number): Promise<Section> {
+  return apiFetch<Section>(`/api/courses/${courseId}/sections`, { method: 'POST', body: { title, orderIndex } })
 }
 
 export function updateSection(id: string, input: { title: string; orderIndex: number }): Promise<Section> {

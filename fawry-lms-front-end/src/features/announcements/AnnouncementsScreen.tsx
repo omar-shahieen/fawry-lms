@@ -107,8 +107,9 @@ export function AnnouncementsScreen() {
   // Own(Instructor) resolves through the course's instructor id (frontend-build §3).
   const isInstructorOwner =
     user?.role === 'INSTRUCTOR' &&
-    ((course?.instructorId !== undefined && course?.instructorId !== null && String(course.instructorId) === String(user.id)) ||
-      (course?.instructor && String(course.instructor.id) === String(user.id)))
+    course?.instructorId !== undefined &&
+    course?.instructorId !== null &&
+    String(course.instructorId) === String(user.id)
   const canManage = user?.role === 'ADMIN' || isInstructorOwner
 
   const isStudent = user?.role === 'STUDENT'

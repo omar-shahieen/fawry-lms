@@ -5,13 +5,14 @@ import { Button } from '../../components/Button'
 import { ErrorState, ForbiddenState, Skeleton } from '../../components/States'
 import { useQuery } from '@tanstack/react-query'
 import { isApiError } from '../../api/errors'
-import { getQuiz } from './api'
+import { getQuiz, getQuizQuestions } from './api'
 
 /**
  * Staff preview of a quiz — intentionally a SEPARATE component from the student
  * take screen (frontend-build.md §7.6.2 rule 5). Staff GET has no attempt side
- * effect; whether the payload includes correctness info is confirmed live — if
- * present it renders here and must never be shared with the student component.
+ * effect and the detail payload is student-shaped (no correctness); correctness
+ * comes from GET /api/quizzes/{id}/questions and must never be shared with the
+ * student component.
  */
 export function StaffQuizView() {
   const { id: quizId = '' } = useParams()
@@ -19,6 +20,14 @@ export function StaffQuizView() {
   const quizQuery = useQuery({
     queryKey: queryKeys.quiz(quizId),
     queryFn: () => getQuiz(quizId),
+    enabled: Boolean(quizId),
+  })
+
+  const questionsQuery = useQuery({
+    queryKey: queryKeys.quizQuestions(quizId),
+    queryFn: () => getQuizQuestions(quizId),
+    enabled: Boolean(quizId),
+    retry: false,
   })
 
   if (quizQuery.isLoading) {
@@ -40,7 +49,7 @@ export function StaffQuizView() {
   const quiz = quizQuery.data
   if (!quiz) return <ErrorState message="Quiz not found." />
 
-  const questions = quiz.questions ?? []
+  const questions = questionsQuery.data ?? []
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -58,6 +67,13 @@ export function StaffQuizView() {
       />
 
       <div className="space-y-4">
+        {questionsQuery.isLoading && <Skeleton className="h-24 w-full" />}
+        {questionsQuery.isError && (
+          <ErrorState
+            message={isApiError(questionsQuery.error) ? questionsQuery.error.message : 'Failed to load questions.'}
+            onRetry={() => void questionsQuery.refetch()}
+          />
+        )}
         {questions.map((question, index) => (
           <Card key={String(question.id ?? index)}>
             <p className="text-sm font-semibold text-gray-900">
@@ -66,23 +82,25 @@ export function StaffQuizView() {
             <ul className="mt-3 space-y-2">
               {(question.options ?? []).map((option, optionIndex) => (
                 <li
-                  key={optionIndex}
+                  key={String(option.id ?? optionIndex)}
                   className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm ${
-                    option.correct ? 'border-green-300 bg-green-50 text-green-900' : 'border-gray-200 bg-white text-gray-700'
+                    option.isCorrect ? 'border-green-300 bg-green-50 text-green-900' : 'border-gray-200 bg-white text-gray-700'
                   }`}
                 >
                   <span
-                    className={`inline-block size-2 rounded-full ${option.correct ? 'bg-green-500' : 'bg-gray-300'}`}
+                    className={`inline-block size-2 rounded-full ${option.isCorrect ? 'bg-green-500' : 'bg-gray-300'}`}
                     aria-hidden="true"
                   />
                   {option.text}
-                  {option.correct && <span className="text-xs font-medium text-green-700">correct</span>}
+                  {option.isCorrect && <span className="text-xs font-medium text-green-700">correct</span>}
                 </li>
               ))}
             </ul>
           </Card>
         ))}
-        {questions.length === 0 && <p className="text-sm text-gray-500">No questions yet.</p>}
+        {!questionsQuery.isLoading && !questionsQuery.isError && questions.length === 0 && (
+          <p className="text-sm text-gray-500">No questions yet.</p>
+        )}
       </div>
     </div>
   )

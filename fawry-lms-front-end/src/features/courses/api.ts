@@ -7,10 +7,12 @@ export interface Course {
   code: string
   term: string
   description?: string
-  /** Ownership fields pending schema.d.ts confirmation (Appendix A #9/#16). */
-  instructorId?: number | string | null
+  /** CourseResponse (schema.d.ts). */
+  instructorId?: string | null
   instructorName?: string | null
-  instructor?: { id?: number | string; fullName?: string } | null
+  isActive?: boolean
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface CourseListFilters {
@@ -35,11 +37,13 @@ export function getCourse(id: string): Promise<Course> {
   return apiFetch<Course>(`/api/courses/${id}`)
 }
 
+/** CreateCourseRequest (schema.d.ts) — instructorId required on create. */
 export interface CreateCourseInput {
   title: string
   description: string
   code: string
   term: string
+  instructorId: string
 }
 
 export function createCourse(input: CreateCourseInput): Promise<Course> {
@@ -54,7 +58,7 @@ export function deleteCourse(id: string): Promise<void> {
   return apiFetch<void>(`/api/courses/${id}`, { method: 'DELETE' })
 }
 
-export function assignInstructor(id: string, instructorId: number | string): Promise<Course> {
+export function assignInstructor(id: string, instructorId: string): Promise<Course> {
   return apiFetch<Course>(`/api/courses/${id}/assign-instructor`, { method: 'PATCH', body: { instructorId } })
 }
 

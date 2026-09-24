@@ -6,12 +6,13 @@ import {
   deleteQuestion,
   deleteQuiz,
   getQuiz,
+  getQuizQuestions,
   listCourseQuizzes,
   updateQuestion,
   updateQuiz,
 } from './api'
 import { listQuizAttempts } from './attempt-api'
-import type { CreateQuizInput, QuestionInput, Quiz } from './api'
+import type { CreateQuizInput, QuestionInput, Quiz, StaffQuizQuestion } from './api'
 
 export function useQuizAttempts(quizId: string, page: number) {
   return useQuery({
@@ -37,6 +38,15 @@ export function useQuiz(id: string) {
   })
 }
 
+/** Staff questions with correctness — GET /api/quizzes/{id}/questions. */
+export function useQuizQuestions(id: string) {
+  return useQuery({
+    queryKey: queryKeys.quizQuestions(id),
+    queryFn: () => getQuizQuestions(id),
+    enabled: Boolean(id),
+  })
+}
+
 function invalidateQuizList(courseId: string) {
   return (queryClient: { invalidateQueries: (args: { queryKey: readonly unknown[] }) => unknown }) => {
     void queryClient.invalidateQueries({ queryKey: queryKeys.courseQuizzes(courseId) })
@@ -55,7 +65,7 @@ export function useCreateQuiz(courseId: string) {
 export function useUpdateQuiz(courseId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: Partial<CreateQuizInput> & { published?: boolean } }) =>
+    mutationFn: ({ id, input }: { id: string; input: Partial<CreateQuizInput> }) =>
       updateQuiz(id, input),
     onSuccess: (_data, variables) => {
       invalidateQuizList(courseId)(queryClient)
@@ -78,7 +88,7 @@ export function useCreateQuestion(quizId: string, courseId: string) {
     mutationFn: (input: QuestionInput) => createQuestion(quizId, input),
     onSuccess: () => {
       invalidateQuizList(courseId)(queryClient)
-      void queryClient.invalidateQueries({ queryKey: queryKeys.quiz(quizId) })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.quizQuestions(quizId) })
     },
   })
 }
@@ -90,7 +100,7 @@ export function useUpdateQuestion(quizId: string, courseId: string) {
       updateQuestion(questionId, input),
     onSuccess: () => {
       invalidateQuizList(courseId)(queryClient)
-      void queryClient.invalidateQueries({ queryKey: queryKeys.quiz(quizId) })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.quizQuestions(quizId) })
     },
   })
 }
@@ -101,9 +111,9 @@ export function useDeleteQuestion(quizId: string, courseId: string) {
     mutationFn: (questionId: string) => deleteQuestion(questionId),
     onSuccess: () => {
       invalidateQuizList(courseId)(queryClient)
-      void queryClient.invalidateQueries({ queryKey: queryKeys.quiz(quizId) })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.quizQuestions(quizId) })
     },
   })
 }
 
-export type { Quiz }
+export type { Quiz, StaffQuizQuestion }

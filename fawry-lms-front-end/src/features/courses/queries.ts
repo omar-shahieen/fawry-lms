@@ -70,7 +70,7 @@ export function useDeleteCourse() {
 export function useAssignInstructor() {
   const invalidate = useInvalidateCourses()
   return useMutation({
-    mutationFn: ({ id, instructorId }: { id: string; instructorId: number | string }) =>
+    mutationFn: ({ id, instructorId }: { id: string; instructorId: string }) =>
       assignInstructor(id, instructorId),
     onSuccess: invalidate,
   })

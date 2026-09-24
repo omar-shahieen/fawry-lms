@@ -95,7 +95,7 @@ export function CourseQuizzesScreen() {
                     </Button>
                   </Link>
                 ) : quiz.published ? (
-                  <Link to={`/quizzes/${quiz.id}`} state={{ quizTitle: quiz.title, durationMinutes: quiz.durationMinutes, questionCount: quiz.questions?.length }}>
+                  <Link to={`/quizzes/${quiz.id}`} state={{ quizTitle: quiz.title, durationMinutes: quiz.durationMinutes }}>
                     <Button size="sm">Open</Button>
                   </Link>
                 ) : null}
@@ -134,7 +134,7 @@ export function QuizManageScreen() {
     if (Object.keys(nextErrors).length > 0) return
 
     try {
-      await createQuiz.mutateAsync({ title: title.trim(), durationMinutes })
+      await createQuiz.mutateAsync({ title: title.trim(), durationMinutes, published: false })
       setCreateOpen(false)
       setTitle('')
       setDuration('15')
@@ -198,10 +198,7 @@ export function QuizManageScreen() {
                   <h2 className="text-sm font-semibold text-gray-900">{quiz.title}</h2>
                   {quiz.published ? <Badge color="green">Published</Badge> : <Badge color="amber">Draft</Badge>}
                 </div>
-                <p className="mt-1 text-xs text-gray-500">
-                  {quiz.durationMinutes} minutes · {quiz.questions?.length ?? 0} question
-                  {(quiz.questions?.length ?? 0) === 1 ? '' : 's'}
-                </p>
+                <p className="mt-1 text-xs text-gray-500">{quiz.durationMinutes} minutes</p>
               </div>
               <div className="flex items-center gap-2">
                 <Button

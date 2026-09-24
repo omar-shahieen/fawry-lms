@@ -22,7 +22,7 @@ function useInvalidateDiscussion(courseId: string) {
 export function useCreatePost(courseId: string) {
   const invalidate = useInvalidateDiscussion(courseId)
   return useMutation({
-    mutationFn: (input: { title?: string; body: string }) => createPost(courseId, input),
+    mutationFn: (input: { title: string; body: string }) => createPost(courseId, input),
     onSuccess: invalidate,
   })
 }

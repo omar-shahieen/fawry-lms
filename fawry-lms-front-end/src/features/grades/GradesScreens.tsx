@@ -45,11 +45,11 @@ export function MyGradesScreen() {
       <PageHeader title="Grades" description="Your quiz results, grouped by course." />
       <div className="space-y-4">
         {groups.map((group, index) => {
-          const title = group.courseTitle ?? group.course?.title ?? 'Course'
-          const code = group.courseCode ?? group.course?.code
-          const entries = group.grades ?? group.results ?? []
+          const title = group.courseTitle ?? 'Course'
+          const code = group.courseCode
+          const entries = group.quizzes ?? []
           return (
-            <Card key={String(group.courseId ?? group.course?.id ?? index)}>
+            <Card key={String(group.courseId ?? index)}>
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
                 {code && <Badge>{code}</Badge>}
@@ -67,10 +67,12 @@ export function MyGradesScreen() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {entries.map((entry, entryIndex) => (
-                      <tr key={String(entry.quizId ?? entry.quiz?.id ?? entryIndex)}>
-                        <td className="py-2 pr-4 text-gray-800">{entry.quizTitle ?? entry.quiz?.title ?? 'Quiz'}</td>
+                      <tr key={String(entry.quizId ?? entryIndex)}>
+                        <td className="py-2 pr-4 text-gray-800">{entry.quizTitle ?? 'Quiz'}</td>
                         <td className="py-2 pr-4 font-medium text-gray-900">
-                          {entry.score !== undefined && entry.score !== null ? entry.score : '—'}
+                          {entry.score !== undefined && entry.score !== null
+                            ? `${entry.score}${entry.totalQuestions !== undefined ? ` / ${entry.totalQuestions}` : ''}`
+                            : '—'}
                         </td>
                         <td className="py-2 text-gray-500">{formatDate(entry.submittedAt)}</td>
                       </tr>
@@ -134,16 +136,24 @@ export function CourseGradesScreen() {
               <thead className="bg-gray-50 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
                 <tr>
                   <th className="px-4 py-3">Student</th>
+                  <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Quiz</th>
                   <th className="px-4 py-3">Score</th>
+                  <th className="px-4 py-3">Submitted</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
                 {gradesQuery.data.content.map((row, index) => (
                   <tr key={index}>
                     <td className="px-4 py-3 font-medium text-gray-900">{studentName(row)}</td>
+                    <td className="px-4 py-3 text-gray-600">{row.student?.email ?? '—'}</td>
                     <td className="px-4 py-3 text-gray-600">{quizName(row)}</td>
-                    <td className="px-4 py-3 font-medium text-gray-900">{row.score}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">
+                      {row.score !== undefined && row.score !== null
+                        ? `${row.score}${row.totalQuestions !== undefined && row.totalQuestions !== null ? ` / ${row.totalQuestions}` : ''}`
+                        : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">{formatDate(row.submittedAt)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -45,22 +45,31 @@ function EditComposer({
 }) {
   const [title, setTitle] = useState(initialTitle)
   const [body, setBody] = useState(initialBody)
+  const [localError, setLocalError] = useState<string | null>(null)
   return (
     <form
       className="space-y-2"
       onSubmit={(e: FormEvent) => {
         e.preventDefault()
-        if (!body.trim()) return
-        onSubmit(withTitle ? { title: title.trim() || undefined, body: body.trim() } : { body: body.trim() })
+        setLocalError(null)
+        if (withTitle && !title.trim()) {
+          setLocalError('Title is required.')
+          return
+        }
+        if (!body.trim()) {
+          setLocalError('Body is required.')
+          return
+        }
+        onSubmit(withTitle ? { title: title.trim(), body: body.trim() } : { title: '', body: body.trim() })
       }}
     >
-      {error && (
+      {(error || localError) && (
         <p className="text-xs font-medium text-red-600" role="alert">
-          {error}
+          {localError ?? error}
         </p>
       )}
       {withTitle && (
-        <Input label="Title" name="editTitle" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <Input label="Title" name="editTitle" value={title} onChange={(e) => setTitle(e.target.value)} required />
       )}
       <Textarea label="Body" name="editBody" rows={4} value={body} onChange={(e) => setBody(e.target.value)} required />
       <div className="flex justify-end gap-2">
@@ -423,12 +432,16 @@ export function DiscussionScreen() {
   const onComposerSubmit = async (event: FormEvent) => {
     event.preventDefault()
     setComposerError(null)
+    if (!newTitle.trim()) {
+      setComposerError('Title is required.')
+      return
+    }
     if (!newBody.trim()) {
       setComposerError('Body is required.')
       return
     }
     try {
-      await createPost.mutateAsync({ title: newTitle.trim() || undefined, body: newBody.trim() })
+      await createPost.mutateAsync({ title: newTitle.trim(), body: newBody.trim() })
       setNewTitle('')
       setNewBody('')
     } catch (error) {
@@ -486,10 +499,11 @@ export function DiscussionScreen() {
             </div>
           )}
           <Input
-            label="Title (optional)"
+            label="Title"
             name="postTitle"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
+            required
           />
           <Textarea
             label="Body"

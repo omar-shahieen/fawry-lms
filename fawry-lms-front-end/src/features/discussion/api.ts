@@ -43,14 +43,12 @@ export function listDiscussion(courseId: string, filters: DiscussionFilters = {}
   return apiFetch<Page<DiscussionPost>>(`/api/courses/${courseId}/discussion?${params.toString()}`)
 }
 
-/** `title` optionality is not pinned (§7.8.2) — sent only when non-empty. */
+/** CreateDiscussionPostRequest (schema.d.ts) — title required on create. */
 export function createPost(
   courseId: string,
-  input: { title?: string; body: string },
+  input: { title: string; body: string },
 ): Promise<DiscussionPost> {
-  const body: { title?: string; body: string } = { body: input.body }
-  if (input.title) body.title = input.title
-  return apiFetch<DiscussionPost>(`/api/courses/${courseId}/discussion`, { method: 'POST', body })
+  return apiFetch<DiscussionPost>(`/api/courses/${courseId}/discussion`, { method: 'POST', body: input })
 }
 
 export function replyToPost(postId: string | number, body: string): Promise<DiscussionReply> {

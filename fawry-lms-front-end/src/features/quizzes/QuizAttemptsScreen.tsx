@@ -67,7 +67,9 @@ export function QuizAttemptsScreen() {
                       {row.submittedAt ? formatDate(row.submittedAt) : <span className="text-amber-700">In progress</span>}
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900">
-                      {row.score !== undefined && row.score !== null ? row.score : '—'}
+                      {row.score !== undefined && row.score !== null
+                        ? `${row.score}${row.totalQuestions !== undefined && row.totalQuestions !== null ? ` / ${row.totalQuestions}` : ''}`
+                        : '—'}
                     </td>
                   </tr>
                 ))}

@@ -14,16 +14,16 @@ export interface LoginInput {
 }
 
 /**
- * Token key names are not pinned by either doc (Appendix A #2).
- * Read the common candidates; tighten once schema.d.ts confirms.
+ * AuthResponse / RefreshResponse (schema.d.ts): accessToken + refreshToken on
+ * auth, accessToken only on refresh. Confirmed against live responses.
  */
 function applyTokens(data: unknown): void {
   if (typeof data !== 'object' || data === null) {
     throw new Error('Unexpected auth response: not an object')
   }
   const record = data as Record<string, unknown>
-  const access = record.accessToken ?? record.access_token ?? record.token
-  const refresh = record.refreshToken ?? record.refresh_token
+  const access = record.accessToken
+  const refresh = record.refreshToken
   if (typeof access !== 'string' || !access) {
     throw new Error('Unexpected auth response: missing access token')
   }

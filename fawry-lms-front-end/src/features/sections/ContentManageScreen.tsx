@@ -127,7 +127,10 @@ export function ContentManageScreen() {
     }
     setSectionError(null)
     try {
-      await createSection.mutateAsync(newSectionTitle.trim())
+      const sections = sectionsQuery.data ?? []
+      const orderIndex =
+        sections.length === 0 ? 0 : Math.max(...sections.map((s) => s.orderIndex)) + 1
+      await createSection.mutateAsync({ title: newSectionTitle.trim(), orderIndex })
       setNewSectionTitle('')
     } catch (error) {
       setSectionError(isApiError(error) ? error.message : 'Something went wrong.')

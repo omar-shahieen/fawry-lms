@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { isApiError } from '../../api/errors'
+import { queryKeys } from '../../api/keys'
 import { Card } from '../../components/Layout'
 import { Button } from '../../components/Button'
 import { Skeleton } from '../../components/States'
@@ -8,8 +10,9 @@ import { submitQuiz } from './attempt-api'
 import type { SubmitAnswer, SubmitResult } from './attempt-api'
 import { formatCountdown } from './useCountdown'
 
+/** Single selection per question — server scores one selectedOptionId per question. */
 interface Selections {
-  [questionId: string]: Set<string>
+  [questionId: string]: number | undefined
 }
 
 export function QuizRunner({
@@ -19,6 +22,7 @@ export function QuizRunner({
   expired,
   onSubmitted,
   onNoAttempt,
+  onViewReview,
 }: {
   quiz: Quiz
   quizId: string
@@ -26,21 +30,18 @@ export function QuizRunner({
   expired: boolean
   onSubmitted: () => void
   onNoAttempt: () => void
+  onViewReview: () => void
 }) {
   const [selections, setSelections] = useState<Selections>({})
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lateRejected, setLateRejected] = useState(false)
+  const queryClient = useQueryClient()
 
   const questions = quiz.questions ?? []
 
-  const toggle = (questionId: string, optionId: string) => {
-    setSelections((prev) => {
-      const current = prev[questionId] ?? new Set<string>()
-      const next = new Set(current)
-      if (next.has(optionId)) next.delete(optionId)
-      else next.add(optionId)
-      return { ...prev, [questionId]: next }
-    })
+  const select = (questionId: number, optionId: number) => {
+    setSelections((prev) => ({ ...prev, [String(questionId)]: optionId }))
   }
 
   const onSubmit = async () => {
@@ -50,22 +51,37 @@ export function QuizRunner({
 
     const answers: SubmitAnswer[] = questions
       .filter((q) => q.id !== undefined && q.id !== null)
-      .map((q) => ({
-        questionId: q.id!,
-        optionIds: Array.from(selections[String(q.id)] ?? []),
-      }))
+      .map((q) => {
+        const selectedOptionId = selections[String(q.id)]
+        return selectedOptionId === undefined
+          ? { questionId: q.id! }
+          : { questionId: q.id!, selectedOptionId }
+      })
 
     try {
       const result: SubmitResult = await submitQuiz(quizId, answers)
       sessionStorage.setItem(`lms.quizResult.${quizId}`, JSON.stringify(result))
+      // post-submit grades/dashboard/attempts are stale — refresh them quietly
+      void queryClient.invalidateQueries({ queryKey: queryKeys.myGrades })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.studentDashboard })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.quizAttempts(quizId, {}) })
       onSubmitted()
     } catch (e) {
       if (isApiError(e) && e.status === 409) {
         // already submitted — single attempt only → straight to review
         onSubmitted()
       } else if (isApiError(e) && e.status === 400) {
-        setError('No attempt was found for this quiz. Returning to the start…')
-        setTimeout(() => onNoAttempt(), 1200)
+        const message = e.message.toLowerCase()
+        if (message.includes('expired')) {
+          // late-reject: server refused the submission; offer the review view
+          setError('The time limit has passed — your submission was not accepted.')
+          setLateRejected(true)
+        } else if (message.includes('not started')) {
+          setError('No attempt was found for this quiz. Returning to the start…')
+          setTimeout(() => onNoAttempt(), 1200)
+        } else {
+          setError(e.message)
+        }
       } else if (isApiError(e)) {
         setError(e.message)
       } else {
@@ -75,6 +91,8 @@ export function QuizRunner({
       setSubmitting(false)
     }
   }
+
+  const selectedCount = Object.values(selections).filter((id) => id !== undefined).length
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -94,14 +112,19 @@ export function QuizRunner({
         </div>
       </div>
 
-      {expired && (
+      {expired && !lateRejected && (
         <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800" role="alert">
           Time is up — submit now.
         </div>
       )}
       {error && (
-        <div className="rounded-md bg-red-50 px-4 py-3 text-sm font-medium text-red-700" role="alert">
-          {error}
+        <div className="flex items-center justify-between gap-3 rounded-md bg-red-50 px-4 py-3 text-sm font-medium text-red-700" role="alert">
+          <span>{error}</span>
+          {lateRejected && (
+            <Button size="sm" variant="secondary" onClick={onViewReview}>
+              View review
+            </Button>
+          )}
         </div>
       )}
 
@@ -114,30 +137,35 @@ export function QuizRunner({
       ) : (
         <div className="space-y-4">
           {questions.map((question, index) => {
-            const questionId = String(question.id ?? index)
-            const selected = selections[questionId] ?? new Set<string>()
+            const questionId = question.id
+            const selected = questionId !== undefined && questionId !== null ? selections[String(questionId)] : undefined
             return (
-              <Card key={questionId}>
+              <Card key={String(questionId ?? index)}>
                 <p className="text-sm font-semibold text-gray-900">
                   {index + 1}. {question.text}
                 </p>
                 <div className="mt-3 space-y-2">
                   {(question.options ?? []).map((option) => {
-                    const optionId = String(option.id ?? option.text)
-                    const checked = selected.has(optionId)
+                    const optionId = option.id
+                    const checked = optionId !== undefined && optionId !== null && selected === optionId
                     return (
                       <label
-                        key={optionId}
+                        key={String(optionId ?? option.text)}
                         className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors ${
                           checked ? 'border-indigo-400 bg-indigo-50' : 'border-gray-200 bg-white hover:bg-gray-50'
-                        } ${expired ? 'pointer-events-none opacity-60' : ''}`}
+                        } ${expired || lateRejected ? 'pointer-events-none opacity-60' : ''}`}
                       >
                         <input
-                          type="checkbox"
-                          className="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                          type="radio"
+                          name={`question-${String(questionId ?? index)}`}
+                          className="size-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                           checked={checked}
-                          disabled={expired || submitting}
-                          onChange={() => toggle(questionId, optionId)}
+                          disabled={expired || submitting || lateRejected}
+                          onChange={() => {
+                            if (questionId !== undefined && questionId !== null && optionId !== undefined && optionId !== null) {
+                              select(questionId, optionId)
+                            }
+                          }}
                         />
                         <span className="text-gray-800">{option.text}</span>
                       </label>
@@ -152,10 +180,9 @@ export function QuizRunner({
 
       <div className="flex items-center justify-between gap-4 pb-8">
         <p className="text-xs text-gray-500">
-          {Object.values(selections).reduce((n, s) => n + s.size, 0)} answer
-          {Object.values(selections).reduce((n, s) => n + s.size, 0) === 1 ? '' : 's'} selected
+          {selectedCount} answer{selectedCount === 1 ? '' : 's'} selected
         </p>
-        <Button onClick={onSubmit} loading={submitting}>
+        <Button onClick={onSubmit} loading={submitting} disabled={lateRejected}>
           {expired ? 'Submit now' : 'Submit quiz'}
         </Button>
       </div>
