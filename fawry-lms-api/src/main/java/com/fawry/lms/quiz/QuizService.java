@@ -17,6 +17,7 @@ import com.fawry.lms.quiz.dtos.QuizAnswerResponse;
 import com.fawry.lms.quiz.dtos.SubmitAnswerRequest;
 import com.fawry.lms.quiz.dtos.SubmitQuizRequest;
 import com.fawry.lms.quiz.dtos.SubmitQuizResponse;
+import com.fawry.lms.quiz.dtos.QuizAttemptResponse;
 import com.fawry.lms.quiz.entities.Quiz;
 import com.fawry.lms.quiz.entities.Question;
 import com.fawry.lms.quiz.entities.QuestionOption;
@@ -253,6 +254,19 @@ public class QuizService {
         return findQuiz(id).getCourse();
     }
 
+    @Transactional(readOnly = true)
+    public QuizAttemptResponse getMyAttempt(Long quizId, User student) {
+        QuizAttempt attempt = attemptRepository.findByQuizIdAndStudentId(quizId, student.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Quiz attempt not found."));
+        return toAttemptResponse(attempt);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<QuizAttemptResponse> listAttempts(Long quizId, Pageable pageable) {
+        findQuiz(quizId);
+        return attemptRepository.findByQuizId(quizId, pageable).map(this::toAttemptResponse);
+    }
+
     private Course findCourse(Long id) {
         return courseRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found."));
@@ -304,5 +318,19 @@ public class QuizService {
                 quiz.isPublished(),
                 quiz.getCreatedAt(),
                 quiz.getUpdatedAt());
+    }
+
+    private QuizAttemptResponse toAttemptResponse(QuizAttempt attempt) {
+        User student = attempt.getStudent();
+        return new QuizAttemptResponse(
+                attempt.getId(),
+                attempt.getQuiz().getId(),
+                student.getId(),
+                student.getFullName(),
+                student.getEmail(),
+                attempt.getStartedAt(),
+                attempt.getSubmittedAt(),
+                attempt.getScore(),
+                attempt.getTotalQuestions());
     }
 }

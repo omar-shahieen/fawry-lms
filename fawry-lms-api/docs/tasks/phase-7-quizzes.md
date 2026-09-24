@@ -21,6 +21,6 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration tests — on-time submission returns correct score + per-question correctness and correct answers; submission after the time limit → rejected with a clear error, based on a manipulated `startedAt` in the test fixture rather than trusting any client-sent timestamp; re-submitting an already-submitted attempt → 409; two near-simultaneous submit calls for the same `(quiz, student)` (fired concurrently in the test) result in exactly one persisted, graded attempt and the loser gets 409 — proving the DB unique constraint from 1.5 is the actual guard, not just app-layer logic; submit on an unpublished quiz or for a course the student isn't enrolled in → rejected.
   **Commit:** `feat(quiz): implement quiz submission with autograding and time-limit enforcement`
 
-- [ ] **7.5 GET attempts/me, GET attempts (staff)**
+- [x] **7.5 GET attempts/me, GET attempts (staff)**
   **Acceptance:** integration test — student sees only their own attempt via `/attempts/me`; a student cannot fetch another student's attempt by any route (403, since there's no id param to swap — assert the query is scoped to `authentication.principal`); staff view (`/attempts`) is paginated and scoped to the instructor's own course unless caller is admin.
   **Commit:** `feat(quiz): implement attempt history endpoints`

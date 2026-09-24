@@ -9,6 +9,7 @@ import com.fawry.lms.quiz.dtos.QuestionResponse;
 import com.fawry.lms.quiz.dtos.QuizDetailResponse;
 import com.fawry.lms.quiz.dtos.SubmitQuizRequest;
 import com.fawry.lms.quiz.dtos.SubmitQuizResponse;
+import com.fawry.lms.quiz.dtos.QuizAttemptResponse;
 import com.fawry.lms.user.entities.User;
 
 import jakarta.validation.Valid;
@@ -61,6 +62,20 @@ public class QuizController {
             @AuthenticationPrincipal User student,
             @Valid @RequestBody SubmitQuizRequest request) {
         return quizService.submit(id, student, request);
+    }
+
+    @GetMapping("/api/quizzes/{id}/attempts/me")
+    @PreAuthorize("hasRole('STUDENT')")
+    public QuizAttemptResponse myAttempt(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User student) {
+        return quizService.getMyAttempt(id, student);
+    }
+
+    @GetMapping("/api/quizzes/{id}/attempts")
+    @PreAuthorize("hasRole('ADMIN') or @authz.isOwnerOrAdmin(authentication.principal, @quizService.getCourse(#id))")
+    public Page<QuizAttemptResponse> attempts(@PathVariable Long id, Pageable pageable) {
+        return quizService.listAttempts(id, pageable);
     }
 
     @PostMapping("/api/courses/{courseId}/quizzes")
