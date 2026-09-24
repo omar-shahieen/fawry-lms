@@ -17,7 +17,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** fresh `docker-compose up` against an empty volume → all the above data exists; stopping and re-running `docker-compose up` against the same (already-seeded) volume → row counts are unchanged, nothing duplicated.
   **Commit:** `feat(seed): implement full startup seed data with idempotency guard`
 
-- [ ] **11.4 README**
+- [x] **11.4 README**
   Run instructions (`docker-compose up` as the only required step), env vars, a "Seeded accounts" table (all roles, from 11.3), swagger URL.
   **Acceptance:** a person with a clean checkout can follow it start-to-finish with no missing steps, and log in as any seeded role via Swagger using only the README.
   **Commit:** `docs: add README with setup, run instructions, and seeded accounts`
