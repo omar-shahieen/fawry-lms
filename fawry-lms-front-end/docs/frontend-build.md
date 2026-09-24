@@ -270,7 +270,7 @@ State: `user | null` (from `GET /api/users/me`), `status: idle | loading | authe
 * Every screen still handles a live `401`/`403` from the API regardless of what the guard decided (§8.1).
 
 - [x] **5.4a** Every non-public route is wrapped in `RequireAuth`.
-- [ ] **5.4b** Admin-only and instructor-only sections are wrapped in `RequireRole`.
+- [x] **5.4b** Admin-only and instructor-only sections are wrapped in `RequireRole`.
 - [x] **5.4c** Team/agent understands: hiding a button is not authorization. Use the §3 table to decide what to show, but never treat a hidden button as a substitute for handling the server's real answer.
 
 ---
@@ -374,7 +374,7 @@ Steps:
 3. `profilePictureUrl` is a plain URL text input — no file upload (out of scope, §1).
 
 - [ ] 7.3a Editing name/URL persists after reload.
-- [ ] 7.3b No role/email/isActive controls exist on `/profile`.
+- [x] 7.3b No role/email/isActive controls exist on `/profile`.
 - [ ] 7.3c Student's own profile view includes their enrolled courses; Instructor/Admin views don't render that section.
 
 ### 7.4 Courses

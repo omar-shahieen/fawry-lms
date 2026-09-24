@@ -1,9 +1,10 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { useAuth } from '../auth/context'
-import { FullPageSpinner, GuestOnly, RequireAuth } from '../auth/guards'
+import { FullPageSpinner, GuestOnly, RequireAuth, RequireRole } from '../auth/guards'
 import { LoginScreen } from '../features/auth/LoginScreen'
 import { SignupScreen } from '../features/auth/SignupScreen'
 import { ProfileScreen } from '../features/profile/ProfileScreen'
+import { AdminUsersScreen } from '../features/admin-users/AdminUsersScreen'
 import { DashboardPlaceholder } from './DashboardPlaceholder'
 import { NotFoundPage } from './pages'
 import { RootLayout } from './RootLayout'
@@ -44,6 +45,14 @@ export function AppRoutes() {
       >
         <Route path="/dashboard" element={<DashboardPlaceholder />} />
         <Route path="/profile" element={<ProfileScreen />} />
+        <Route
+          path="/admin/users"
+          element={
+            <RequireRole roles={['ADMIN']}>
+              <AdminUsersScreen />
+            </RequireRole>
+          }
+        />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

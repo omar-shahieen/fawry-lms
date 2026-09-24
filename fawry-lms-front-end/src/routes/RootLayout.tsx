@@ -13,6 +13,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/profile', label: 'Profile' },
+  { to: '/admin/users', label: 'Users', roles: ['ADMIN'] },
 ]
 
 function navItemsForRole(role: Role): NavItem[] {
