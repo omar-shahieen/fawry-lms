@@ -15,6 +15,9 @@ import com.fawry.lms.quiz.entities.QuizAttempt;
 import com.fawry.lms.quiz.repositories.QuizAttemptRepository;
 import com.fawry.lms.quiz.repositories.QuizRepository;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.entities.Role;
+import com.fawry.lms.user.repositories.UserRepository;
+import com.fawry.lms.dashboard.dtos.AdminDashboardResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,18 +34,21 @@ public class DashboardService {
     private final QuizAttemptRepository attemptRepository;
     private final CourseRepository courseRepository;
     private final AnnouncementRepository announcementRepository;
+    private final UserRepository userRepository;
 
     public DashboardService(
             EnrollmentRepository enrollmentRepository,
             QuizRepository quizRepository,
             QuizAttemptRepository attemptRepository,
             CourseRepository courseRepository,
-            AnnouncementRepository announcementRepository) {
+            AnnouncementRepository announcementRepository,
+            UserRepository userRepository) {
         this.enrollmentRepository = enrollmentRepository;
         this.quizRepository = quizRepository;
         this.attemptRepository = attemptRepository;
         this.courseRepository = courseRepository;
         this.announcementRepository = announcementRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional(readOnly = true)
@@ -69,6 +75,18 @@ public class DashboardService {
                 .findByAuthor_IdAndCourse_Instructor_IdOrderByCreatedAtDesc(instructor.getId(), instructor.getId())
                 .stream().map(this::toInstructorAnnouncement).toList();
         return new InstructorDashboardResponse(summaries, announcements);
+    }
+
+    @Transactional(readOnly = true)
+    public AdminDashboardResponse getAdminDashboard() {
+        Map<Role, Long> userCounts = new java.util.EnumMap<>(Role.class);
+        for (Role role : Role.values()) {
+            userCounts.put(role, userRepository.countByRole(role));
+        }
+        return new AdminDashboardResponse(
+                userCounts,
+                courseRepository.count(),
+                enrollmentRepository.count());
     }
 
     private InstructorCourseSummaryResponse toCourseSummary(

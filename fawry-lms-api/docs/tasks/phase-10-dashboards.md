@@ -11,6 +11,6 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** integration test — includes only the instructor's own courses, a quiz-results summary per course (attempt counts, average score across submitted attempts), and their own announcements; no content/section summary or discussion feed (cut from scope); no data from courses they're not assigned to.
   **Commit:** `feat(dashboard): implement instructor dashboard`
 
-- [ ] **10.3 Admin dashboard**
+- [x] **10.3 Admin dashboard**
   **Acceptance:** integration test — total user count by role, total course count, total enrollment count match seeded fixture data exactly.
   **Commit:** `feat(dashboard): implement admin dashboard`

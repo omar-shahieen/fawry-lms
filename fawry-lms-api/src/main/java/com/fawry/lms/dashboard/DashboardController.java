@@ -2,6 +2,7 @@ package com.fawry.lms.dashboard;
 
 import com.fawry.lms.dashboard.dtos.StudentDashboardCourseResponse;
 import com.fawry.lms.dashboard.dtos.InstructorDashboardResponse;
+import com.fawry.lms.dashboard.dtos.AdminDashboardResponse;
 import com.fawry.lms.user.entities.User;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,5 +33,10 @@ public class DashboardController {
     @PreAuthorize("hasRole('INSTRUCTOR')")
     public InstructorDashboardResponse instructorDashboard(@AuthenticationPrincipal User instructor) {
         return dashboardService.getInstructorDashboard(instructor);
+    }
+
+    @GetMapping("/api/admin/dashboard")
+    public AdminDashboardResponse adminDashboard() {
+        return dashboardService.getAdminDashboard();
     }
 }
