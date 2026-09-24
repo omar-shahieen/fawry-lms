@@ -2,9 +2,9 @@ package com.fawry.lms.course;
 
 import com.fawry.lms.course.entities.Course;
 import com.fawry.lms.security.JwtTokenProvider;
-import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.repositories.UserRepository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +44,9 @@ class CourseAssignmentIntegrationTest {
         Course course = saveCourse(first);
 
         mockMvc.perform(patch("/api/courses/" + course.getId() + "/assign-instructor")
-                        .header("Authorization", bearerToken(admin))
-                        .contentType("application/json")
-                        .content("{\"instructorId\":\"" + second.getId() + "\"}"))
+                .header("Authorization", bearerToken(admin))
+                .contentType("application/json")
+                .content("{\"instructorId\":\"" + second.getId() + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.instructorId").value(second.getId().toString()));
     }
@@ -59,9 +59,9 @@ class CourseAssignmentIntegrationTest {
         Course course = saveCourse(instructor);
 
         mockMvc.perform(patch("/api/courses/" + course.getId() + "/assign-instructor")
-                        .header("Authorization", bearerToken(admin))
-                        .contentType("application/json")
-                        .content("{\"instructorId\":\"" + student.getId() + "\"}"))
+                .header("Authorization", bearerToken(admin))
+                .contentType("application/json")
+                .content("{\"instructorId\":\"" + student.getId() + "\"}"))
                 .andExpect(status().isBadRequest());
     }
 

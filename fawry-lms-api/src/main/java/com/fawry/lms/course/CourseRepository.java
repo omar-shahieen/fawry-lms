@@ -17,12 +17,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("""
             select c from Course c
             where c.isActive = true
-              and (:search is null or lower(c.title) like lower(concat('%', :search, '%')))
+              and lower(c.title) like :titlePattern
               and (:term is null or c.term = :term)
               and (:code is null or c.code = :code)
             """)
     Page<Course> searchActive(
-            @Param("search") String search,
+            @Param("titlePattern") String titlePattern,
             @Param("term") String term,
             @Param("code") String code,
             Pageable pageable);

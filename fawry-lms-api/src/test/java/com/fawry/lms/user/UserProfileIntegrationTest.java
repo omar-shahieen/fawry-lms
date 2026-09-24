@@ -6,6 +6,7 @@ import com.fawry.lms.course.EnrollmentRepository;
 import com.fawry.lms.security.JwtTokenProvider;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.repositories.UserRepository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,17 +90,17 @@ class UserProfileIntegrationTest {
         User student = saveUser(Role.STUDENT, "Student");
 
         mockMvc.perform(patch("/api/users/me")
-                        .header("Authorization", bearerToken(student))
-                        .contentType("application/json")
-                        .content("""
-                                {
-                                  "fullName": "Updated Student",
-                                  "profilePictureUrl": "https://example.com/avatar.png",
-                                  "email": "changed@example.com",
-                                  "role": "ADMIN",
-                                  "isActive": false
-                                }
-                                """))
+                .header("Authorization", bearerToken(student))
+                .contentType("application/json")
+                .content("""
+                        {
+                          "fullName": "Updated Student",
+                          "profilePictureUrl": "https://example.com/avatar.png",
+                          "email": "changed@example.com",
+                          "role": "ADMIN",
+                          "isActive": false
+                        }
+                        """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.fullName").value("Updated Student"))
                 .andExpect(jsonPath("$.profilePictureUrl").value("https://example.com/avatar.png"))

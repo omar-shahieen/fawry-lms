@@ -8,15 +8,16 @@ import com.fawry.lms.course.dtos.AssignInstructorRequest;
 import com.fawry.lms.course.dtos.CourseStudentResponse;
 import com.fawry.lms.course.dtos.EnrollmentResponse;
 import com.fawry.lms.course.entities.Enrollment;
-import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.repositories.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -37,7 +38,7 @@ public class CourseService {
 
     @Transactional(readOnly = true)
     public Page<CourseResponse> listActive(String search, String term, String code, Pageable pageable) {
-        return courseRepository.searchActive(normalize(search), normalize(term), normalize(code), pageable)
+        return courseRepository.searchActive(titlePattern(search), normalize(term), normalize(code), pageable)
                 .map(this::toResponse);
     }
 
@@ -146,5 +147,10 @@ public class CourseService {
 
     private String normalize(String value) {
         return value == null || value.isBlank() ? null : value;
+    }
+
+    private String titlePattern(String search) {
+        String value = normalize(search);
+        return value == null ? "%" : "%" + value.toLowerCase(Locale.ROOT) + "%";
     }
 }

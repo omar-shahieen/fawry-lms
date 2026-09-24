@@ -2,9 +2,9 @@ package com.fawry.lms.course;
 
 import com.fawry.lms.course.entities.Course;
 import com.fawry.lms.security.JwtTokenProvider;
-import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.repositories.UserRepository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,18 +43,18 @@ class CourseReadIntegrationTest {
         Course inactive = saveCourse(instructor, "Spring Data", "CS-DATA", "Fall 2026", false);
 
         mockMvc.perform(get("/api/courses")
-                        .param("search", "security")
-                        .param("term", "Fall 2026")
-                        .param("page", "0")
-                        .param("size", "1")
-                        .header("Authorization", bearerToken(instructor)))
+                .param("search", "security")
+                .param("term", "Fall 2026")
+                .param("page", "0")
+                .param("size", "1")
+                .header("Authorization", bearerToken(instructor)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].id").value(active.getId()))
                 .andExpect(jsonPath("$.content[0].isActive").value(true));
 
         mockMvc.perform(get("/api/courses/" + inactive.getId())
-                        .header("Authorization", bearerToken(instructor)))
+                .header("Authorization", bearerToken(instructor)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(inactive.getId()))
                 .andExpect(jsonPath("$.isActive").value(false));
@@ -65,8 +65,23 @@ class CourseReadIntegrationTest {
         User instructor = saveUser("Instructor");
 
         mockMvc.perform(get("/api/courses/999999")
-                        .header("Authorization", bearerToken(instructor)))
+                .header("Authorization", bearerToken(instructor)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void listWithoutSearchTermOrCodeReturnsActiveCourses() throws Exception {
+        User instructor = saveUser("Instructor");
+        Course active = saveCourse(instructor, "Operating Systems", "CS-OS", "Fall 2026", true);
+        saveCourse(instructor, "Hidden Course", "CS-HIDE", "Fall 2026", false);
+
+        mockMvc.perform(get("/api/courses")
+                .param("page", "0")
+                .param("size", "10")
+                .header("Authorization", bearerToken(instructor)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(active.getId()));
     }
 
     private Course saveCourse(User instructor, String title, String code, String term, boolean active) {

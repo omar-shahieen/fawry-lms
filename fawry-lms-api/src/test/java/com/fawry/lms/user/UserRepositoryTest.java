@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.repositories.UserRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

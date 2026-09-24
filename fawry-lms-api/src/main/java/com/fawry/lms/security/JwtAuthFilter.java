@@ -1,7 +1,7 @@
 package com.fawry.lms.security;
 
-import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.repositories.UserRepository;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

@@ -10,6 +10,7 @@ import com.fawry.lms.user.dtos.CreateUserRequest;
 import com.fawry.lms.user.dtos.AdminUpdateUserRequest;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.repositories.UserRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -2,9 +2,9 @@ package com.fawry.lms.auth;
 
 import com.fawry.lms.auth.dtos.*;
 import com.fawry.lms.security.JwtTokenProvider;
-import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.repositories.UserRepository;
 import com.fawry.lms.user.utils.ProfilePictureUrlGenerator;
 
 import org.springframework.security.authentication.BadCredentialsException;

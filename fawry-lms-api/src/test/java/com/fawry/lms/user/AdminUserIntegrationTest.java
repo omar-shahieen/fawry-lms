@@ -3,6 +3,7 @@ package com.fawry.lms.user;
 import com.fawry.lms.security.JwtTokenProvider;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.repositories.UserRepository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +39,10 @@ class AdminUserIntegrationTest {
         saveUser(Role.INSTRUCTOR, "Instructor");
 
         mockMvc.perform(get("/api/users")
-                        .param("role", "STUDENT")
-                        .param("page", "0")
-                        .param("size", "1")
-                        .header("Authorization", bearerToken(admin)))
+                .param("role", "STUDENT")
+                .param("page", "0")
+                .param("size", "1")
+                .header("Authorization", bearerToken(admin)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(1))
@@ -55,7 +56,7 @@ class AdminUserIntegrationTest {
         User student = saveUser(Role.STUDENT, "Student");
 
         mockMvc.perform(get("/api/users")
-                        .header("Authorization", bearerToken(student)))
+                .header("Authorization", bearerToken(student)))
                 .andExpect(status().isForbidden());
     }
 

@@ -1,8 +1,8 @@
 package com.fawry.lms.security;
 
-import com.fawry.lms.user.UserRepository;
 import com.fawry.lms.user.entities.Role;
 import com.fawry.lms.user.entities.User;
+import com.fawry.lms.user.repositories.UserRepository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
