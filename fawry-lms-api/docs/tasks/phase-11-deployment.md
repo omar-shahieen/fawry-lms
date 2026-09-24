@@ -12,7 +12,7 @@ Status legend: `[x]` done, `[ ]` not yet.
   **Acceptance:** from a clean checkout, a single `docker-compose up` (no separate `mvn spring-boot:run`) brings up both containers; `GET /actuator/health` against the containerized app → 200; no manual setup steps needed.
   **Commit:** `chore(deploy): dockerize app and wire full-stack docker-compose`
 
-- [ ] **11.3 Startup seed data**
+- [x] **11.3 Startup seed data**
   A `DataSeeder` (`CommandLineRunner`) that runs on every boot but only inserts when the database is empty (e.g. guard on `userRepository.count() == 0`) — **not** gated behind a dev-only profile, since it has to produce a working, logged-in-capable stack the first time anyone runs `docker-compose up`. Inserts, in dependency order: 1 Admin (from `ADMIN_SEED_EMAIL`/`ADMIN_SEED_PASSWORD`, defaulting to documented dev values), 2–3 Instructors, 5–8 Students (all bcrypt-hashed, all with a generated DiceBear avatar); 2–3 Courses each assigned to a different seeded instructor; Enrollments with some students in multiple courses; 2–3 Sections + sample MarkdownContent per course; at least 1 published Quiz per course with 3–5 Questions each and correct options marked; a couple of pre-seeded QuizAttempts + QuizAnswers so grade/attempt-history endpoints aren't empty on first look; a few Announcements and DiscussionPosts per course, including at least one reply (to exercise the one-level-nesting constraint).
   **Acceptance:** fresh `docker-compose up` against an empty volume → all the above data exists; stopping and re-running `docker-compose up` against the same (already-seeded) volume → row counts are unchanged, nothing duplicated.
   **Commit:** `feat(seed): implement full startup seed data with idempotency guard`
