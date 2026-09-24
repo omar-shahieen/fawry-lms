@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.stream.Collectors;
 import com.fawry.lms.common.ConflictException;
@@ -121,6 +122,7 @@ public class QuizService {
                 attempt = new QuizAttempt();
                 attempt.setQuiz(quiz);
                 attempt.setStudent(user);
+                attempt.setStartedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
                 attempt.setTotalQuestions(quiz.getQuestions().size());
                 attempt = attemptRepository.saveAndFlush(attempt);
             }
