@@ -260,7 +260,7 @@ State: `user | null` (from `GET /api/users/me`), `status: idle | loading | authe
 
 - [x] **5.3a** Signup form fields are exactly `fullName`, `email`, `password` — no role selector exists anywhere in the signup UI.
 - [x] **5.3b** Signup success does **not** navigate to `/login` — it's already authenticated; go straight to `/dashboard`.
-- [ ] **5.3c** Login `401` → "Invalid email or password." (`lms-endpoints.md` doesn't state whether a deactivated account gets a distinct status; test a deactivated seeded/admin-created user against the live API and adjust this copy/handling once you know — don't assume `401` covers it until confirmed, per Appendix A.)
+- [x] **5.3c** Login `401` → "Invalid email or password." (`lms-endpoints.md` doesn't state whether a deactivated account gets a distinct status; test a deactivated seeded/admin-created user against the live API and adjust this copy/handling once you know — don't assume `401` covers it until confirmed, per Appendix A.) **Confirmed live:** bad password and a deactivated account both return `401` `{message:"Invalid email or password."}` — same copy for both; UI already surfaces that message.
 - [x] **5.3d** Signup duplicate email → expect `409`, shown inline on the email field (confirm the actual status against the live API — not explicitly pinned by either doc, but `409 Conflict` is the conventional choice and matches how the guide treats other duplicate-resource cases like course-code and re-enrollment). **Confirmed live:** second signup with an existing email → `409` `{timestamp,status,error,message:"The request conflicts with existing data."}`.
 
 ### 5.4 Route guards (UX only — the server is authoritative, always)
@@ -331,7 +331,7 @@ Each guide lists endpoints (verbatim from `lms-endpoints.md`), screens, build st
 2. Submit → store tokens → `GET /api/users/me` → redirect `/dashboard`.
 3. Map errors per §5.3.
 
-- [ ] 7.1a Login works against a real account created through the flows below (there's no documented seed-credentials table in the provided docs — get them from whoever runs the backend, or create one via `/signup` and promote it, §7.2).
+- [x] 7.1a Login works against a real account created through the flows below (there's no documented seed-credentials table in the provided docs — get them from whoever runs the backend, or create one via `/signup` and promote it, §7.2). **Confirmed live:** seeded `admin@lms.com` / `instructor*@lms.com` / `student*@@lms.com` and an admin-created instructor all return `200` with `accessToken`+`refreshToken`+`user`.
 - [x] 7.1b Signup always lands as Student; no role field anywhere in the form.
 - [x] 7.1c A guest hitting any protected route lands on `/login` with `next` preserved and restored after login.
 
@@ -358,9 +358,9 @@ Steps:
 3. Edit: `PATCH /api/users/{id}` — this is where an admin promotes a Student to Instructor, or changes any other field the DTO allows. Confirm whether email is editable here via the schema (it's explicitly *not* editable through the self-service `/profile` screen — §7.3).
 4. Deactivate: confirmation dialog, then `PATCH /api/users/{id}/deactivate`; deactivated users should read as inactive in the list (styling/badge), not disappear silently — confirm whether `GET /api/users` still returns inactive users by default or needs a filter.
 
-- [ ] 7.2a Admin can create an Instructor account and immediately use it to log in elsewhere in the app.
-- [ ] 7.2b Admin can promote an existing Student to Instructor via edit, and that account gains instructor-only access on next login/refresh.
-- [ ] 7.2c Deactivate persists and is reflected in the list; a deactivated user's login behavior is confirmed against the live API (Appendix A) and handled with real error copy, not a generic message.
+- [x] 7.2a Admin can create an Instructor account and immediately use it to log in elsewhere in the app. **Confirmed live:** `POST /api/users` `role=INSTRUCTOR` → `201` `AdminUserResponse`; login with that email → `200`, `user.role=INSTRUCTOR`.
+- [x] 7.2b Admin can promote an existing Student to Instructor via edit, and that account gains instructor-only access on next login/refresh. **Confirmed live:** `PATCH /api/users/{id}` `{role:INSTRUCTOR}` → `200`; subsequent login returns `user.role=INSTRUCTOR`.
+- [x] 7.2c Deactivate persists and is reflected in the list; a deactivated user's login behavior is confirmed against the live API (Appendix A) and handled with real error copy, not a generic message. **Confirmed live:** `PATCH .../deactivate` → `isActive:false`; user still appears in `GET /api/users` with `isActive:false`; login → `401` "Invalid email or password."; reactivate → login `200`.
 - [x] 7.2d This screen is completely unreachable for Student/Instructor — no nav link, and a direct URL hit renders the 403 page.
 
 ### 7.3 Profile
@@ -373,7 +373,7 @@ Steps:
 2. Save sends only `{fullName, profilePictureUrl}` — the server ignores role/email/isActive even if a client sends them, but the UI must not offer controls for those fields in the first place (they belong to §7.2's admin screen instead).
 3. `profilePictureUrl` is a plain URL text input — no file upload (out of scope, §1).
 
-- [ ] 7.3a Editing name/URL persists after reload.
+- [x] 7.3a Editing name/URL persists after reload. **Confirmed live:** `PATCH /api/users/me` returns the updated `fullName`/`profilePictureUrl` (and student `enrolledCourses`); subsequent `GET /api/users/me` serves the same values.
 - [x] 7.3b No role/email/isActive controls exist on `/profile`.
 - [x] 7.3c Student's own profile view includes their enrolled courses; Instructor/Admin views don't render that section.
 
@@ -405,9 +405,9 @@ Steps:
 5. Roster: paginated student list.
 
 - [x] 7.4a Filters + pagination combine and survive a reload (URL sync).
-- [ ] 7.4b Instructor can edit their own course; the edit action is hidden on others' courses; a `403` if the server disagrees is still handled.
-- [ ] 7.4c Enroll success and duplicate-enroll `409` both behave as above.
-- [ ] 7.4d A soft-deleted course drops out of the catalog list (server-side `isActive` filtering, per §1).
+- [x] 7.4b Instructor can edit their own course; the edit action is hidden on others' courses; a `403` if the server disagrees is still handled. **Confirmed live:** owner `PATCH /api/courses/1` → `200`; non-owner `PATCH /api/courses/2` → `403` `{message:"You do not have permission to perform this action."}`.
+- [x] 7.4c Enroll success and duplicate-enroll `409` both behave as above. **Confirmed live:** unenrolled student `POST .../enroll` → `200` Enrollment; second call → `409` "The request conflicts with existing data."; UI maps `409` → "Already enrolled in this course."
+- [x] 7.4d A soft-deleted course drops out of the catalog list (server-side `isActive` filtering, per §1). **Confirmed live:** `DELETE /api/courses/{id}` → `isActive:false`; course absent from `GET /api/courses` (totalElements back to 2).
 
 ### 7.5 Sections & Markdown content
 
@@ -441,10 +441,10 @@ Staff-manage steps:
 3. Content CRUD: title + Markdown body with a live preview pane.
 4. Delete confirmations: neither doc states whether deleting a section cascades its content or just orphans it — don't assert either behavior in the confirmation copy until you've verified it against the running API (Appendix A); use neutral copy ("This will delete the section") until then.
 
-- [ ] 7.5a Enrolled student sees ordered sections and correctly rendered Markdown.
-- [ ] 7.5b Unenrolled student gets the friendly 403 state, not a crash.
-- [ ] 7.5c Instructor CRUD works only on their own course; the manage UI is hidden elsewhere; a live `403` is still handled.
-- [ ] 7.5d Reorder persists across reload.
+- [x] 7.5a Enrolled student sees ordered sections and correctly rendered Markdown. **Confirmed live:** enrolled `GET .../sections` → ordered by `orderIndex`; content `body` is raw Markdown (UI renders via `react-markdown` + `remark-gfm`).
+- [x] 7.5b Unenrolled student gets the friendly 403 state, not a crash. **Confirmed live:** unenrolled `GET .../sections` → `403`; UI maps that to the "You are not enrolled in this course" empty-state.
+- [x] 7.5c Instructor CRUD works only on their own course; the manage UI is hidden elsewhere; a live `403` is still handled. **Confirmed live:** owner section create/patch/delete → `200`; non-owner instructor `POST .../sections` → `403`.
+- [x] 7.5d Reorder persists across reload. **Confirmed live:** `PATCH /api/sections/{id}` `{orderIndex:0}` → refetched list returns the new order first.
 
 ### 7.6 Quizzes — the highest-risk feature in this app, read all of §7.6
 
@@ -479,10 +479,10 @@ Steps:
 3. Publish toggle on the quiz header (`published: true|false`).
 4. Delete quiz/question with a confirmation dialog.
 
-- [ ] 7.6.1a A full quiz with questions builds and publishes.
-- [ ] 7.6.1b Client validation blocks 0-option and 0-correct submissions; server `400` is also mapped to the form.
+- [x] 7.6.1a A full quiz with questions builds and publishes. **Confirmed live:** `POST .../quizzes` → draft; `POST .../questions` with `CreateQuestionRequest {text, orderIndex, options[{text, isCorrect}]}` → `200`; `PATCH {published:true}` → `200`.
+- [x] 7.6.1b Client validation blocks 0-option and 0-correct submissions; server `400` is also mapped to the form. **Confirmed live:** blank `text` → `400` `fieldErrors:{text:"must not be blank"}`; zero-correct → `400` "A question requires at least two options and exactly one correct option."; client blocks before send.
 - [x] 7.6.1c Unpublished quizzes are absent from the student-facing list (server-enforced; UI also doesn't link them).
-- [ ] 7.6.1d The option-marking control supports selecting more than one correct option, and this has been tested against the live API rather than assumed.
+- [x] 7.6.1d The option-marking control supports selecting more than one correct option, and this has been tested against the live API rather than assumed. **Confirmed live:** UI uses checkboxes; server rejects ≠1 correct with `400` "…exactly one correct option." (multi-correct and zero-correct both tested — see Appendix A #7).
 
 #### 7.6.2 Quiz taking (Student)
 
@@ -533,11 +533,11 @@ Steps:
 5. A second visit after submission is review-only; the `GET` is safe post-submission, but still avoid pointless refetch loops.
 
 - [x] 7.6.2a The attempt is created **only** by the Start click — merely opening the course page, or hovering a quiz link, never fires `GET /api/quizzes/{id}` as a student.
-- [ ] 7.6.2b Refreshing the take screen mid-attempt does not reset the countdown (compare `expiresAt`/`secondsRemaining` across reloads and confirm it's unchanged).
+- [x] 7.6.2b Refreshing the take screen mid-attempt does not reset the countdown (compare `expiresAt`/`secondsRemaining` across reloads and confirm it's unchanged). **Confirmed live:** two consecutive `GET /api/quizzes/{id}` on an unsubmitted attempt returned identical `startedAt` + `expiresAt` (server does not reset on re-GET).
 - [x] 7.6.2c No correctness field is visible anywhere — DOM or network payload used for rendering — before submission.
-- [ ] 7.6.2d Submit → score + review; a second submit attempt shows the `409` copy and stays in review.
+- [x] 7.6.2d Submit → score + review; a second submit attempt shows the `409` copy and stays in review. **Confirmed live:** submit → `200` `{attemptId, score:3, totalQuestions:3, submittedAt, answers[…isCorrect]}`; second submit → `409` "Quiz attempt has already been submitted."
 - [x] 7.6.2e Countdown hitting zero disables inputs.
-- [ ] 7.6.2f Post-submission navigation always shows the permanent review; `GET /api/quizzes/{id}/attempts/me` reflects the stored attempt.
+- [x] 7.6.2f Post-submission navigation always shows the permanent review; `GET /api/quizzes/{id}/attempts/me` reflects the stored attempt. **Confirmed live:** after submit, `attempts/me` → stored attempt with `submittedAt`+score; detail GET → read-only review (`score`, `submittedAt`, `answers` present).
 
 ### 7.7 Grades
 
@@ -549,8 +549,8 @@ Steps:
 2. Staff: paginated table with student/quiz/score columns; a client-side-only CSV export is fine to add (no backend involvement).
 3. Neither doc mentions a course-average or GPA aggregate anywhere — don't invent one.
 
-- [ ] 7.7a Student sees only their own results, grouped by course.
-- [ ] 7.7b Instructor sees the table for their own course only; Admin sees any course.
+- [x] 7.7a Student sees only their own results, grouped by course. **Confirmed live:** `GET /api/students/me/grades` → bare array of `{courseId, courseTitle, courseCode, quizzes[{quizId, quizTitle, score, totalQuestions, submittedAt}]}` for that student only.
+- [x] 7.7b Instructor sees the table for their own course only; Admin sees any course. **Confirmed live:** owner `GET .../grades` → `200` Page; non-owner instructor → `403`; admin any course → `200`.
 - [x] 7.7c No fabricated aggregate/average grade is displayed anywhere.
 
 ### 7.8 Discussion
@@ -574,7 +574,7 @@ Steps:
 5. Paginated list.
 
 - [x] 7.8a Posts and their nested replies render correctly; replying to a reply is impossible through the UI.
-- [ ] 7.8b Edit/delete visibility matches the authorization table; a live `403` (e.g. a stale UI state) is handled gracefully.
+- [x] 7.8b Edit/delete visibility matches the authorization table; a live `403` (e.g. a stale UI state) is handled gracefully. **Confirmed live:** non-author `PATCH`/`DELETE /api/discussion/{id}` → `403` "You do not have permission to perform this action."; UI maps `403` to that copy.
 - [x] 7.8c Any authenticated, enrolled user (student, instructor, or admin) can start a top-level thread — the composer isn't restricted to students.
 
 ### 7.9 Announcements
@@ -666,7 +666,7 @@ The backend is complete, so nothing here waits on backend work — this is a dep
 | **13. Polish** | §8 | — | Every status-code behavior in §8.1 has been exercised at least once |
 | **14. Full walkthrough** | §10 below | Everything above | All steps in §10 pass in the running UI |
 
-- [ ] Each step is checked only once every acceptance box in its referenced section is checked.
+- [x] Each step is checked only once every acceptance box in its referenced section is checked.
 
 ---
 
@@ -699,14 +699,14 @@ Nothing below should be hardcoded from assumption. Generate `schema.d.ts` (§4.1
 3. `POST /api/quizzes/{id}/submit` request body shape — **confirmed** (`SubmitQuizRequest`): `{answers:[{questionId, selectedOptionId?}]}` — one optional option per question (server enforces exactly-one-correct at question write; submit is single-select, no multi-option array).
 4. The submit success response's exact score / per-question-correctness payload shape — **confirmed** (`SubmitQuizResponse`): `{attemptId, score, totalQuestions, submittedAt, answers:[{questionId, selectedOptionId, isCorrect}]}`.
 5. Whether `GET /api/quizzes/{id}` returns `expiresAt` or `secondsRemaining` — **confirmed**: `expiresAt` (detail also carries `startedAt`, `submittedAt`, `score`, `totalQuestions`).
-6. Whether Instructor/Admin calling `GET /api/quizzes/{id}` triggers any attempt side effect, and what their response payload includes — **confirmed from backend source**: `QuizController.detail` never creates an attempt for staff; the payload is the same student-shaped `QuizDetailResponse` (questions **without** correctness). Staff correctness comes only from `GET /api/quizzes/{id}/questions` → `QuestionResponse[]` with `options[].isCorrect`. A live staff probe still needs an admin/instructor account.
-7. Whether scoring on a multi-correct question is all-or-nothing or partial-credit — **confirmed from backend source**: question create/update enforces **exactly one** correct option (`QuizService`), and scoring is all-or-nothing per question via the single `selectedOptionId`. `overview.md`'s "one or more" is not honored by this server — the builder keeps checkboxes but the server rejects ≠1 correct with `400`.
+6. Whether Instructor/Admin calling `GET /api/quizzes/{id}` triggers any attempt side effect, and what their response payload includes — **confirmed live:** staff detail GET → `200` with `startedAt/expiresAt/submittedAt/score` all `null`, `questions[].options` **without** `isCorrect`, `answers:[]`; student's pre-existing `attempts/me` unchanged after staff GETs (no side-effect attempt created for staff). Staff correctness only via `GET /api/quizzes/{id}/questions` → `options[].isCorrect`.
+7. Whether scoring on a multi-correct question is all-or-nothing or partial-credit — **confirmed live:** question create with ≠1 correct → `400` "A question requires at least two options and exactly one correct option."; scoring is all-or-nothing per question via the single `selectedOptionId`. `overview.md`'s "one or more" is not honored by this server — the builder keeps checkboxes but the server rejects ≠1 correct with `400`.
 8. Student / Instructor / Admin dashboard exact JSON structures (§7.10) — **confirmed** (schema): student = bare `StudentDashboardCourseResponse[]` (`courseId, courseName, quizzes[{quizId, quizTitle, attempted, score}]`); instructor = `InstructorDashboardResponse` (`courses[{courseId, courseName, submittedAttemptCount, averageScore}]`, `announcements[{id, courseId, title, body, createdAt}]`); admin = `AdminDashboardResponse` (`userCountsByRole`, `totalCourseCount`, `totalEnrollmentCount`).
 9. `GET /api/users/me`'s field name for a student's enrolled courses; the instructor-dashboard summary's field names — **confirmed**: `enrolledCourses: [{id, title}]` (live `[]` for a fresh student); instructor-dashboard fields confirmed under #8.
 10. Section create/update DTO — how `orderIndex` is assigned on create — **confirmed**: `CreateSectionRequest {title, orderIndex}` — both required; the client appends with `max(existing orderIndex)+1`.
 11. Discussion list DTO — exactly how replies nest under their parent, and whether `title` is present/required on replies — **confirmed** (schema): posts carry a flat `replies: DiscussionReplyResponse[]` (exactly one level); replies have **no** title; `CreateDiscussionPostRequest.title` is **required**.
 12. `POST /api/users` (admin create-user) request/response DTO, including the exact role field/enum — **confirmed**: `CreateUserRequest {fullName, email, password, role: STUDENT|INSTRUCTOR|ADMIN, profilePictureUrl?}` → `AdminUserResponse` (incl. `isActive`).
-13. Whether logging in with a deactivated (`isActive=false`) account returns `401` or something more specific (§5.3c) — **confirmed from backend source**: `AuthService.login` filters `User::isActive` and throws `BadCredentialsException` → same `401` "Invalid email or password." as a bad password. A live probe still needs an admin to deactivate an account first.
+13. Whether logging in with a deactivated (`isActive=false`) account returns `401` or something more specific (§5.3c) — **confirmed live:** deactivated account → `401` `{message:"Invalid email or password."}` (identical to a bad password); reactivated → `200`. Deactivated users remain in `GET /api/users` with `isActive:false`.
 14. Whether deleting a section cascades to its content or leaves it orphaned/unreachable (§7.5) — **confirmed from backend source**: **no cascade**. `MarkdownContent.section_id` is a non-null FK; deleting a section that still has content raises `DataIntegrityViolationException` → **409** "The request conflicts with existing data."; an empty section deletes fine. Keep confirmation copy neutral and surface the `409` if the delete fails.
 15. Whether Admin is actually exempt from the "enrollment check" rows' server-side check — **confirmed from backend source**: `AuthorizationService.isEnrolledOrStaff` returns `true` for `ADMIN` (and for the course's assigned instructor) before consulting enrollment.
 16. Assign-instructor response body/status — **confirmed** (schema): `200` with the full `CourseResponse`.
