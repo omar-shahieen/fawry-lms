@@ -46,7 +46,7 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     public UserProfileResponse updateCurrentUser(
             @AuthenticationPrincipal User user,
-            @RequestBody UpdateCurrentUserRequest request) {
+            @Valid @RequestBody UpdateCurrentUserRequest request) {
         return userService.updateProfile(user, request);
     }
 
@@ -70,7 +70,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public AdminUserResponse updateUser(
             @PathVariable UUID id,
-            @RequestBody AdminUpdateUserRequest request) {
+            @Valid @RequestBody AdminUpdateUserRequest request) {
         return userService.updateUser(id, request);
     }
 

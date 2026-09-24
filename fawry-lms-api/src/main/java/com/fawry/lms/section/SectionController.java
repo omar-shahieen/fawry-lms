@@ -42,7 +42,7 @@ public class SectionController {
 
     @PatchMapping("/api/sections/{id}")
     @PreAuthorize("hasRole('ADMIN') or @authz.isOwnerOrAdmin(authentication.principal, @sectionService.getCourse(#id))")
-    public SectionResponse update(@PathVariable Long id, @RequestBody UpdateSectionRequest request) {
+    public SectionResponse update(@PathVariable Long id, @Valid @RequestBody UpdateSectionRequest request) {
         return sectionService.update(id, request);
     }
 

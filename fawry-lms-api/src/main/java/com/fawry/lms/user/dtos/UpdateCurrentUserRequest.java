@@ -1,6 +1,8 @@
 package com.fawry.lms.user.dtos;
 
+import jakarta.validation.constraints.Pattern;
+
 public record UpdateCurrentUserRequest(
-        String fullName,
+        @Pattern(regexp = ".*\\S.*") String fullName,
         String profilePictureUrl) {
 }

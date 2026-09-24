@@ -48,7 +48,7 @@ public class ContentController {
 
     @PatchMapping("/api/content/{id}")
     @PreAuthorize("hasRole('ADMIN') or @authz.isOwnerOrAdmin(authentication.principal, @contentService.getCourse(#id))")
-    public ContentResponse update(@PathVariable Long id, @RequestBody UpdateContentRequest request) {
+    public ContentResponse update(@PathVariable Long id, @Valid @RequestBody UpdateContentRequest request) {
         return contentService.update(id, request);
     }
 

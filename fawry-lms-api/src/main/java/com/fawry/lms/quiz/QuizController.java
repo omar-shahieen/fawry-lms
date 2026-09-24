@@ -86,7 +86,7 @@ public class QuizController {
 
     @PatchMapping("/api/quizzes/{id}")
     @PreAuthorize("hasRole('ADMIN') or @authz.isOwnerOrAdmin(authentication.principal, @quizService.getCourse(#id))")
-    public QuizResponse update(@PathVariable Long id, @RequestBody UpdateQuizRequest request) {
+    public QuizResponse update(@PathVariable Long id, @Valid @RequestBody UpdateQuizRequest request) {
         return quizService.update(id, request);
     }
 

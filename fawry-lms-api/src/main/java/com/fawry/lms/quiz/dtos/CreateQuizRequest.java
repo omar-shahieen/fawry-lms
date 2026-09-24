@@ -7,5 +7,5 @@ import jakarta.validation.constraints.NotNull;
 public record CreateQuizRequest(
         @NotBlank String title,
         @NotNull @Min(1) Integer durationMinutes,
-        boolean published) {
+        @NotNull Boolean published) {
 }

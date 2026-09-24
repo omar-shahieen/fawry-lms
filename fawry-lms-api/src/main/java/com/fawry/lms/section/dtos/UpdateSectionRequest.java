@@ -1,4 +1,6 @@
 package com.fawry.lms.section.dtos;
 
-public record UpdateSectionRequest(String title, Integer orderIndex) {
+import jakarta.validation.constraints.Pattern;
+
+public record UpdateSectionRequest(@Pattern(regexp = ".*\\S.*") String title, Integer orderIndex) {
 }

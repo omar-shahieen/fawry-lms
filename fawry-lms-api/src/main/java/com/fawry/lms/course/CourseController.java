@@ -57,7 +57,7 @@ public class CourseController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or @authz.isOwnerOrAdmin(authentication.principal, @courseService.getInstructorId(#id))")
-    public CourseResponse update(@PathVariable Long id, @RequestBody UpdateCourseRequest request) {
+    public CourseResponse update(@PathVariable Long id, @Valid @RequestBody UpdateCourseRequest request) {
         return courseService.update(id, request);
     }
 

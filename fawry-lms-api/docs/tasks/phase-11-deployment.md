@@ -2,7 +2,7 @@
 
 Status legend: `[x]` done, `[ ]` not yet.
 
-- [ ] **11.1 Validation sweep**
+- [x] **11.1 Validation sweep**
   `@Valid` + Bean Validation annotations on every request DTO that doesn't have them yet.
   **Acceptance:** for each mutating endpoint, one test sending a blank required field → 400 with `fieldErrors`; an invalid enum value (e.g. bad `role`) and an invalid FK reference (e.g. assigning a non-existent instructor) are rejected with a clear error, not a 500.
   **Commit:** `feat(validation): add request DTO validation across all mutating endpoints`

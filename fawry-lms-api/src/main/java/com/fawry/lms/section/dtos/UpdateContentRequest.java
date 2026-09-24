@@ -1,4 +1,8 @@
 package com.fawry.lms.section.dtos;
 
-public record UpdateContentRequest(String title, String body) {
+import jakarta.validation.constraints.Pattern;
+
+public record UpdateContentRequest(
+        @Pattern(regexp = ".*\\S.*") String title,
+        @Pattern(regexp = ".*\\S.*") String body) {
 }
