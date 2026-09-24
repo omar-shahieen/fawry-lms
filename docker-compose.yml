@@ -49,7 +49,7 @@ services:
     depends_on:
       - api
     ports:
-      - "${FRONTEND_PORT:-3000}:80"
+      - "${FRONTEND_PORT:-5173}:80"
     restart: unless-stopped
     networks:
       - lms-network

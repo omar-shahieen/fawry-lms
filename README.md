@@ -9,7 +9,6 @@ Welcome to the **Fawry LMS Monorepo**, managed with **Nx** and containerized wit
 ```
 fawry-lms/
 ├── .nx/                       # Nx computation cache & workspace data
-├── .venv/                     # Python virtual environment for workspace scripts
 ├── docker-compose.yml         # Full-stack orchestrator (Postgres + API + Frontend)
 ├── nx.json                    # Nx workspace configuration
 ├── package.json               # Root workspace package with cross-service scripts
@@ -32,7 +31,6 @@ fawry-lms/
 - **Node.js**: v20+ (recommended v24)
 - **Java JDK**: 21+ (configured for 25)
 - **Docker & Docker Compose**: v2.20+
-- **Python**: 3.12+ (for `.venv` scripts)
 
 ---
 
@@ -44,7 +42,7 @@ To run the entire platform (PostgreSQL database, Spring Boot API, and React fron
 docker compose up -d --build
 ```
 
-- **Frontend (Web Application)**: [http://localhost:3000](http://localhost:3000)
+- **Frontend (Web Application)**: [http://localhost:5173](http://localhost:5173)
 - **Backend API**: [http://localhost:8080](http://localhost:8080)
 - **Swagger / OpenAPI Documentation**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - **PostgreSQL Database**: `localhost:5432` (`db: lms`, `user: lms_user`, `password: lms_pass`)
@@ -64,14 +62,8 @@ docker compose down
 npm install
 ```
 
-### 2. Python Virtual Environment
-A root Python virtual environment is available in `.venv`:
-```powershell
-# Windows PowerShell
-.\.venv\Scripts\Activate.ps1
-```
 
-### 3. Running Services
+### 2. Running Services
 
 | Command | Action |
 |---|---|
