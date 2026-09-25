@@ -1,7 +1,7 @@
 import { ApiError, responseToApiError } from './errors'
 import { clearTokens, getAccessToken, getRefreshToken, notifySessionEnded, setAccessToken } from '../auth/token-store'
 
-const BASE_URL: string = import.meta.env.VITE_API_BASE_URL
+const BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? ''
 
 let refreshInFlight: Promise<RefreshOutcome> | null = null
 
