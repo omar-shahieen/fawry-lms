@@ -7,14 +7,14 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "mvnw.cmd spring-boot:run",
+        "command": "./mvnw spring-boot:run",
         "cwd": "fawry-lms-api"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "mvnw.cmd clean package -DskipTests",
+        "command": "./mvnw clean package -DskipTests",
         "cwd": "fawry-lms-api"
       },
       "outputs": ["{projectRoot}/target"]
@@ -22,7 +22,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "mvnw.cmd test",
+        "command": "./mvnw test",
         "cwd": "fawry-lms-api"
       }
     },

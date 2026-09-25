@@ -1,26 +1,33 @@
 # Fawry LMS API
 
-A university learning-management REST API built with Spring Boot, Spring Security/JWT, Spring Data JPA, and PostgreSQL. The API and database run together with Docker Compose.
+A university learning-management REST API built with Spring Boot, Spring Security/JWT, Spring Data JPA, and PostgreSQL. The whole stack (PostgreSQL + API + frontend) is orchestrated by the single compose file at the **monorepo root**: [`../docker-compose.yml`](../docker-compose.yml).
 
 ## Run the application
 
 Prerequisite: Docker Desktop (or Docker Engine with the Compose plugin) is installed and running.
 
-From the repository root, run this single command:
+From the **monorepo root** (`..`, one level above this directory), run this single command:
 
-```powershell
+```bash
 docker compose up -d --build
 ```
 
-This builds the Alpine-based Java 25 application image, waits for PostgreSQL to become healthy, and starts both services. The first build downloads dependencies and may take a few minutes. To use the legacy standalone Compose command, run `docker-compose up -d --build` instead.
+There is no `docker-compose.yml` in this directory anymore — always run Compose from the monorepo root so the API and database end up on the same network. This builds the Alpine-based Java 25 application image, waits for PostgreSQL to become healthy (accepting TCP connections), and then starts the API. The first build downloads dependencies and may take a few minutes.
 
 The API is available at `http://localhost:8080`. Check startup with `http://localhost:8080/actuator/health`; a healthy app returns HTTP 200 with health status `UP`. Swagger UI is at [`http://localhost:8080/swagger-ui/index.html`](http://localhost:8080/swagger-ui/index.html).
 
-To stop the services while keeping database data, run `docker compose down`. Compose stores PostgreSQL data in the persistent `pgdata` volume, so a later `docker compose up -d` reuses it. The sample data is inserted only when the database has no users; existing databases are left unchanged.
+To stop the services while keeping database data, run `docker compose down`. Compose stores PostgreSQL data in the persistent `pgdata` volume, so a later `docker compose up -d` reuses it. To wipe the database and re-seed from scratch, run `docker compose down -v`. The sample data is inserted only when the database has no users; existing databases are left unchanged.
+
+See the [root README](../README.md) for URLs, configuration, troubleshooting, and the local (non-Docker) development workflow.
 
 ## Configuration
 
-No `.env` file is required for a local demo. Compose supplies development defaults. To customize them, copy `.env.example` to `.env` in the repository root and set the values before starting Compose. Keep `.env` private; it is ignored by Git. In particular, set a private `JWT_SECRET` of at least 32 characters and a private admin password outside local demos.
+No `.env` file is required for a local demo. Compose supplies development defaults.
+
+* **Docker Compose** reads `.env` from the **monorepo root** (create it there to customize container settings; copy [`../fawry-lms-api/.env.example`](.env.example) as a starting point).
+* **Running the API directly on the host** (`./mvnw spring-boot:run` or `npx nx run fawry-lms-api:serve`) reads `fawry-lms-api/.env` via `spring.config.import` — this is where `SPRING_DATASOURCE_URL` pointing at `localhost:5432` applies.
+
+Keep `.env` private; it is ignored by Git. In particular, set a private `JWT_SECRET` of at least 32 characters and a private admin password outside local demos.
 
 | Variable | Compose default | Purpose |
 | --- | --- | --- |
@@ -54,7 +61,7 @@ The admin email and password in this table are the Compose defaults; if `ADMIN_S
 
 Run the full test suite and package the application with Maven:
 
-```powershell
-.\mvnw.cmd test
-.\mvnw.cmd verify
+```bash
+./mvnw test      # Windows: .\mvnw.cmd test
+./mvnw verify    # Windows: .\mvnw.cmd verify
 ```
